@@ -1,0 +1,55 @@
+{
+  "name": "re-in-act",
+  "private": true,
+  "description": "Documentation site for Re in Act, an open specification for reasoning in action.",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "next build",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv env.d.ts",
+    "check": "npm run build && tsc",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "dev": "next dev",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@opennextjs/cloudflare": "1.14.0",
+    "@tailwindcss/typography": "^0.5.19",
+    "@xyflow/react": "^12.10.1",
+    "framer-motion": "^12.38.0",
+    "gray-matter": "^4.0.3",
+    "lucide-react": "^0.577.0",
+    "next": "16.0.7",
+    "next-mdx-remote": "^6.0.0",
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-slug": "^6.0.0",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.1.17",
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "oxfmt": "latest",
+    "oxlint": "latest",
+    "tailwindcss": "4.1.17",
+    "typescript": "5.9.3",
+    "wrangler": "4.56.0"
+  },
+  "cloudflare": {
+    "label": "Re in Act Docs",
+    "products": [
+      "Workers"
+    ],
+    "categories": [],
+    "preview_icon_url": "https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/05eee9e0-2c04-48fd-11bf-84e65f839000/public",
+    "preview_image_url": "https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/4e913a56-fd99-4372-0586-9f1364173100/preview",
+    "publish": true
+  }
+}

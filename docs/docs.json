@@ -1,0 +1,42 @@
+{
+  "name": "Re in Act",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "pages": [
+          {
+            "group": "Get Started",
+            "pages": ["docs/getting-started/intro", "docs/getting-started/concepts"]
+          },
+          {
+            "group": "Learn",
+            "pages": ["docs/learn/architecture"]
+          },
+          {
+            "group": "Develop",
+            "pages": ["docs/develop/setup"]
+          }
+        ]
+      },
+      {
+        "tab": "Specification",
+        "versions": [
+          {
+            "version": "Draft 0.1",
+            "pages": ["specification/draft/index"]
+          }
+        ]
+      },
+      {
+        "tab": "Proposals",
+        "pages": ["proposals/index"]
+      },
+      {
+        "tab": "Community",
+        "pages": ["community/contributing", "community/governance"]
+      }
+    ]
+  },
+  "redirects": []
+}

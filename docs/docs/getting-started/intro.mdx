@@ -1,0 +1,69 @@
+---
+title: "Introduction"
+description: What is Re in Act? A quick orientation for new readers.
+---
+
+# What is Re in Act?
+
+**Re in Act** (Reasoning in Action) is a new paradigm for AI agents. Instead of the traditional ReAct loop of _Reason → Act → Observe → Repeat_, the main agent reasons once to produce an executable plan, then delegates it to an **Action Execution Runtime (AER)**, where local `reason()` calls happen inside the action phase.
+
+The result: fewer round trips, a cleaner context window, and deterministic control flow.
+
+---
+
+## The Cerebellum Insight
+
+Think of the human brain. The **cerebrum** handles high-level, deliberate thought: slow and conscious. The **cerebellum** handles motor control and reflexes: fast, continuous, and automatic.
+
+Traditional ReAct forces the cerebrum to micromanage each step. Re in Act puts reasoning inside action, freeing the main agent to stay deliberate.
+
+|                | Traditional ReAct     | Re in Act                        |
+| -------------- | --------------------- | -------------------------------- |
+| Reasoning      | Outer-loop every step | Main agent once; local in AER    |
+| Execution      | LLM-gated             | AER-driven                       |
+| Control flow   | Model-stepped         | Deterministic in runtime         |
+| Round trips    | Many outer-loop turns | One delegated action phase       |
+| Context growth | Grows in main loop    | Isolated from main agent context |
+
+---
+
+## Key Concepts
+
+### Action Execution Runtime (AER)
+
+The AER is the execution context for the delegated action phase. It provides two core interfaces:
+
+- **`reason(prompt, example_output)`** — calls the LLM for structured JSON output (fresh context, no memory)
+- **`act(name, args)`** — calls an external tool and returns its result _(optional — you may use your own action executor)_
+
+### Two Runtime Flavors
+
+**Bash AER** pipes data through shell commands:
+
+```bash
+cat data.json | reason --prompt - --structure '{"key": ""}' | jq -r '.data.key' | act tool -
+```
+
+**Code AER** uses `async/await` and native programmatic control flow (Python and TypeScript):
+
+```python
+# Python
+result = await reason("analyze this:", {"score": 0})
+if result["data"]["score"] > 80:
+    await act("approve", {})
+```
+
+```typescript
+const result = await reason("analyze this:", { score: 0 });
+if (result.data.score > 80) {
+  await act("approve", {});
+}
+```
+
+---
+
+## Next Steps
+
+- [Concepts →](/docs/getting-started/concepts) — deeper walkthrough of runtime flavors and interfaces
+- [Specification →](/specification/draft/index) — the full formal draft
+- [one-agent →](https://github.com/RIA-Spec/one-agent) — the reference implementation

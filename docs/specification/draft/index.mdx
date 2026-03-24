@@ -1,0 +1,158 @@
+---
+title: "Re in Act — Specification Draft 0.1"
+description: The working draft of the Re in Act open specification for Reasoning in Action.
+---
+
+# Specification — Draft 0.1
+
+<Note>
+  This is a **working draft** (v0.1.0, 2026-02-01). It is subject to change and should not be
+  considered stable. Author: https://x.com/yaoandyan.
+</Note>
+
+## 1. Introduction
+
+This draft proposes **Re in Act** (Reasoning in Action), a new paradigm and open specification for AI agents designed to address the latency and context bloat that emerge in traditional ReAct-style outer-loop agents.
+
+Departing from the inefficiency of multiple reason-act-observe round trips, the main agent can reason once, then allow context-aware `reason()` calls to happen **inside** the acting phase.
+
+Reference implementations suggest this paradigm can collapse many outer-loop iterations into a single delegated action phase, reducing both main-context growth and wall-clock time.
+
+---
+
+## 2. Motivation
+
+AI agents, especially coding agents, have evolved significantly since the inception of ReAct, which revolutionised problem-solving by interleaving thought and action. Yet fundamental limitations persist.
+
+ReAct relies on iterative cycles of **serialised reasoning and acting**, where execution must pause for observation before the next decision. This architecture suffers from three structural problems:
+
+### 2.1 Unnecessary Round Trips
+
+Though the community has developed `CodeAct` and batch-action patterns to reduce turns, many agents are still restricted to a ReAct-style round-trip loop. In common chat-agent implementations, each observation is typically pushed back into model context.
+
+### 2.2 Context Window Pollution
+
+When observing, an agent retains the last action result verbatim. These intermediate, often irrelevant observations pollute the main context window, causing bloat and eventually repetitive loops.
+
+Approaches like _swarm_ and _subagent_ attempt to address this, but suffer from context loss at handoff and brittle inter-agent communication.
+
+### 2.3 Fragile Probabilistic Control Flow
+
+The LLM controls the flow at each step. Given hallucination and attention loss as context grows, decisions become increasingly unreliable. Control flow should be **deterministic**, not probabilistic.
+
+---
+
+## 3. Overview
+
+Re in Act transforms a serial "Reason and Act" loop into an atomic **"Reason in Action"** primitive: combining deterministic control flow with non-deterministic decisions in one action.
+
+**Benefits:**
+
+- Reduce round trips and latency by merging adaptive reasoning with actions under a single deterministic control flow
+- Intermediate data stays in the action phase — out of the main context window — and the most relevant context is always available
+- Accurate control flows (conditions, loops) reduce hallucination
+
+**New complexity introduced:**
+
+An **Action Execution Runtime (AER)** is required: an execution context that can run a delegated action phase through `reason()` and optional `act()` calls.
+
+---
+
+## 4. Specification
+
+### 4.1 Action Execution Runtime (AER)
+
+The AER defines the execution context and interfaces for reasoning in action. It can be run in two main forms:
+
+#### Bash AER — The Unix Philosophy
+
+The agent controls flow using Unix pipes (`|`) and redirection (`>`). Intermediate data is persisted transparently on the filesystem.
+
+```bash
+cat api_docs.md | \
+  reason \
+    --prompt "Read this API documentation:" \
+    --prompt - \
+    --prompt "Generate a bash command to test this API." \
+    --structure '{"cmd": ""}' | \
+  jq -r '.data.cmd' | \
+  act bash -
+```
+
+This pipeline streams API documentation into the agent to generate an executable command, which is then extracted by `jq` and immediately run via `act`.
+
+#### Code Interpreter AER — The Programmatic Approach
+
+The agent manages control flow using code execution (conditions, loops, branches). Python and TypeScript are recommended to leverage model pre-training on their syntax and async semantics.
+
+```python
+log = open("build.log").read()
+analysis = await reason(
+    log + "Did the build succeed?",
+    {"success": False, "reason": ""}
+)
+if analysis["data"]["success"]:
+    await act("deploy", "deploy to production")
+else:
+    await act("notify", analysis["data"]["reason"])
+```
+
+This script uses Python's native control flow to branch between deployment and notification based on the AI's structured analysis.
+
+### 4.2 Sandbox
+
+Two sandbox strategies are supported:
+
+- **LLM API Side Sandbox** — the AER runs alongside the model inference endpoint
+- **Client Side Sandbox** — the AER runs in a controlled client environment
+
+_Further sandbox requirements are deferred to a future revision._
+
+---
+
+## 5. Interfaces
+
+Two interfaces **MUST** be supported regardless of the AER chosen. They share the same contract across Bash AER and Python AER.
+
+### 5.1 `reason([prompt], [example_output])`
+
+**Description:** Transforms a non-deterministic natural-language request into deterministic structured JSON for controlling flows or extracting information. An atomic reasoning step — no tools, no memory.
+
+**Algorithm:**
+
+1. Infer a JSON schema from `example_output`
+2. Request the LLM for structured output using the prompt and inferred schema
+3. Validate the structured output against the schema
+   - If validation **fails**: retry up to N−1 times with the validation error as feedback; on the N-th failure, return `{ "error": "<error message>" }`
+   - If validation **passes**: return `{ "data": <structured output> }`
+
+**Implementation options:**
+
+- **New conversation context** — reuse your LLM request logic but start a fresh context (similar to the "subagent" approach)
+- **MCP Sampling** — where the AER acts as an MCP Server and requests completion from the MCP client
+
+### 5.2 `act([name], [args])` — Optional
+
+**Description:** Gets external resources or calls external tools (MCP tools, custom functions, etc.).
+
+**Definition:** Given a tool name and its proposed arguments, call the tool and return its result. On failure, return the error for better feedback.
+
+> **Note:** Action execution is ultimately up to the runtime and user. `act()` is provided as a standard reference interface. Implementations may substitute any user-defined action execution strategy.
+
+---
+
+## 6. Implementation
+
+For reference, we open-sourced a Re in Act implementation project called **one-agent**.
+
+- GitHub: [RIA-Spec/one-agent](https://github.com/RIA-Spec/one-agent)
+- Supports both Bash AER and Python AER modes via the `AER_MODE` environment variable
+- Uses MCP for tool discovery and execution
+
+_Further implementation details are deferred to a future revision._
+
+---
+
+## 7. Agent Benchmarks
+
+_Benchmark results and methodology are deferred to a future revision._

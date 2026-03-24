@@ -1,0 +1,152 @@
+---
+title: "AER Concepts"
+description: Deeper walkthrough of the Action Execution Runtime, reason(), and act() with real examples.
+---
+
+# AER Concepts
+
+This page walks through the two AER runtime flavors and the two core interfaces with annotated examples drawn from the [one-agent](https://github.com/RIA-Spec/one-agent) reference implementation.
+
+---
+
+## The Two Runtime Flavors
+
+### Code AER
+
+The agent writes scripts (Python or TypeScript). `reason()` and `act()` are async interfaces available in scope.
+
+```python
+import asyncio
+
+async def main():
+    # act() — user-defined or provided by the runtime
+    m = await act("__manual__", {})
+
+    # reason() — structured output grounded in the tool list
+    r = await reason(
+        f"Goal: web scraping. Pick relevant tools from: {m['content'][0]['text']}",
+        example=["tool_name"]
+    )
+
+    for tool in r["data"]:
+        info = await act("__manual__", {"name": tool})
+        print(info["content"][0]["text"])
+
+asyncio.run(main())
+```
+
+**Pattern**: `act()` for data retrieval → `reason()` for selection → loop to `act()` for each result.
+
+The agent can write these scripts interchangeably in **Python** or **TypeScript/Node.js**, since both provide native `async`/`await` control flow.
+
+```typescript
+async function main() {
+  // act() — user-defined or provided by the runtime
+  const m = await act("__manual__", {});
+
+  // reason() — structured output
+  const r = await reason(`Goal: web scraping. Pick relevant tools from: ${m.content[0].text}`, [
+    "tool_name",
+  ]);
+
+  for (const tool of r.data) {
+    const info = await act("__manual__", { name: tool });
+    console.log(info.content[0].text);
+  }
+}
+
+main().catch(console.error);
+```
+
+**Pattern**: Nearly identical async logic across languages.
+
+### Bash AER
+
+The agent writes shell pipelines. `reason` and `act` are CLI commands available in `PATH`.
+
+```bash
+# Discover and filter tools
+act --manual > m.json && \
+  cat m.json | reason \
+    --prompt "Extract relevant tool names as JSON array:" \
+    --prompt - \
+    --structure '["bash"]' > tools.json && \
+  cat tools.json | jq -r '.data[]' | while read -r t; do
+    act --manual "$t"
+  done
+```
+
+**Pattern**: redirect intermediate results with `>` → use `jq` to extract from `.data` → pipe into the next command.
+
+---
+
+## `reason(prompt, example_output)`
+
+`reason()` is the **only required interface** in the spec. It converts a natural-language request into deterministic structured JSON.
+
+### Key rules
+
+- **Always starts a fresh context** — no memory of previous calls. Include all needed context in the prompt.
+- **Retry on schema failure** — validates the output against the schema inferred from `example_output`. Retries up to N times with the error as feedback before returning `{ "error": "..." }`.
+- **Use a lightweight model** — `reason()` is an atomic reasoning call, not a planning step.
+
+### Example — sentiment analysis
+
+```python
+items = ["Great product!", "Broke after two days", "Absolutely love it"]
+r = await reason(
+    f"Classify sentiment for each: {items}",
+    example=[{"text": "", "sentiment": ""}]
+)
+for x in r["data"]:
+    print(f"{x['text']} → {x['sentiment']}")
+```
+
+### Example — binary decision
+
+```python
+r = await reason(
+    "System status: 15 errors in the last hour, threshold is 10. Should we alert?",
+    example=True
+)
+if r["data"]:
+    print("Alert!")
+```
+
+---
+
+## `act(name, args)` — Optional
+
+`act()` is a **convenience interface** provided by the AER for calling external tools. The spec does not require you to use it — you may execute actions any way you like.
+
+### When to use `act()`
+
+- Calling MCP tools
+- Running bash commands
+- Fetching external resources
+- Any stateless external operation
+
+### Error handling
+
+```python
+result = await act("websearch", {"query": "Re in Act spec"})
+if result.get("isError"):
+    print(result)
+    return
+# Safe to use result["content"][0]["text"]
+```
+
+### Batch actions
+
+Always batch all related `act()` calls into a single script. Do not split related actions across multiple conversation turns:
+
+```python
+# Good — one script, multiple acts
+urls = (await reason(f"Top 2 URLs from: {search_result}", ["url1", "url2"]))["data"]
+data = [
+    (await act("webfetch", {"url": u}))["content"][0]["text"]
+    for u in urls
+]
+summary = (await reason(f"Synthesize: {data}", {"summary": ""}))["data"]["summary"]
+print(summary)
+```

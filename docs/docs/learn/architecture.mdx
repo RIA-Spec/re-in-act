@@ -1,0 +1,45 @@
+---
+title: Architecture
+description: Understand how the Re in Act docs site and content system are structured.
+---
+
+# Architecture
+
+The Re in Act site is a Next.js app that renders MDX content from the `docs/` directory using a catch-all route and a navigation model defined in `docs/docs.json`.
+
+## Runtime Flow
+
+```
+Browser Request
+	-> Next.js App Router (`src/app/[...slug]/page.tsx`)
+	-> Slug resolution (`src/lib/mdx.ts`)
+	-> MDX compile (`next-mdx-remote`)
+	-> Render with shared MDX components
+```
+
+## Content System
+
+- Documents live in `docs/**/*.mdx`.
+- Navigation is declared in `docs/docs.json`.
+- Page titles are read from frontmatter and resolved in `src/lib/navigation.ts`.
+- Static generation paths are discovered by walking content directories in `src/lib/mdx.ts`.
+
+## UI Structure
+
+- `src/app/layout.tsx`: global HTML shell, theme bootstrap script, font loading
+- `src/components/Header.tsx`: top navigation and tab highlighting
+- `src/components/Sidebar.tsx`: docs tab/group/version navigation
+- `src/components/mdx/MdxComponents.tsx`: shared MDX component mappings
+
+## Deployment Architecture
+
+- Build target: Next.js production output
+- Adapter: OpenNext Cloudflare
+- Runtime: Cloudflare Workers
+
+## Design Goals
+
+1. Content-first authoring with straightforward MDX files
+2. Predictable navigation controlled by a single config file
+3. Static-friendly rendering for performance and reliability
+4. Clear separation between content (`docs/`) and presentation (`src/`)
