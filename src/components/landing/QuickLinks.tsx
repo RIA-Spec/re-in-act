@@ -21,7 +21,7 @@ interface QuickLink {
 const links: QuickLink[] = [
   {
     title: "Documentation",
-    description: "Understand AER, reason(), act(), and how to get started.",
+    description: "Understand the Cerebellum design: RAS, reason(), act(), and how to get started.",
     href: NAV_TABS[0].href,
     icon: BookOpen,
   },

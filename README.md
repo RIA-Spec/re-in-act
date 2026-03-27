@@ -1,8 +1,8 @@
-# Re in Act Documentation Site
+# Re in Act
 
-This repository hosts the Re in Act documentation and specification website.
+This repository hosts the documentation and specification for **Re in Act** (Reason in Action) — an open specification for AI agents that delegates execution to a **Reason-able Action Space (RAS)**, moving adaptive `reason()` calls inside the action phase instead of the outer loop.
 
-Re in Act (Reasoning in Action) is an open specification for AI agent to offload dynamic reasoning into the action phase through an Action Execution Runtime (AER).
+The result: deterministic control flow, fewer round trips, and a clean main context window.
 
 ## Tech Stack
 

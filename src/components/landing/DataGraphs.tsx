@@ -6,15 +6,32 @@ import { Section, SectionHeader, IndexLabel, fade } from "./shared";
 const MONO = "var(--font-mono)";
 const SANS = "var(--font-sans)";
 
-const PARADIGM_SHIFT_COMPARISONS: Array<{ from: string; to: string; bold?: boolean }> = [
+const PARADIGM_SHIFT_COMPARISONS: Array<{
+  from: string;
+  to: string;
+  bold?: boolean;
+}> = [
   {
-    from: "Many Outer-Loop Turns",
-    to: "One Delegated Action Phase",
+    from: "Low-Variety Action Interface",
+    to: "RAS Expands Local Action Variety",
     bold: true,
   },
-  { from: "Interleaved Reason-Act-Observe", to: "Reason inside Action" },
-  { from: "Main-Context Accumulation", to: "Isolated Action Context" },
-  { from: "Model-Stepped Flow", to: "Runtime-Controlled Flow" },
+  {
+    from: "Round-Trip Tax (Reason-Act-Observe)",
+    to: "One Delegated Action Phase",
+  },
+  {
+    from: "Context Bloat from Intermediate Observations",
+    to: "Intermediate State Stays in RAS",
+  },
+  {
+    from: "Probabilistic Micro-Control Flow",
+    to: "Deterministic Runtime Control Flow",
+  },
+  {
+    from: "No Local Internal Model at Action Layer",
+    to: "Feedback-Capable Local Regulator",
+  },
 ] as const;
 
 /* ────────────────────────────────────────────
@@ -276,7 +293,7 @@ function ParadigmShift() {
           </text>
           <rect x={155} y={50} width={50} height={20} rx={4} fill="var(--accent)" fillOpacity={1} />
           <text x={180} y={63} textAnchor="middle" fill="#fff" fontSize={9} fontWeight={700}>
-            AER
+            RAS
           </text>
 
           {/* Delegate Arrow */}
@@ -307,7 +324,7 @@ function ParadigmShift() {
             </text>
           </motion.g>
 
-          {/* AER Core visualization */}
+          {/* RAS Core visualization */}
           <motion.g
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -420,20 +437,24 @@ function ParadigmShiftComparisons() {
     >
       <div className="flex flex-col divide-y divide-[var(--border)]">
         {PARADIGM_SHIFT_COMPARISONS.map((item, index) => (
-          <div key={item.from} className="flex items-center justify-between px-6 py-2.5">
-            <span
-              style={{ color: item.bold ? "var(--foreground)" : "var(--muted)" }}
-              className={item.bold ? "font-medium" : ""}
-            >
-              {item.from}
-            </span>
-            <span className="mx-4 opacity-20">→</span>
-            <span
-              style={{ color: index === 0 ? "var(--foreground)" : "var(--accent)" }}
-              className="font-bold"
-            >
-              {item.to}
-            </span>
+          <div key={item.from} className="flex flex-col px-6 py-3">
+            <div className="flex items-center justify-between">
+              <span
+                style={{ color: item.bold ? "var(--foreground)" : "var(--muted)" }}
+                className={item.bold ? "font-medium" : ""}
+              >
+                {item.from}
+              </span>
+              <span className="mx-4 opacity-20">→</span>
+              <span
+                style={{
+                  color: index === 0 ? "var(--foreground)" : "var(--accent)",
+                }}
+                className="font-bold shrink-0"
+              >
+                {item.to}
+              </span>
+            </div>
           </div>
         ))}
       </div>
@@ -442,16 +463,16 @@ function ParadigmShiftComparisons() {
 }
 
 /* ────────────────────────────────────────────
-   02 — AER Execution Flow (directed graph)
+  02 — RAS Execution Flow (directed graph)
    ──────────────────────────────────────────── */
 
-function AERFlow() {
+function RASFlow() {
   const W = 560;
   const H = 200;
 
   const nodes = [
     { id: "agent", x: 60, y: 100, label: "Agent", w: 76, role: "outer" as const },
-    { id: "aer", x: 270, y: 100, label: "AER Context", w: 110, role: "hub" as const },
+    { id: "aer", x: 270, y: 100, label: "RAS Context", w: 110, role: "hub" as const },
     { id: "reason", x: 410, y: 68, label: "reason()", w: 84, role: "fn" as const },
     { id: "act", x: 410, y: 138, label: "act()", w: 84, role: "fn" as const },
     { id: "result", x: 510, y: 100, label: "{ data }", w: 72, role: "data" as const },
@@ -483,7 +504,7 @@ function AERFlow() {
           </marker>
         </defs>
 
-        {/* Agent → AER */}
+        {/* Agent → RAS */}
         <line
           x1={100}
           y1={100}
@@ -504,7 +525,7 @@ function AERFlow() {
           task
         </text>
 
-        {/* AER → reason */}
+        {/* RAS → reason */}
         <line
           x1={326}
           y1={88}
@@ -514,7 +535,7 @@ function AERFlow() {
           strokeWidth={1}
           markerEnd="url(#af-arr-a)"
         />
-        {/* AER → act */}
+        {/* RAS → act */}
         <line
           x1={326}
           y1={112}
@@ -657,7 +678,7 @@ function RuntimeLayers() {
           Orchestrates multiple continuous actions over time
         </text>
 
-        {/* Code AER - Left */}
+        {/* Code RAS - Left */}
         <rect
           x={30}
           y={70}
@@ -669,13 +690,13 @@ function RuntimeLayers() {
           strokeWidth={1}
         />
         <text x={46} y={92} fill="var(--accent)" fontSize={11} fontFamily={MONO} fontWeight={600}>
-          Code AER
+          Code RAS
         </text>
         <text x={46} y={108} fill="var(--muted)" fontSize={10} fontFamily={SANS}>
           async reason() / act()
         </text>
 
-        {/* Bash AER - Right */}
+        {/* Bash RAS - Right */}
         <rect
           x={310}
           y={70}
@@ -687,7 +708,7 @@ function RuntimeLayers() {
           strokeWidth={1}
         />
         <text x={326} y={92} fill="var(--accent)" fontSize={11} fontFamily={MONO} fontWeight={600}>
-          Bash AER
+          Bash RAS
         </text>
         <text x={326} y={108} fill="var(--muted)" fontSize={10} fontFamily={SANS}>
           reason | act | jq | unix pipes
@@ -753,10 +774,10 @@ export function DataGraphs() {
       <div className="mb-16">
         <IndexLabel
           index="02"
-          title="AER Architecture"
+          title="RAS Architecture"
           sub="The main agent delegates once; the action context composes reason() and act() under a stable runtime contract."
         />
-        <AERFlow />
+        <RASFlow />
       </div>
 
       <div>

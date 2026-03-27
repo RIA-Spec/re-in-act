@@ -14,18 +14,19 @@ export function FlowDemo() {
   return (
     <Section>
       <SectionHeader
-        title="Action Execution Runtimes"
-        sub="AER defines the action-phase execution context: script-driven control flow or shell pipelines, both using the same interface contract."
+        title="Reason-able Action Spaces"
+        sub="The Cerebellum in practice. RAS provides deterministic, feedback-driven execution inside the action phase — so main reasoning only needs to state goals and constraints, not manage every step."
       />
 
-      {/* ── 1. Code AER ── */}
+      {/* ── 1. Code RAS ── */}
       <div className="mt-12 mb-8 border-b pb-4" style={{ borderColor: "var(--border)" }}>
         <h3 className="text-xl font-semibold tracking-tight" style={{ color: "var(--foreground)" }}>
-          Code AER (Python / TS)
+          Code RAS (Python / TS)
         </h3>
         <p className="text-[14px] mt-1.5 leading-relaxed" style={{ color: "var(--muted)" }}>
           Deterministic orchestration in scripts: branches, loops, and validation happen in code,
-          while `reason()` provides local adaptive decisions inside execution.
+          while `reason()` provides local adaptive decisions inside execution — without a single
+          outer-loop round trip.
         </p>
       </div>
 
@@ -95,10 +96,10 @@ export function FlowDemo() {
         </div>
       </motion.div>
 
-      {/* ── 2. Bash AER ── */}
+      {/* ── 2. Bash RAS ── */}
       <div className="mt-28 mb-8 border-b pb-4" style={{ borderColor: "var(--border)" }}>
         <h3 className="text-xl font-semibold tracking-tight" style={{ color: "var(--foreground)" }}>
-          Bash AER Pipeline
+          Bash RAS Pipeline
         </h3>
         <p className="text-[14px] mt-1.5 leading-relaxed" style={{ color: "var(--muted)" }}>
           Unix-style pipelines compose `reason` and `act` in a single action phase, with explicit

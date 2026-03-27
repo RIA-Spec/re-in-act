@@ -11,7 +11,11 @@
           },
           {
             "group": "Learn",
-            "pages": ["docs/learn/architecture"]
+            "pages": [
+              "docs/learn/architecture",
+              "docs/learn/aer-snapshot",
+              "docs/learn/integrations"
+            ]
           },
           {
             "group": "Develop",
@@ -23,7 +27,7 @@
         "tab": "Specification",
         "versions": [
           {
-            "version": "Draft 0.1",
+            "version": "Working Draft",
             "pages": ["specification/draft/index"]
           }
         ]

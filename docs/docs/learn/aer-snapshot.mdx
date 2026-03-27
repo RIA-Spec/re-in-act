@@ -1,0 +1,77 @@
+---
+title: RAS Snapshot
+description: Reuse a completed RAS execution flow to enable emergent agent behavior.
+---
+
+# RAS Snapshot
+
+An **RAS Snapshot** is a saved, replayable record of a completed RAS execution: the delegated program, the sequence of `reason()` / `act()` calls, intermediate data, and final result.
+
+Snapshots enable a key property of Re in Act: **emergent behavior through reuse**.
+
+---
+
+## The Concept
+
+When an agent successfully completes a task inside the RAS, the execution flow itself becomes knowledge. A snapshot captures:
+
+- The **delegated program** (script or pipeline)
+- The **call trace** — inputs and outputs of each `reason()` / `act()` step
+- The **final observation** returned to the outer agent
+
+This snapshot can then be:
+
+1. **Replayed** — re-run the same flow on new inputs
+2. **Composed** — used as a sub-step inside a larger RAS program
+3. **Shared** — distributed as a reusable capability
+
+---
+
+## Why This Enables Emergent Behavior
+
+In traditional ReAct, every task starts from zero. There is no mechanism to reuse a prior execution path without re-prompting.
+
+With RAS Snapshots, successful flows accumulate into a **library of proven execution patterns**. Main reasoning can select and invoke a snapshot by name — without re-deriving the logic. Over time, the agent's effective capability grows from its execution history.
+
+This is analogous to how the Cerebellum encodes motor programs through repetition: a learned movement pattern becomes available as a fast, autonomous subroutine.
+
+---
+
+## Usage Pattern
+
+```python
+# First run — agent derives and executes the flow
+result = await aer.run("""
+    tools = (await reason("Choose tools for web research", ["tool"]))["data"]
+    results = [await act(t, {"query": topic}) for t in tools]
+    return (await reason(f"Synthesize: {results}", {"summary": ""}))["data"]
+""", inputs={"topic": "Re in Act"})
+
+# Snapshot the flow
+snapshot = aer.snapshot(name="web_research_and_synthesize")
+
+# Later — reuse directly on new inputs, no re-derivation
+result = await aer.replay(snapshot, inputs={"topic": "Ashby's Law"})
+```
+
+---
+
+## Composition
+
+Snapshots can be used as `act()` targets, making them composable with other RAS programs:
+
+```python
+# One snapshot calls another as a tool
+outline = (await act("web_research_and_synthesize", {"topic": topic}))
+draft = (await reason(f"Write a post based on: {outline}", {"content": ""}))["data"]
+```
+
+This allows complex multi-step behaviors to emerge from simple, proven building blocks — without growing the outer agent's context.
+
+---
+
+## Relationship to the Spec
+
+RAS Snapshots are an **emergent capability** built on top of the core spec interfaces (`reason()` / `act()`). The spec does not mandate snapshot support — implementations may choose to provide it as an extension.
+
+See [Proposals](/proposals/index) to suggest snapshot standardization.

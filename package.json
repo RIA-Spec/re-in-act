@@ -1,7 +1,7 @@
 {
   "name": "re-in-act",
   "private": true,
-  "description": "Documentation site for Re in Act, an open specification for reasoning in action.",
+  "description": "Documentation site for Re in Act, an open specification for reason in action.",
   "license": "Apache-2.0",
   "scripts": {
     "build": "next build",
@@ -32,6 +32,7 @@
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
+    "@mcpc-tech/unplugin-dev-inspector-mcp": "^0.1.47",
     "@tailwindcss/postcss": "4.1.17",
     "@types/node": "24.10.1",
     "@types/react": "19.2.7",

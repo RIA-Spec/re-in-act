@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "dev-inspector": {
+      "type": "sse",
+      "url": "http://localhost:6139/__mcp__/sse?clientId=vscode&puppetId=inspector"
+    }
+  }
+}

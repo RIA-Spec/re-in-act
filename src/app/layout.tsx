@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/constants";
+import { DevInspector } from "@mcpc-tech/unplugin-dev-inspector-mcp/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -31,6 +32,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased font-sans transition-colors duration-200">
+        <DevInspector />
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>

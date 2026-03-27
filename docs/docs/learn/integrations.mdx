@@ -1,0 +1,87 @@
+---
+title: Integrations
+description: How Re in Act connects to external tools, models, and runtimes.
+---
+
+# Integrations
+
+Re in Act is runtime-agnostic. The RAS works with any tool execution layer — as long as it can expose `reason()` and optionally `act()`.
+
+---
+
+## MCP (Model Context Protocol)
+
+MCP is the recommended integration layer for tool discovery and execution. The RAS can act as an **MCP Server** or consume tools exposed by an MCP host.
+
+### Using MCP tools via `act()`
+
+Any MCP tool can be called through `act()`:
+
+```python
+# List available tools
+tools = await act("__manual__", {})
+
+# Call a specific MCP tool
+result = await act("websearch", {"query": "Re in Act spec"})
+```
+
+### MCP Sampling for `reason()`
+
+`reason()` can be implemented via **MCP Sampling** — the RAS acts as an MCP Server and requests LLM completion from the MCP client. This offloads model invocation to the host application, with no direct API key required inside the RAS.
+
+```
+RAS (MCP Server) → sampling/createMessage → MCP Client → LLM
+```
+
+See the [one-agent](https://github.com/RIA-Spec/one-agent) reference implementation for a working MCP Sampling integration.
+
+---
+
+## LLM APIs
+
+`reason()` can be backed by any LLM API that supports structured output (JSON schema). The implementation should always start a **fresh conversation context** — no history, no memory.
+
+Recommended models for `reason()` calls: lightweight, fast models. `reason()` is an atomic decision step, not a full main reasoning pass — it does not need frontier-scale capability.
+
+---
+
+## Bash / CLI
+
+The Bash RAS runs `reason` and `act` as CLI commands in `PATH`. This makes it easy to integrate with any shell environment, CI pipeline, or existing scripting workflow:
+
+```bash
+cat input.json | reason --prompt "Summarize:" --prompt - --structure '{"summary": ""}' | jq -r '.data.summary'
+```
+
+No SDK or language runtime required.
+
+---
+
+## Code Runtimes
+
+The Code RAS runs inside a sandboxed Python or Node.js process. Integration points:
+
+| Runtime    | How `reason()` / `act()` are provided             |
+| ---------- | ------------------------------------------------- |
+| Python     | Injected as async functions into the script scope |
+| TypeScript | Injected as async functions into the module scope |
+| Bash       | Registered as CLI commands in `PATH`              |
+
+The runtime executes the delegated program and returns a single final observation to the outer agent loop.
+
+---
+
+## Sandboxing
+
+The RAS executes arbitrary code, so sandboxing is essential in production. Two supported strategies:
+
+- **Cloud Sandbox** — the RAS runs in a managed cloud environment. Providers purpose-built for agent code execution:
+  - [E2B](https://e2b.dev) — cloud sandboxes with Python/JS SDKs, popular for AI agent use cases
+  - [Deno Sandbox](https://deno.com/blog/sandbox) — instant Linux microVMs with TypeScript + Python SDKs, built-in prompt injection protection
+  - [Modal](https://modal.com) — serverless container execution, commonly used with LangChain agents
+  - [Daytona](https://daytona.io) — dev environment sandboxes for agents
+  - [Sprites](https://sprites.sh) — agent-focused sandbox runtime
+
+- **Client-side Sandbox** — the RAS runs locally or in a self-hosted environment (Docker, WASM, Cloudflare Workers).
+
+The sandboxing strategy does not affect the `reason()` / `act()` interface contract.

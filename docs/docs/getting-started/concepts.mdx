@@ -1,17 +1,15 @@
 ---
-title: "AER Concepts"
-description: Deeper walkthrough of the Action Execution Runtime, reason(), and act() with real examples.
+title: "RAS Concepts"
+description: Deeper walkthrough of the Reason-able Action Space, reason(), and act() with real examples.
 ---
 
-# AER Concepts
+# RAS Concepts
 
-This page walks through the two AER runtime flavors and the two core interfaces with annotated examples drawn from the [one-agent](https://github.com/RIA-Spec/one-agent) reference implementation.
-
----
+This page walks through the two RAS runtime flavors and the two core interfaces with annotated examples drawn from the [one-agent](https://github.com/RIA-Spec/one-agent) reference implementation.
 
 ## The Two Runtime Flavors
 
-### Code AER
+### Code RAS
 
 The agent writes scripts (Python or TypeScript). `reason()` and `act()` are async interfaces available in scope.
 
@@ -60,7 +58,7 @@ main().catch(console.error);
 
 **Pattern**: Nearly identical async logic across languages.
 
-### Bash AER
+### Bash RAS
 
 The agent writes shell pipelines. `reason` and `act` are CLI commands available in `PATH`.
 
@@ -87,8 +85,10 @@ act --manual > m.json && \
 ### Key rules
 
 - **Always starts a fresh context** — no memory of previous calls. Include all needed context in the prompt.
+- **Include reference + observation + constraints** — prompts should state target objective, local state/feedback, and operational bounds.
 - **Retry on schema failure** — validates the output against the schema inferred from `example_output`. Retries up to N times with the error as feedback before returning `{ "error": "..." }`.
-- **Use a lightweight model** — `reason()` is an atomic reasoning call, not a planning step.
+- **Bound output variety with schema** — `example_output` constrains responses into an executable control channel.
+- **Use a lightweight model** — `reason()` is an atomic local reasoning call, not a full main reasoning cycle.
 
 ### Example — sentiment analysis
 
@@ -117,7 +117,7 @@ if r["data"]:
 
 ## `act(name, args)` — Optional
 
-`act()` is a **convenience interface** provided by the AER for calling external tools. The spec does not require you to use it — you may execute actions any way you like.
+`act()` is a **convenience interface** provided by the RAS for calling external tools. The spec does not require you to use it — you may execute actions any way you like.
 
 ### When to use `act()`
 

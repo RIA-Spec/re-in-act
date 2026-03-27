@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { fade } from "./shared";
 
 /* ────────────────────────────────────────────
-   Data — Bash AER pipeline: 4-node horizontal chain
+  Data — Bash RAS pipeline: 4-node horizontal chain
    api_docs.md → reason → jq → act
    ──────────────────────────────────────────── */
 
@@ -245,7 +245,7 @@ export function NetworkPulse() {
             className="w-full"
             style={{ display: "block" }}
             role="img"
-            aria-label="Bash AER pipeline animation"
+            aria-label="Bash RAS pipeline animation"
           >
             {/* Static pipe lines */}
             {LINKS.map((l) => {

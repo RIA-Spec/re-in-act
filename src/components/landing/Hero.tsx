@@ -49,8 +49,9 @@ export function Hero() {
         transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
       >
         <p className="max-w-2xl text-lg leading-tight" style={{ color: "var(--foreground)" }}>
-          A new paradigm for AI agents. By moving adaptive reasoning into the action phase, Re in
-          Act reduces the latency and context bloat of traditional{" "}
+          Re in Act expands the action space: main reasoning sets goals once, while RAS handles
+          local feedback with deterministic control flow to reduce ReAct's round-trip tax and
+          context bloat.{" "}
           <a
             href="https://arxiv.org/abs/2210.03629"
             target="_blank"

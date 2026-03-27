@@ -7,11 +7,11 @@ export const SITE_NAME = "Re in Act";
 
 /** Site description for <meta> and hero subtitle */
 export const SITE_DESCRIPTION =
-  "An open specification for AI agent to move adaptive reasoning into the action phase through a deterministic execution contract.";
+  "An open specification for AI agents to move adaptive reasoning into the action phase through a reason-able action space with deterministic control flow.";
 
 /** The biological metaphor for the hero section */
 export const SITE_METAPHOR =
-  "Your AI Agent is just like your cerebellum — handling reflexive flow so the conscious brain doesn't have to. Re in Act shifts the paradigm from high-latency micromanagement to reasoning in action.";
+  "Your AI agent is like a cerebellum model: reflexive execution stays local, while main reasoning stays deliberate. Re in Act shifts from high-latency micromanagement to reason in action.";
 
 /** GitHub repository URL */
 export const GITHUB_URL = "https://github.com/RIA-Spec/re-in-act";

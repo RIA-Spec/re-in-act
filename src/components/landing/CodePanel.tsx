@@ -8,7 +8,7 @@ import { useEffect, useRef } from "react";
    ──────────────────────────────────────────── */
 
 const CODE_LINES = [
-  { text: "# Build analyzer — Re in Act AER", cls: "cmt" },
+  { text: "# Build analyzer — Re in Act RAS", cls: "cmt" },
   { text: "log = open('build.log').read()", cls: "" },
   { text: "", cls: "" },
   { text: "analysis = await reason(", cls: "kw" },

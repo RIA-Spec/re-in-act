@@ -341,7 +341,7 @@ export function CerebellumGraphic() {
           fontFamily="var(--font-sans)"
           fontWeight={600}
         >
-          Action Execution Runtime
+          Reason-able Action Space
         </text>
 
         {/* Parallel capabilities: reason() and act() */}
