@@ -1,0 +1,118 @@
+---
+title: Subagents and RAS
+description: How Re in Act relates to subagents and agent teams as a complementary execution pattern, not a competing architecture.
+---
+
+# Subagents and RAS
+
+At first glance, Re in Act can look similar to subagents or agent teams. In all three patterns, the main agent delegates work instead of doing every step in the outer loop.
+
+The difference is **where the delegation boundary lives**.
+
+In Re in Act, the main agent delegates **one action phase** into a **Reason-able Action Space (RAS)**. The delegated program can call `reason()` locally, use deterministic control flow, call tools through `act()`, and return one final observation to the outer loop.
+
+In a subagent or agent-team design, delegation usually creates another reasoning actor with its own prompt, context, handoff protocol, and coordination surface.
+
+These patterns are **not in conflict**. A subagent can itself use Re in Act internally. An agent team can assign one member a local RAS for tool-heavy execution. Re in Act is best understood as an execution pattern that can live underneath a larger orchestration design.
+
+---
+
+## Why They Feel Similar
+
+The surface similarity is real:
+
+- The outer agent hands off a sub-task.
+- The delegated unit can make local decisions.
+- The outer agent gets back a more useful result than a raw tool response.
+
+That is why the spec notes that a fresh-context `reason()` call can resemble the "subagent" approach.
+
+But that similarity is only at the edge of the interface. Architecturally, Re in Act is not primarily about adding more planners. It is about giving execution a local regulator.
+
+---
+
+## The Architectural Difference
+
+The core Re in Act idea is still the Cerebrum/Cerebellum split introduced in [Introduction](/docs/getting-started/intro):
+
+- The **Cerebrum** sets goals, constraints, and when to delegate.
+- The **RAS** absorbs local disturbances during execution.
+
+That means the delegated unit in Re in Act is usually best thought of as a **bounded execution workspace**, not as a peer agent.
+
+Inside that workspace:
+
+- `reason()` starts with **fresh context** and produces structured JSON.
+- loops, branches, validation, and retries happen in **code or shell**, not by re-prompting the outer loop.
+- intermediate logs, tool outputs, and failed attempts stay **inside the RAS** unless the delegated program decides they matter.
+
+This is the main distinction from agent-team patterns. Agent teams multiply reasoning contexts. Re in Act expands the action layer.
+
+That is why the relationship is usually **layered, not competitive**:
+
+- subagents answer "who should handle this sub-problem?"
+- Re in Act answers "how should this delegated unit execute reliably once it has the work?"
+
+---
+
+## Comparison at a Glance
+
+|                     | Subagents / Agent Teams                       | Re in Act                                             |
+| ------------------- | --------------------------------------------- | ----------------------------------------------------- |
+| **Primary unit**    | Additional reasoning actors                   | **One delegated action phase inside a RAS**           |
+| **Control flow**    | Often coordinated by prompts and handoffs     | **Deterministic in code or shell**                    |
+| **Local reasoning** | Separate agent context or role prompt         | **Fresh-context `reason()` inside execution**         |
+| **Latency**         | More model turns and coordination overhead    | **Fewer outer-loop round trips**                      |
+| **Context growth**  | Context can spread across multiple actors     | **Intermediate state stays inside the RAS**           |
+| **State sharing**   | Requires explicit handoff and synchronization | **Local state lives in one delegated runtime**        |
+| **Failure mode**    | Miscommunication or drift across handoffs     | **Execution failures handled near the tool boundary** |
+| **Observability**   | Multiple transcripts or role-specific traces  | **One execution trace plus the final observation**    |
+| **Reuse**           | Reusable specialists or role prompts          | **Reusable snapshots and composable RAS programs**    |
+
+This table is about emphasis, not exclusivity. A subagent can still execute its task through a RAS, and a RAS-backed workflow can still sit inside a broader team topology.
+
+---
+
+## Where RAS Snapshots Fit
+
+If you are looking for the closest Re in Act analogue to a reusable helper, it is usually an [RAS Snapshot](/docs/learn/ras-snapshot).
+
+A snapshot can replay a proven execution flow, be composed into a larger program, and behave like a fast subroutine. That makes it similar to a specialized helper in practice.
+
+The difference is that snapshots are built on the same RAS model:
+
+- they do not require a new long-lived planning authority,
+- they reuse a proven delegated program instead of introducing a new conversational role,
+- and they keep the execution boundary local to the action layer.
+
+So snapshots may look like reusable subagents from the outside, but internally they are still RAS-native execution patterns.
+
+---
+
+## When Re in Act Fits Best
+
+Re in Act is usually the better fit when the hard part of the problem is:
+
+- absorbing noisy tool feedback,
+- keeping intermediate state out of the main context,
+- enforcing deterministic branches, loops, and validation,
+- reducing the round-trip tax of repeated outer-loop reasoning.
+
+This is especially true for coding, research, shell automation, and tool-heavy workflows where the main agent should delegate once and receive a denoised result.
+
+---
+
+## When Separate Agents Still Make Sense
+
+Subagents or agent teams can still be useful when the system genuinely needs:
+
+- distinct long-lived roles,
+- separate planning authorities,
+- different incentives or review responsibilities,
+- coordination across parallel workstreams that should stay conceptually separate.
+
+Re in Act does not claim those patterns are wrong. Its claim is narrower and more practical: many workflows that look like they need more agents actually need a better execution layer.
+
+If the problem is local adaptation during action, reach for the RAS first. If the problem is organizational separation of reasoning roles, separate agents may still be the right abstraction.
+
+In practice, many strong systems use both: a top-level subagent or team structure for decomposition, and Re in Act inside each delegated unit for efficient, tool-heavy execution.

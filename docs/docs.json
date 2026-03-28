@@ -11,7 +11,11 @@
           },
           {
             "group": "Learn",
-            "pages": ["docs/learn/aer-snapshot", "docs/learn/integrations"]
+            "pages": [
+              "docs/learn/ras-snapshot",
+              "docs/learn/integrations",
+              "docs/learn/subagents-agent-teams"
+            ]
           }
         ]
       },
