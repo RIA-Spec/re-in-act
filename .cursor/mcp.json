@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "dev-inspector": {
-      "url": "http://localhost:6139/__mcp__/sse?clientId=cursor&puppetId=inspector"
+      "url": "http://localhost:6137/__mcp__/sse?clientId=cursor&puppetId=inspector"
     }
   }
 }
