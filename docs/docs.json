@@ -11,15 +11,7 @@
           },
           {
             "group": "Learn",
-            "pages": [
-              "docs/learn/architecture",
-              "docs/learn/aer-snapshot",
-              "docs/learn/integrations"
-            ]
-          },
-          {
-            "group": "Develop",
-            "pages": ["docs/develop/setup"]
+            "pages": ["docs/learn/aer-snapshot", "docs/learn/integrations"]
           }
         ]
       },

@@ -12,11 +12,11 @@ description: The working draft of the Re in Act open specification for Reason in
 
 ## 1. Introduction
 
-This draft proposes **Re in Act** (Reason in Action), a new paradigm and open specification for AI agents that expands the effective action space available during execution.
+Think of an agent like a person walking. The conscious brain sets the direction, but it does not micromanage every muscle correction. Local adjustment happens in the cerebellum, close to the body and close to feedback.
 
-Instead of forcing main reasoning to micromanage every reason-act-observe turn, Re in Act delegates execution into a **Reason-able Action Space (RAS)** where context-aware `reason()` calls happen **inside** the action phase. This shifts local adaptation from the outer loop into the execution layer itself.
+**Re in Act** applies the same idea to AI agents. Main reasoning should set goals and constraints. The fast, local adjustments needed during execution should happen inside a **Reason-able Action Space (RAS)**.
 
-The central advantage is cybernetic, not only operational: ReAct's fixed action interface often lacks requisite variety, so main reasoning must continuously compensate. RAS increases local execution variety and embeds feedback close to action, aligning with Ashby's Law and the Good Regulator principle. Reference implementations show this also collapses many outer-loop iterations into a single delegated action phase, reducing wall-clock latency and main-context growth.
+This makes the core idea simple: instead of sending every small disturbance back through an outer reason-act-observe loop, let execution absorb and regulate local problems where they occur. The deeper control-theoretic argument comes later, but the practical result is immediate: fewer round trips, less context bloat, and a larger effective action space during execution.
 
 ---
 

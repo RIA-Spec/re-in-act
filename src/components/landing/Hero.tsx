@@ -49,16 +49,15 @@ export function Hero() {
         transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
       >
         <p className="max-w-2xl text-lg leading-tight" style={{ color: "var(--foreground)" }}>
-          Re in Act expands the action space: main reasoning sets goals once, while RAS handles
-          local feedback with deterministic control flow to reduce ReAct's round-trip tax and
-          context bloat.{" "}
+          A bigger action space for AI agents. Re in Act lets execution absorb local disturbances
+          before they turn into round trips, context bloat, and brittle control in traditional{" "}
           <a
             href="https://arxiv.org/abs/2210.03629"
             target="_blank"
             rel="noopener noreferrer"
             className="font-semibold text-accent underline decoration-[0.08em] underline-offset-4"
           >
-            ReAct
+            ReAct agents
           </a>
           .
         </p>

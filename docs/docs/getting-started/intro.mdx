@@ -5,11 +5,11 @@ description: What is Re in Act? A quick orientation for new readers.
 
 # What is Re in Act?
 
-**Re in Act** (Reason in Action) is a new paradigm for AI agents designed to overcome the structural limitations of the traditional ReAct loop.
+**Re in Act** (Reason in Action) is a simple idea: let the agent think globally, but adapt locally.
 
-In traditional **ReAct** (_Reason → Act → Observe → Repeat_), each step requires a full LLM round trip, polluting the context window with intermediate observations and forcing the model to handle deterministic logic (like if/else) through slow, fragile **probabilistic control flow**.
+In traditional **ReAct** (_Reason → Act → Observe → Repeat_), every small issue has to travel back through the outer loop. That makes agents slow, noisy, and fragile.
 
-**Re in Act** shifts this paradigm: main reasoning states goal and constraints once, then delegates execution to a **Reason-able Action Space (RAS)**. Inside the RAS, local `reason()` calls happen within the action phase, using fresh, isolated context.
+**Re in Act** changes this by introducing a **Reason-able Action Space (RAS)**. Main reasoning sets the objective once, and the RAS handles local adjustment during execution.
 
 ---
 
@@ -26,7 +26,7 @@ The Cerebellum has two properties that make it the right metaphor for the RAS:
 1. **Goal-oriented (fixed target)**: The Cerebellum doesn't perform main reasoning. It receives a high-level command — "walk forward" — and treats it as a fixed reference point. Achieving that goal in the actual environment (balance, terrain, speed) is entirely its own business.
 2. **Internal models**: It maintains internal models of the body and environment to dynamically adjust execution in real time, without consulting the Cerebrum for every correction.
 
-Together, these mean the Cerebrum **never needs to enumerate or pre-model all possible disturbances**. It delegates to a system capable of handling variety locally. This is the exact theoretical basis:
+Together, these mean the Cerebrum **never needs to enumerate or pre-model all possible disturbances**. It delegates to a system that can absorb local problems where they happen. The theory comes after the intuition:
 
 - **Ashby's Law (Requisite Variety)**: A controller must have at least as much variety as the system it controls. ReAct's fixed Action Primitives lack this variety. The RAS — a programmable, feedback-driven runtime — provides it.
 - **Good Regulator Theorem**: Every good regulator must contain an internal model of the system it regulates. The RAS is precisely this: a local model of the tool environment, operating as a **closed-loop feedback system** that self-corrects without escalating every deviation back to main reasoning.
