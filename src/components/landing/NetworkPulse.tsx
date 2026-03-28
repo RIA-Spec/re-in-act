@@ -47,6 +47,8 @@ const LINKS: PipeLink[] = [
 ];
 
 const TOTAL_LOOP = 6;
+const PIPE_VIEWBOX_Y = 52;
+const PIPE_VIEWBOX_H = 96;
 
 function nodeById(id: string): PipeNode {
   return NODES.find((n) => n.id === id)!;
@@ -203,7 +205,7 @@ function PipeNode({ node }: { node: PipeNode }) {
       {/* Subtext goes below the circle */}
       <text
         x={node.cx}
-        y={node.cy + r + 16}
+        y={node.cy + r + 14}
         textAnchor="middle"
         dominantBaseline="middle"
         fill="var(--muted)"
@@ -241,7 +243,7 @@ export function NetworkPulse() {
           </div>
 
           <svg
-            viewBox="0 64 640 72"
+            viewBox={`0 ${PIPE_VIEWBOX_Y} 640 ${PIPE_VIEWBOX_H}`}
             className="w-full"
             style={{ display: "block" }}
             role="img"
@@ -264,7 +266,7 @@ export function NetworkPulse() {
                   />
                   <text
                     x={(a.cx + b.cx) / 2}
-                    y={a.cy - 28}
+                    y={a.cy - 24}
                     textAnchor="middle"
                     fill="var(--muted)"
                     fontSize={8}

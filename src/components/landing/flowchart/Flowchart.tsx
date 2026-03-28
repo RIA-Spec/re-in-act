@@ -25,15 +25,16 @@ function glowTransition(delay: number): Transition {
 /* ── ViewBox — crops tightly around the content ── */
 
 const VX = 110;
+const VY = -18;
 const VW = 280;
-const VH = 400;
+const VH = 422;
 
 /** The animated Python-style flowchart SVG. */
 export function Flowchart() {
   return (
     <svg
       width="100%"
-      viewBox={`${VX} 0 ${VW} ${VH}`}
+      viewBox={`${VX} ${VY} ${VW} ${VH}`}
       fill="none"
       className="mx-auto"
       aria-hidden="true"

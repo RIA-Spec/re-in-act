@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useId } from "react";
 import { Section, SectionHeader, IndexLabel, fade } from "./shared";
 
 const MONO = "var(--font-mono)";
@@ -342,7 +343,6 @@ function ParadigmShift() {
               filter="url(#ria-glow)"
             />
 
-            {/* Pulsing internal loop */}
             <motion.circle
               cx={180}
               cy={125}
@@ -355,11 +355,15 @@ function ParadigmShift() {
               transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
             />
 
-            <g className="font-mono text-[7px] font-bold" fill="var(--accent)">
+            <g>
               <motion.text
                 x={180}
                 y={120}
                 textAnchor="middle"
+                fill="var(--accent)"
+                fontSize={7.2}
+                fontFamily={MONO}
+                fontWeight={700}
                 animate={{ opacity: [0.4, 1, 0.4] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
@@ -369,6 +373,10 @@ function ParadigmShift() {
                 x={180}
                 y={135}
                 textAnchor="middle"
+                fill="var(--accent-alt)"
+                fontSize={7.2}
+                fontFamily={MONO}
+                fontWeight={700}
                 animate={{ opacity: [0.4, 1, 0.4] }}
                 transition={{ duration: 2, repeat: Infinity, delay: 1 }}
               >
@@ -401,7 +409,7 @@ function ParadigmShift() {
               fontSize={9}
               fontFamily={MONO}
             >
-              result
+              denoised result
             </text>
           </motion.g>
 
@@ -467,16 +475,11 @@ function ParadigmShiftComparisons() {
    ──────────────────────────────────────────── */
 
 function RASFlow() {
-  const W = 560;
-  const H = 200;
-
-  const nodes = [
-    { id: "agent", x: 60, y: 100, label: "Agent", w: 76, role: "outer" as const },
-    { id: "aer", x: 270, y: 100, label: "RAS Context", w: 110, role: "hub" as const },
-    { id: "reason", x: 410, y: 68, label: "reason()", w: 84, role: "fn" as const },
-    { id: "act", x: 410, y: 138, label: "act()", w: 84, role: "fn" as const },
-    { id: "result", x: 510, y: 100, label: "{ data }", w: 72, role: "data" as const },
-  ];
+  const W = 700;
+  const H = 240;
+  const markerId = useId().replace(/:/g, "");
+  const mutedMarkerId = `ras-flow-muted-${markerId}`;
+  const accentMarkerId = `ras-flow-accent-${markerId}`;
 
   return (
     <motion.div
@@ -486,153 +489,221 @@ function RASFlow() {
     >
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} fill="none" aria-hidden="true">
         <defs>
-          <marker id="af-arr" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
-            <path d="M0,0 L7,2.5 L0,5" fill="none" stroke="var(--muted)" strokeWidth="1" />
-          </marker>
-          <marker id="af-arr-a" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
-            <path d="M0,0 L7,2.5 L0,5" fill="none" stroke="var(--accent)" strokeWidth="1" />
-          </marker>
           <marker
-            id="af-arr-alt"
+            id={mutedMarkerId}
             markerWidth="7"
             markerHeight="5"
             refX="6"
             refY="2.5"
             orient="auto"
           >
-            <path d="M0,0 L7,2.5 L0,5" fill="none" stroke="var(--accent-alt)" strokeWidth="1" />
+            <path d="M0,0 L7,2.5 L0,5" fill="none" stroke="var(--muted)" strokeWidth="1" />
+          </marker>
+          <marker
+            id={accentMarkerId}
+            markerWidth="7"
+            markerHeight="5"
+            refX="6"
+            refY="2.5"
+            orient="auto"
+          >
+            <path d="M0,0 L7,2.5 L0,5" fill="none" stroke="var(--accent)" strokeWidth="1" />
           </marker>
         </defs>
 
-        {/* Agent → RAS */}
-        <line
-          x1={100}
-          y1={100}
-          x2={213}
-          y2={100}
-          stroke="var(--accent)"
-          strokeWidth={1.5}
-          markerEnd="url(#af-arr-a)"
+        <path
+          d="M 585 106 C 590 18, 88 18, 88 96"
+          stroke="var(--muted)"
+          strokeWidth={1.2}
+          strokeDasharray="5 5"
+          markerEnd={`url(#${mutedMarkerId})`}
+        />
+        <text x={350} y={18} textAnchor="middle" fill="var(--muted)" fontSize={8} fontFamily={MONO}>
+          return denoised result
+        </text>
+
+        <rect
+          x={28}
+          y={108}
+          width={126}
+          height={34}
+          rx={8}
+          fill="var(--card-bg)"
+          stroke="var(--muted)"
+          strokeWidth={1.2}
         />
         <text
-          x={157}
-          y={92}
+          x={91}
+          y={125}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fill="var(--foreground)"
+          fontSize={10.8}
+          fontFamily={MONO}
+          fontWeight={600}
+        >
+          Main Reasoning
+        </text>
+
+        <line
+          x1={154}
+          y1={125}
+          x2={220}
+          y2={125}
+          stroke="var(--accent)"
+          strokeWidth={1.5}
+          markerEnd={`url(#${accentMarkerId})`}
+        />
+        <text
+          x={186}
+          y={116}
           textAnchor="middle"
           fill="var(--accent)"
           fontSize={8}
           fontFamily={MONO}
         >
-          task
+          goal + constraints
         </text>
 
-        {/* RAS → reason */}
-        <line
-          x1={326}
-          y1={88}
-          x2={366}
-          y2={74}
+        <rect
+          x={220}
+          y={46}
+          width={270}
+          height={140}
+          rx={18}
+          fill="var(--accent-muted)"
           stroke="var(--accent)"
-          strokeWidth={1}
-          markerEnd="url(#af-arr-a)"
+          strokeWidth={1.6}
         />
-        {/* RAS → act */}
-        <line
-          x1={326}
-          y1={112}
-          x2={366}
-          y2={132}
-          stroke="var(--accent-alt)"
-          strokeWidth={1}
-          markerEnd="url(#af-arr-alt)"
-        />
-
-        {/* reason → result */}
-        <line
-          x1={454}
-          y1={74}
-          x2={472}
-          y2={92}
-          stroke="var(--muted)"
-          strokeWidth={1}
-          markerEnd="url(#af-arr)"
-        />
-        {/* act → result */}
-        <line
-          x1={454}
-          y1={132}
-          x2={472}
-          y2={110}
-          stroke="var(--muted)"
-          strokeWidth={1}
-          markerEnd="url(#af-arr)"
-        />
-
-        {/* Result → Agent (return arc) */}
-        <path
-          d={`M 510 92 C 510 30, 60 30, 60 88`}
-          stroke="var(--muted)"
-          strokeWidth={1}
-          strokeDasharray="4 3"
-          markerEnd="url(#af-arr)"
-        />
-        <text x={285} y={22} textAnchor="middle" fill="var(--muted)" fontSize={8} fontFamily={MONO}>
-          result
+        <text
+          x={355}
+          y={70}
+          textAnchor="middle"
+          fill="var(--accent)"
+          fontSize={10.8}
+          fontFamily={MONO}
+          fontWeight={700}
+        >
+          RAS Environment
+        </text>
+        <text
+          x={355}
+          y={85}
+          textAnchor="middle"
+          fill="var(--muted)"
+          fontSize={8.2}
+          fontFamily={MONO}
+        >
+          local regulation
         </text>
 
-        {/* Nodes */}
-        {nodes.map(({ id, x, y, label, w, role }) => {
-          const h = 28;
-          const fill =
-            role === "hub"
-              ? "var(--accent-muted)"
-              : role === "fn" && id === "reason"
-                ? "var(--accent-muted)"
-                : role === "fn"
-                  ? "rgba(167,139,250,0.12)"
-                  : "var(--card-bg)";
-          const stroke =
-            role === "hub"
-              ? "var(--accent)"
-              : role === "fn" && id === "reason"
-                ? "var(--accent)"
-                : role === "fn"
-                  ? "var(--accent-alt)"
-                  : "var(--muted)";
-          const textFill =
-            role === "hub"
-              ? "var(--accent)"
-              : role === "fn" && id === "reason"
-                ? "var(--accent)"
-                : role === "fn"
-                  ? "var(--accent-alt)"
-                  : "var(--foreground)";
-          return (
-            <g key={id}>
-              <rect
-                x={x - w / 2}
-                y={y - h / 2}
-                width={w}
-                height={h}
-                rx={6}
-                fill={fill}
-                stroke={stroke}
-                strokeWidth={role === "hub" ? 1.5 : 1}
-              />
-              <text
-                x={x}
-                y={y + 1}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill={textFill}
-                fontSize={10}
-                fontFamily={MONO}
-                fontWeight={600}
-              >
-                {label}
-              </text>
-            </g>
-          );
-        })}
+        <rect
+          x={240}
+          y={94}
+          width={224}
+          height={62}
+          rx={23}
+          fill="none"
+          stroke="var(--muted)"
+          strokeWidth={1}
+          strokeDasharray="5 5"
+          opacity={0.72}
+        />
+
+        <ellipse
+          cx={292}
+          cy={125}
+          rx={32}
+          ry={16}
+          fill="none"
+          stroke="var(--accent)"
+          strokeWidth={1.3}
+          strokeDasharray="5 5"
+          opacity={0.78}
+        />
+        <rect
+          x={366}
+          y={107}
+          width={78}
+          height={36}
+          rx={16}
+          fill="var(--card-bg)"
+          stroke="var(--accent-alt)"
+          strokeWidth={1.3}
+        />
+
+        <path
+          d="M 325 110 C 337 96, 351 96, 365 110"
+          stroke="var(--muted)"
+          strokeWidth={1.1}
+          strokeDasharray="5 5"
+          markerEnd={`url(#${mutedMarkerId})`}
+        />
+        <path
+          d="M 365 140 C 351 154, 337 154, 321 140"
+          stroke="var(--muted)"
+          strokeWidth={1.1}
+          strokeDasharray="5 5"
+          markerEnd={`url(#${mutedMarkerId})`}
+        />
+
+        <text
+          x={292}
+          y={125}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fill="var(--accent)"
+          fontSize={10.2}
+          fontFamily={MONO}
+          fontWeight={700}
+        >
+          reason()
+        </text>
+        <text
+          x={405}
+          y={125}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fill="var(--accent-alt)"
+          fontSize={10.4}
+          fontFamily={MONO}
+          fontWeight={700}
+        >
+          act()
+        </text>
+
+        <line
+          x1={456}
+          y1={125}
+          x2={520}
+          y2={125}
+          stroke="var(--muted)"
+          strokeWidth={1.2}
+          markerEnd={`url(#${mutedMarkerId})`}
+        />
+
+        <rect
+          x={520}
+          y={108}
+          width={130}
+          height={34}
+          rx={8}
+          fill="var(--card-bg)"
+          stroke="var(--muted)"
+          strokeWidth={1.2}
+        />
+        <text
+          x={585}
+          y={125}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fill="var(--foreground)"
+          fontSize={10.8}
+          fontFamily={MONO}
+          fontWeight={600}
+        >
+          denoised result
+        </text>
       </svg>
     </motion.div>
   );
@@ -672,10 +743,10 @@ function RuntimeLayers() {
           fontFamily={MONO}
           fontWeight={600}
         >
-          Agent Loop (LLM)
+          Main Reasoning Loop
         </text>
         <text x={26} y={48} fill="var(--muted)" fontSize={10} fontFamily={SANS}>
-          Orchestrates multiple continuous actions over time
+          Sets goals, constraints, and when to delegate
         </text>
 
         {/* Code RAS - Left */}
@@ -774,8 +845,8 @@ export function DataGraphs() {
       <div className="mb-16">
         <IndexLabel
           index="02"
-          title="RAS Architecture"
-          sub="The main agent delegates once; the action context composes reason() and act() under a stable runtime contract."
+          title="Local Regulation"
+          sub="Delegate once. The RAS handles local adjustment and returns a denoised result."
         />
         <RASFlow />
       </div>
@@ -783,8 +854,8 @@ export function DataGraphs() {
       <div>
         <IndexLabel
           index="03"
-          title="Runtime Environments"
-          sub="Script and shell flavors share the same interface semantics, so behavior stays portable across environments."
+          title="Two Execution Forms"
+          sub="The same RAS model can run as code or shell pipelines. The syntax changes, but local regulation stays the same."
         />
         <RuntimeLayers />
       </div>
