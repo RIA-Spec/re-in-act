@@ -34,7 +34,7 @@ function RASCore({ loopMarkerId }: { loopMarkerId: string }) {
         fontFamily="var(--font-mono)"
         opacity={0.9}
       >
-        local regulation
+        local execution
       </text>
 
       <motion.rect
@@ -433,8 +433,7 @@ export function CerebellumGraphic() {
         <span className="font-semibold" style={{ color: "var(--foreground)" }}>
           cerebrum
         </span>
-        . Re in Act keeps main reasoning focused on direction while the action layer handles local
-        adjustment.
+        . Re in Act keeps the big picture high-level while local adjustment stays with the work.
       </p>
     </div>
   );
@@ -444,8 +443,8 @@ export function CerebellumViz() {
   return (
     <Section>
       <SectionHeader
-        title="The Cerebellum Insight"
-        sub="Main reasoning sets direction; local regulation stays close to action and feedback."
+        title="Execution Stays Local"
+        sub="Keep the plan high-level. Keep local adjustment close to action and feedback."
       />
       <motion.div {...fade}>
         <CerebellumGraphic />

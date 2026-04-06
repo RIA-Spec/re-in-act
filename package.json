@@ -32,7 +32,7 @@
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
-    "@mcpc-tech/unplugin-dev-inspector-mcp": "^0.1.47",
+    "@mcpc-tech/unplugin-dev-inspector-mcp": "^0.1.49",
     "@tailwindcss/postcss": "4.1.17",
     "@types/node": "24.10.1",
     "@types/react": "19.2.7",

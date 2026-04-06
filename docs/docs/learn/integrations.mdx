@@ -9,6 +9,8 @@ Think of the RAS as a socket adapter: it does not care which appliance is plugge
 
 Re in Act is runtime-agnostic. The RAS works with any tool execution layer — as long as it can expose `reason()` and optionally `act()`.
 
+That matters because Re in Act is not tied to one vendor or one orchestration stack. The core idea is to strengthen the execution phase, whatever runtime happens to host it.
+
 ---
 
 ## MCP (Model Context Protocol)
@@ -41,11 +43,11 @@ See the [one-agent](https://github.com/RIA-Spec/one-agent) reference implementat
 
 ## LLM APIs
 
-One useful reference design here is Anthropic's [Programmatic tool calling](https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling). In that model, Claude writes code inside a code-execution container, calls tools from the running program, pauses on `tool_use`, resumes when the host returns `tool_result`, and keeps intermediate processing out of the model's main context window until the final output is ready.
+One useful reference design here is Anthropic's [Programmatic tool calling](https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling). In that model, Claude writes code inside a code-execution container, calls tools from the running program, pauses on `tool_use`, resumes when the host returns `tool_result`, and keeps intermediate processing out of the model's top-level context window until the final output is ready.
 
 That is close to the Re in Act intuition: loops, filtering, branching, and local tool coordination should happen **inside execution**, not through repeated outer-loop model turns.
 
-Re in Act is broader than that specific product feature. The spec does not require Anthropic-managed code execution or Anthropic's response protocol. `reason()` can be backed by any LLM API that supports structured output and **fresh-context** calls, while `act()` can be wired to MCP tools, custom functions, or runtime-native actions.
+Re in Act is broader than that specific product feature. The spec does not require Anthropic-managed code execution or Anthropic's response protocol. `reason()` can be backed by any LLM API that supports structured output and fresh local inference calls, while `act()` can be wired to MCP tools, custom functions, or runtime-native actions.
 
 Recommended models for `reason()` calls: lightweight, fast models. `reason()` is an atomic local decision step, not a full main reasoning pass — it does not need frontier-scale capability.
 
@@ -73,7 +75,7 @@ The Code RAS runs inside a sandboxed Python or Node.js process. Integration poin
 | TypeScript | Injected as async functions into the module scope |
 | Bash       | Registered as CLI commands in `PATH`              |
 
-The runtime executes the delegated program and returns a single final observation to the outer agent loop.
+The runtime executes the delegated program and returns a single final observation to the outer loop. This is the integration-level expression of the same idea used throughout the docs: keep local work local, and only return what matters.
 
 ---
 

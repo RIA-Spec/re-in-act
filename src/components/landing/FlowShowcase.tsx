@@ -194,14 +194,14 @@ export function Interfaces() {
     <Section>
       <SectionHeader
         title="The Interfaces"
-        sub="Two primitives — one required, one optional — that define the Re in Act contract."
+        sub="Two simple interfaces: one for local judgment, one for external action."
       />
 
       <div className="mb-16">
         <IndexLabel
           index="01"
           title="reason(prompt, example_output)"
-          sub="Transforms non-deterministic requests into deterministic structured JSON. Uses a lightweight model and fresh context."
+          sub="Turns local evidence into structured output that the RAS can use right away."
         />
         <ReasonSchema />
       </div>

@@ -1,0 +1,92 @@
+---
+title: Riff
+description: Riff - Reusable RAS Definitions.
+---
+
+# Riff
+
+Riff stands for **Reusable RAS Definitions**: named RAS programs that can be invoked again, composed with other RAS programs, and shared as reusable execution capabilities.
+
+Think of a Riff as a saved playbook for execution.
+
+---
+
+## The Concept
+
+A Riff captures the part of the RAS that should be reused:
+
+- the **RAS program** itself, whether script or pipeline
+- its expected inputs and outputs
+- the structure of its `reason()` / `act()` steps
+- any constraints that should stay attached to that execution flow
+
+That is why the reusable asset is the execution logic itself.
+
+A Riff can then be:
+
+1. **Run again** on new inputs
+2. **Composed** as a sub-step inside a larger RAS program
+3. **Shared** as a reusable capability
+
+---
+
+## Why This Matters
+
+In traditional ReAct, every task starts from zero. There is no clean way to keep a proven execution flow and invoke it again as a first-class capability.
+
+With Riffs, successful flows accumulate into a **library of proven execution patterns**. Top-level reasoning can select one by name and run it without re-deriving the logic each time.
+
+This fits the broader Re in Act story: capability does not improve only by making the model smarter. It also improves by making execution reusable.
+
+This is analogous to how the cerebellum reuses learned motor programs: once the structure works, it can be invoked again without rebuilding it from scratch.
+
+---
+
+## Example
+
+A Riff can be written and named directly:
+
+```python
+WEB_RESEARCH_AND_SYNTHESIZE = """
+    tools = (await reason("Choose tools for web research", ["tool"]))["data"]
+    results = [await act(t, {"query": topic}) for t in tools]
+    return (await reason(f"Synthesize: {results}", {"summary": ""}))["data"]
+"""
+
+result = await ras.run(WEB_RESEARCH_AND_SYNTHESIZE, inputs={"topic": "Re in Act"})
+```
+
+Once that flow proves useful, it can be registered under a reusable name and invoked later:
+
+```python
+register_ras_definition("web_research_and_synthesize", WEB_RESEARCH_AND_SYNTHESIZE)
+
+outline = await act("web_research_and_synthesize", {"topic": "Ashby's Law"})
+```
+
+The exact API is implementation-specific. The important point is the same: the reusable thing is the **Riff**, not some captured runtime instance.
+
+---
+
+## Composition
+
+Riffs are especially useful because they compose naturally.
+
+One named Riff can call another through `act()`, making larger execution flows out of smaller proven ones.
+
+```python
+outline = await act("web_research_and_synthesize", {"topic": topic})
+draft = (await reason(f"Write a post based on: {outline}", {"content": ""}))["data"]
+```
+
+This allows complex behavior to emerge from simple, reusable building blocks without bloating the top-level context or forcing the system to rediscover the same execution structure over and over.
+
+---
+
+## Relationship to the Spec
+
+Riffs are an **extension capability** built on top of the core spec interfaces (`reason()` / `act()`).
+
+The core spec does not require a standard packaging format for reusable definitions, but the concept fits naturally on top of Re in Act.
+
+See [Proposals](/proposals/index) if you want to push toward standardization of naming, packaging, and sharing Riffs.

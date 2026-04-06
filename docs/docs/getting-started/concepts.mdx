@@ -9,6 +9,21 @@ If the introduction explains the idea, this page explains the working parts. Thi
 
 This page walks through the two RAS runtime flavors and the two core interfaces with annotated examples drawn from the [one-agent](https://github.com/RIA-Spec/one-agent) reference implementation.
 
+## Control View
+
+Re in Act is easiest to understand as a local control architecture.
+
+- The **top-level reasoner** defines the RAS and its constraints.
+- The **Team Context** defines the RAS with that work specification plus local inputs.
+- The RAS runs deterministic control flow such as loops, retries, and tool calls.
+- `reason()` plays the role of a **semantic comparator and filter**: it takes the current local observations and intermediate data, compares them against the work specification, and returns schema-bounded output that execution can act on.
+
+This is an engineering analogy, not a claim that the runtime is literally a classical control block diagram. The point is that raw observations become useful only after local filtering and comparison.
+
+If you want the deeper design rationale, see [Control-Theoretic View](/docs/learn/control-theoretic-view).
+
+In practical agent terms, this is why the RAS matters: it lets execution keep working through local uncertainty instead of handing every small disturbance back to the main loop.
+
 ## The Two Runtime Flavors
 
 ### Code RAS
@@ -78,6 +93,8 @@ act --manual > m.json && \
 
 **Pattern**: redirect intermediate results with `>` → use `jq` to extract from `.data` → pipe into the next command.
 
+Unix pipelines are useful here because they compose programs through standard streams while hiding internal details behind clean interfaces. They do not automatically provide semantic understanding; `reason()` is still what turns raw output into a useful structured judgment.
+
 ---
 
 ## `reason(prompt, example_output)`
@@ -86,11 +103,24 @@ act --manual > m.json && \
 
 ### Key rules
 
-- **Always starts a fresh context** — no memory of previous calls. Include all needed context in the prompt.
-- **Include reference + observation + constraints** — prompts should state target objective, local state/feedback, and operational bounds.
+- **Uses a fresh inference context** — each call should include the needed local context explicitly, but the surrounding execution state and orchestration still stay in the same RAS.
+- **Include reference + observation + constraints** — prompts should state target objective, local observations/feedback, and operational bounds.
 - **Retry on schema failure** — validates the output against the schema inferred from `example_output`. Retries up to N times with the error as feedback before returning `{ "error": "..." }`.
 - **Bound output variety with schema** — `example_output` constrains responses into an executable control channel.
-- **Use a lightweight model** — `reason()` is an atomic local reasoning call, not a full main reasoning cycle.
+- **Use a lightweight model when possible** — `reason()` is an atomic local reasoning call, not a full main reasoning cycle.
+
+### What `reason()` is for
+
+`reason()` is not a second full agent. It is a local judgment step inside an orchestrable RAS. Its job is to turn raw local evidence into bounded decisions that execution can carry out deterministically under the control of the enclosing runtime.
+
+That is why `reason()` improves execution quality: it lets the agent compress noisy local observations and intermediate data into something small, explicit, and actionable.
+
+Typical uses include:
+
+- classify success or failure from noisy logs
+- pick the next tool or branch from a constrained set
+- extract structured facts from unstructured local evidence
+- summarize only the signal that should leave the RAS
 
 ### Example — sentiment analysis
 

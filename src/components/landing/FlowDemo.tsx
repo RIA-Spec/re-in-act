@@ -15,7 +15,7 @@ export function FlowDemo() {
     <Section>
       <SectionHeader
         title="Reason-able Action Spaces"
-        sub="The Cerebellum in practice. RAS provides deterministic, feedback-driven execution inside the action phase — so main reasoning only needs to state goals and constraints, not manage every step."
+        sub="What the RAS looks like in practice: local checks, bounded judgments, and work that keeps moving."
       />
 
       {/* ── 1. Code RAS ── */}
@@ -25,8 +25,7 @@ export function FlowDemo() {
         </h3>
         <p className="text-[14px] mt-1.5 leading-relaxed" style={{ color: "var(--muted)" }}>
           Deterministic orchestration in scripts: branches, loops, and validation happen in code,
-          while `reason()` provides local adaptive decisions inside execution — without a single
-          outer-loop round trip.
+          while `reason()` turns local evidence into structured judgments inside execution.
         </p>
       </div>
 
@@ -103,7 +102,7 @@ export function FlowDemo() {
         </h3>
         <p className="text-[14px] mt-1.5 leading-relaxed" style={{ color: "var(--muted)" }}>
           Unix-style pipelines compose `reason` and `act` in a single action phase, with explicit
-          data flow between steps.
+          data flow between steps and no need to bounce each small result back to the outer loop.
         </p>
       </div>
 

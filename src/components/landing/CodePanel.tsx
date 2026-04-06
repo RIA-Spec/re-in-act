@@ -4,22 +4,22 @@ import { motion, useMotionValue, useTransform, animate, useInView } from "framer
 import { useEffect, useRef } from "react";
 
 /* ────────────────────────────────────────────
-   Re in Act — discover_tools pseudo-code
+   Re in Act — execution stays local
    ──────────────────────────────────────────── */
 
 const CODE_LINES = [
-  { text: "# Build analyzer — Re in Act RAS", cls: "cmt" },
+  { text: "# Build analyzer — local execution", cls: "cmt" },
   { text: "log = open('build.log').read()", cls: "" },
   { text: "", cls: "" },
   { text: "analysis = await reason(", cls: "kw" },
-  { text: "    log + 'Success?',", cls: "" },
-  { text: "    '{\"success\": false}'", cls: "" },
+  { text: "    log + 'Did the build succeed?',", cls: "" },
+  { text: '    \'{"success": false, "reason": ""}\'', cls: "" },
   { text: ")", cls: "kw" },
   { text: "", cls: "" },
-  { text: "if analysis['success']:", cls: "kw" },
+  { text: "if analysis['data']['success']:", cls: "kw" },
   { text: "    act('deploy', 'to prod')", cls: "act" },
   { text: "else:", cls: "kw" },
-  { text: "    act('notify', 'on failure')", cls: "act" },
+  { text: "    act('notify', analysis['data']['reason'])", cls: "act" },
 ];
 
 /* ────────────────────────────────────────────

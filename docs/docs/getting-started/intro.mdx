@@ -5,43 +5,47 @@ description: What is Re in Act? A quick orientation for new readers.
 
 # What is Re in Act?
 
-**Re in Act** (Reason in Action) is a simple idea: let the agent think globally, but adapt locally.
+**Re in Act** is about making execution stronger.
 
-In traditional **ReAct** (_Reason → Act → Observe → Repeat_), every small issue has to travel back through the outer loop. That makes agents slow, noisy, and fragile.
+In traditional **ReAct** (_Reason → Act → Observe → Repeat_), small execution problems keep bouncing back to the outer loop. That creates extra round trips, noisy context, and brittle control.
 
-**Re in Act** changes this by introducing a **Reason-able Action Space (RAS)**. Main reasoning sets the objective once, and the RAS handles local adjustment during execution.
+Re in Act introduces a **Reason-able Action Space (RAS)** so those local problems can be handled where they appear. Top-level reasoning defines the RAS and its constraints; execution uses that workspace to inspect feedback, make bounded judgments, and keep moving.
+
+The result is simpler execution: fewer outer-loop turns, less context bloat, and a larger effective action space during execution.
 
 ---
 
 ## The Cerebellum Metaphor
 
-In biology, the **Cerebrum** (Big Brain) handles slow, deliberate, and conscious thought. The **Cerebellum** (Small Brain) handles motor control and reflexes: it is fast, continuous, and automatic.
+Think about walking. The conscious brain decides to move, but it does not micromanage every correction. Adjustment happens closer to the body and closer to feedback.
 
-If you decide to walk, your Cerebrum issues the high-level command: "Walk forward." It doesn't calculate every muscle contraction. Instead, your **Cerebellum** takes that command and organizes the complex actions required, dynamically adjusting your balance based on real-time feedback from the terrain.
+That is the intuition behind the RAS.
 
-### Why this matters for AI:
+Top-level reasoning should define the work and its constraints. The execution layer should handle local disturbances inside that bounded workspace instead of escalating every small issue back to the outer loop.
 
-The Cerebellum has two properties that make it the right metaphor for the RAS:
+This metaphor matters for two reasons:
 
-1. **Goal-oriented (fixed target)**: The Cerebellum doesn't perform main reasoning. It receives a high-level command — "walk forward" — and treats it as a fixed reference point. Achieving that goal in the actual environment (balance, terrain, speed) is entirely its own business.
-2. **Internal models**: It maintains internal models of the body and environment to dynamically adjust execution in real time, without consulting the Cerebrum for every correction.
+1. **Bounded execution**: the RAS works inside a defined task package rather than inventing a new top-level objective.
+2. **Local adaptation**: the RAS can use nearby observations, intermediate data, and runtime control flow to adjust while execution is already underway.
 
-Together, these mean the Cerebrum **never needs to enumerate or pre-model all possible disturbances**. It delegates to a system that can absorb local problems where they happen. The theory comes after the intuition:
+That is why the deeper theory points in the same direction:
 
-- **Ashby's Law (Requisite Variety)**: A controller must have at least as much variety as the system it controls. ReAct's fixed Action Primitives lack this variety. The RAS — a programmable, feedback-driven runtime — provides it.
-- **Good Regulator Theorem**: Every good regulator must contain an internal model of the system it regulates. The RAS is precisely this: a local model of the tool environment, operating as a **closed-loop feedback system** that self-corrects without escalating every deviation back to main reasoning.
+- **Ashby's Law (Requisite Variety)**: only variety can absorb variety. ReAct's fixed action layer often cannot express enough differentiated responses to handle local disturbances well. The RAS expands that local controller variety.
+- **Good Regulator Theorem**: a successful regulator needs access to a model of the system it regulates. In Re in Act, the RAS supplies task-relevant local structure, so the agent does not need to rebuild that structure from scratch on every outer-loop turn.
+
+If you want the deeper version of this argument, see [Control-Theoretic View](/docs/learn/control-theoretic-view).
 
 ---
 
 ## At a Glance
 
-|                 | Traditional ReAct           | Re in Act                      |
-| --------------- | --------------------------- | ------------------------------ |
-| **Logic**       | Probabilistic (LLM-stepped) | **Deterministic** (RAS-driven) |
-| **Metaphor**    | Micro-managing Cerebrum     | **Autonomous Cerebellum**      |
-| **Round Trips** | Continuous outer-loop turns | **One delegated action phase** |
-| **Context**     | Grows with observations     | **Isolated from main context** |
-| **Resilience**  | Brittle to perturbations    | **Self-correcting via RAS**    |
+|                 | Traditional ReAct           | Re in Act                            |
+| --------------- | --------------------------- | ------------------------------------ |
+| **Logic**       | Probabilistic (LLM-stepped) | **Deterministic** (RAS-driven)       |
+| **Metaphor**    | Micro-managing Cerebrum     | **Bounded Cerebellum**               |
+| **Round Trips** | Continuous outer-loop turns | **One orchestrated execution phase** |
+| **Context**     | Grows with observations     | **Isolated from top-level context**  |
+| **Resilience**  | Brittle to perturbations    | **Self-correcting via RAS**          |
 
 ---
 
@@ -49,9 +53,16 @@ Together, these mean the Cerebrum **never needs to enumerate or pre-model all po
 
 ### Reason-able Action Space (RAS)
 
-The RAS is the execution context for the delegated action phase. It provides two core interfaces:
+The RAS is the execution context that top-level reasoning defines for an orchestrated action phase. It contains:
 
-- **`reason(prompt, example_output)`** — calls the LLM for structured JSON output (fresh context, no memory)
+- **Team Context** — the work specification, local inputs, and constraints that define the RAS
+- **`reason(prompt, example_output)`** — a local semantic judgment step that turns context plus feedback into structured output
+- deterministic control flow for retries, branching, and intermediate-data handling
+
+The important point is that the RAS is not just a place to run tools. It is the part of the system that top-level reasoning can still structure and control while execution inspects local observations and intermediate data, makes bounded judgments, and keeps moving without turning every small issue into another outer-loop turn.
+
+It may also provide:
+
 - **`act(name, args)`** — calls an external tool and returns its result _(optional — you may use your own action executor)_
 
 ### Two Runtime Flavors
@@ -66,5 +77,6 @@ See [Concepts →](/docs/getting-started/concepts) for annotated examples of bot
 ## Next Steps
 
 - [Concepts →](/docs/getting-started/concepts) — deeper walkthrough of runtime flavors and interfaces
+- [Control-Theoretic View →](/docs/learn/control-theoretic-view) — the deeper design argument behind the architecture
 - [Specification →](/specification/draft/index) — the full formal draft
 - [one-agent →](https://github.com/RIA-Spec/one-agent) — the reference implementation

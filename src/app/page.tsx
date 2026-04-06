@@ -9,10 +9,10 @@ export default function HomePage() {
   return (
     <main className="min-h-screen" style={{ backgroundColor: "var(--background)" }}>
       <Hero />
+      <QuickLinks />
       <DataGraphs />
       <Interfaces />
       <FlowDemo />
-      <QuickLinks />
       <Footer />
     </main>
   );

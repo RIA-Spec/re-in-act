@@ -1,13 +1,13 @@
 ---
 title: "Re in Act — Specification"
-description: The working draft of the Re in Act open specification for Reason in Action.
+description: The working draft of the Re in Act open specification.
 ---
 
 # Specification
 
 <Note>
   This is a **working draft** (v0.1.0, 2026-02-01). It is subject to change and should not be
-  considered stable. Author: https://x.com/yaoandyan.
+  considered stable. Author: [@yaoandyan](https://x.com/yaoandyan).
 </Note>
 
 ## 1. Introduction
@@ -16,7 +16,11 @@ Think of an agent like a person walking. The conscious brain sets the direction,
 
 **Re in Act** applies the same idea to AI agents. Main reasoning should set goals and constraints. The fast, local adjustments needed during execution should happen inside a **Reason-able Action Space (RAS)**.
 
-This makes the core idea simple: instead of sending every small disturbance back through an outer reason-act-observe loop, let execution absorb and regulate local problems where they occur. The deeper control-theoretic argument comes later, but the practical result is immediate: fewer round trips, less context bloat, and a larger effective action space during execution.
+This makes the core idea simple: instead of sending every small disturbance back through an outer reason-act-observe loop, let execution handle local problems where they occur.
+
+For an agent, that means the main model does not need to stop and rethink after every failed command, noisy log, or small branch in execution. It can delegate a bounded piece of work into the RAS, let that work adapt locally, and only return when there is something meaningful to report.
+
+The practical result is straightforward: fewer round trips, less context bloat, and a larger effective action space during execution. The deeper claim of this specification is that many agent failures come from the execution layer being too weak, not only from the model being too weak. Re in Act strengthens that execution layer.
 
 ---
 
@@ -24,58 +28,96 @@ This makes the core idea simple: instead of sending every small disturbance back
 
 AI agents, especially coding agents, have evolved significantly since the inception of ReAct, which revolutionized problem-solving by interleaving thought and action. Yet fundamental limitations persist.
 
-ReAct relies on iterative cycles of **serialized reasoning and acting**, where execution must pause for observation before the next decision. This architecture suffers from three structural problems and one control-theoretic bottleneck:
+ReAct relies on iterative cycles of **serialized reasoning and acting**, where execution must pause for observation before the next decision. This works for simple tasks, but it starts to break down when an agent has to deal with messy local reality: logs, retries, partial failures, branching conditions, and tool-specific details.
 
-### 2.1 Unnecessary Round Trips (High Latency)
+### 2.1 What Goes Wrong for Agents
 
-Each observation is pushed back into model context, requiring a full outer-loop turn. This "round-trip tax" makes agents feel slow and expensive.
+In a ReAct loop, every small disturbance tends to bounce back to the main model:
 
-### 2.2 Context Window Pollution
+- a command prints too much output
+- a build fails and needs diagnosis
+- a web page or API returns something slightly different than expected
+- a task needs a short retry loop or branch before the real work can continue
 
-By observing every intermediate result verbatim (e.g., massive build logs), the main context window becomes bloated with noisy, irrelevant data. This leads to attention loss and repetitive loops. The cumulative attention cost scales as $O(L^2)$ with context length $L$ — a fundamental constraint of transformer-based ReAct that compounds with every added round trip.
+The agent can still solve these problems, but it solves them in an awkward way: stop execution, push the intermediate data back into context, think again, then take one more small step.
 
-### 2.3 Fragile Probabilistic Control Flow
+### 2.2 Why That Feels Slow and Fragile
 
-The LLM controls the flow at every micro-step. Logic that should be **deterministic** (if/else, loops) is instead **probabilistic**, making the agent's behavior increasingly unreliable as complexity grows.
+This outer-loop style creates three familiar agent problems:
 
-Concretely, an LLM-controlled `for` or `while` loop has no formal correctness or termination guarantee. Under attention pressure, the model may silently mis-count iterations, skip conditions, or misread loop state — turning what should be deterministic execution into an unreliable probabilistic gamble.
+- **Too many round trips**: local issues that should be handled in place become extra think-act-observe cycles.
+- **Too much noise in context**: raw logs, raw tool output, and other intermediate artifacts crowd the top-level context window.
+- **Weak control over execution**: branching, retries, and loops are guided by repeated model turns instead of being handled directly inside the orchestrated execution phase.
 
-### 2.4 Control Theory
+As tasks get longer, the agent spends more effort managing execution itself and less effort advancing the user's actual goal.
 
-According to Ashby's Law, a controller must have at least as much variety as the system it is intended to control. In ReAct, the practical bottleneck is not only the LLM itself, but the narrow action interface between action and a complex environment: the action layer cannot carry enough variety to absorb environmental perturbations, so required variety is not effectively transmitted where regulation happens.
+### 2.3 What Re in Act Changes
 
-"Every good regulator of a system must be a model of that system." ReAct therefore forces a global model (the LLM) to compensate continuously for missing local structure. This is an **internal variety tax**: token-intensive repair work, added latency, and rising drift risk as corrective chains grow longer.
+Re in Act introduces a **Reason-able Action Space (RAS)** that top-level reasoning defines and orchestrates, so local issues can be handled where they happen inside a controllable execution workspace.
 
-Re in Act addresses this by introducing the **Reason-able Action Space (RAS)** as a local, feedback-capable intermediary between main reasoning and the environment. RAS increases local execution variety and provides a task-level internal model at the action layer, so adaptation occurs where action actually happens instead of being repeatedly escalated to main reasoning.
+Inside the RAS, execution can:
+
+- inspect intermediate data without sending everything back to the outer loop
+- use `reason()` to turn noisy local evidence into a small structured judgment
+- continue execution through code or shell control flow until the local job is actually done
+
+The effect is simple: the main model defines the objective and the executable workspace around it, while execution gets enough local structure to adapt without escalating every small deviation.
+
+### 2.4 The Deeper Point
+
+This is the agent-facing meaning of the control-theoretic argument behind Re in Act. A capable model is not enough if the action layer is too narrow and every correction must go back through the outer loop.
+
+Re in Act expands what the agent can do **during execution**, not just what it can say before execution starts. That is why the visible improvements are fewer round trips, cleaner context, and more reliable task completion.
+
+For the full design rationale behind this control-theoretic framing, see [Control-Theoretic View](/docs/learn/control-theoretic-view).
 
 ---
 
 ## 3. Overview
 
-Re in Act transforms a serial "Reason and Act" loop into an atomic **"Reason in Action"** primitive: combining deterministic control flow with non-deterministic decisions in one action.
+Re in Act transforms a serial "Reason and Act" loop into an atomic **"Reason in Action"** primitive: combining deterministic control flow with non-deterministic decisions in one orchestrated execution phase.
+
+This specification models the architecture with three core elements:
+
+- **Top-level reasoning**: defines the RAS, its success criteria, and its high-level constraints.
+- **Team Context**: the bounded task package by which top-level reasoning defines the RAS, including the work specification, local inputs, constraints, and any necessary prior decisions.
+- **`reason()` inside the RAS**: produces local structured judgments that execution can use immediately.
+
+Together these form a practical local feedback loop. This is an engineering mapping, not a claim that the whole architecture is a fully formalized control-system proof. The point is architectural: direction stays global, while sensing, comparison, and correction move closer to action.
 
 **Benefits:**
 
-- **Fewer round trips**: Multiple outer-loop turns collapse into a single delegated action phase, reducing latency and cost.
-- **Clean context window**: Intermediate data (build logs, API responses, intermediate reasoning) stays **inside** the RAS and never enters the main context. Only the final observation is returned.
+- **Fewer round trips**: Multiple outer-loop turns collapse into a single orchestrated execution phase, reducing latency and cost.
+- **Clean context window**: Intermediate data (build logs, API responses, intermediate reasoning) stays **inside** the RAS and never enters the top-level context. Only the final observation is returned.
 - **Deterministic control flow**: `for`/`while`/`if` logic runs in code, not through the LLM — correctness is guaranteed by the runtime, not by model attention.
-- **Requisite variety**: The RAS is a programmable, adaptive execution layer with the variety needed to handle unmodeled environmental perturbations.
+- **Higher effective controller variety**: The RAS is a programmable, adaptive execution layer with more ways to sense, compare, and respond to local perturbations.
 
 **New complexity introduced:**
 
-A **Reason-able Action Space (RAS)** is required: an execution context that can run a delegated action phase through `reason()` and optional `act()` calls. Main reasoning must be able to generate well-structured delegated programs, and intermediate execution state is not directly observable from the outer loop.
+A **Reason-able Action Space (RAS)** is required: an execution context that top-level reasoning can define and orchestrate through `reason()` and optional `act()` calls. The RAS is a programmable execution workspace, not an independent reasoning actor, and intermediate execution state is no longer exposed step by step to the outer loop.
 
 ---
 
 ## 4. Specification
 
-### 4.1 Reason-able Action Space (RAS)
+### 4.1 Required Roles
+
+An implementation conforming to this specification MUST provide the following logical roles, whether or not they are exposed as separate components:
+
+1. **Top-level reasoner** that defines and orchestrates a RAS.
+2. **Team Context** that defines the objective and local constraints of that RAS.
+3. **`reason()` capability** that produces schema-bounded local judgments.
+4. A runtime inside the RAS that can execute deterministic control flow and action calls.
+
+### 4.2 Reason-able Action Space (RAS)
 
 The RAS defines the execution context and interfaces for reasoning in action. It can be run in two main forms:
 
 #### Bash RAS — The Unix Philosophy
 
 The agent controls flow using Unix pipes (`|`) and redirection (`>`). Intermediate data is persisted transparently on the filesystem.
+
+Unix pipelines matter here because they are a compositional execution mechanism: processes can be connected through standard streams while hiding internal implementation details. They do **not** by themselves provide global sensing or semantic understanding; those must still be supplied by prompts, schemas, and local filtering.
 
 ```bash
 cat api_docs.md | \
@@ -94,6 +136,8 @@ This pipeline streams API documentation into the agent to generate an executable
 
 The agent manages control flow using code execution (conditions, loops, branches). Python and TypeScript are recommended to leverage model pre-training on their syntax and async semantics.
 
+General-purpose code sandboxes are useful because they are expressive enough to encode rich local policies, retries, branches, and derived checks. In abstract computability terms they are typically Turing-complete, but implementations remain bounded by real limits such as time, memory, permissions, and sandbox policy. This specification relies on their **practical expressivity**, not on any claim of infinite real-world capacity.
+
 ```python
 log = open("build.log").read()
 analysis = await reason(
@@ -108,7 +152,18 @@ else:
 
 This script uses Python's native control flow to branch between deployment and notification based on the AI's structured analysis.
 
-### 4.2 Sandbox
+### 4.3 Team Context
+
+Team Context is the bounded package by which top-level reasoning defines a RAS. It SHOULD contain:
+
+1. The objective or sub-goal that the RAS is being defined to execute.
+2. Relevant local observations or artifacts.
+3. Constraints, policies, and stop conditions.
+4. Any prior decisions that the RAS must preserve.
+
+Team Context MUST be sufficient for `reason()` to operate without hidden dependence on the outer conversation state, while remaining under the control of the same orchestrated execution workspace.
+
+### 4.4 Sandbox
 
 Two sandbox strategies are supported:
 
@@ -123,11 +178,11 @@ Two sandbox strategies are supported:
 
 ### 5.1 `reason([prompt], [example_output])`
 
-**Description:** A local regulator interface that maps non-deterministic language inputs into deterministic structured JSON for execution control. In control-theoretic terms, `reason()` converts local observations plus a reference objective into a bounded control signal. It is an atomic reasoning step — no tools, no memory, no side effects.
+**Description:** A local regulator interface that maps non-deterministic language inputs into deterministic structured JSON for execution control. In control-theoretic terms, `reason()` converts local observations plus a reference objective into a bounded control signal. More precisely, it plays the role of a semantic comparator and filter inside the local loop. It is an atomic reasoning step — no tools, no memory, no side effects.
 
 **Control-theoretic contract:**
 
-1. **Reference + observation in, control signal out** — prompts should contain the target objective (reference), relevant local state/feedback (observation), and constraints.
+1. **Reference + observation in, control signal out** — prompts should contain the target objective (reference), relevant local observations or feedback (observation), and constraints.
 2. **Bounded variety output** — `example_output` defines the admissible response shape, constraining output variety into an executable channel.
 3. **Isolated local regulation** — `reason()` must not call tools or depend on hidden conversation state; otherwise the regulation boundary becomes ambiguous.
 4. **Explicit failure semantics** — on repeated schema failure, return structured error output rather than unconstrained text.
@@ -142,7 +197,7 @@ Two sandbox strategies are supported:
 
 **Implementation options:**
 
-- **New conversation context** — reuse your LLM request logic but start a fresh context (similar to the "subagent" approach)
+- **New conversation context** — reuse your LLM request logic but start a fresh inference context for the local call, while keeping orchestration, state, and control in the same RAS
 - **MCP Sampling** — where the RAS acts as an MCP Server and requests completion from the MCP client
 
 ### 5.2 `act([name], [args])` — Optional
@@ -160,10 +215,8 @@ Two sandbox strategies are supported:
 For reference, we open-sourced a Re in Act implementation project called **one-agent**.
 
 - GitHub: [RIA-Spec/one-agent](https://github.com/RIA-Spec/one-agent)
-- Supports both Bash RAS and Python RAS modes; the current reference implementation still uses the `AER_MODE` environment variable as a legacy compatibility name
+- Supports both Bash RAS and Python RAS modes
 - Uses MCP for tool discovery and execution
-
-_Further implementation details are deferred to a future revision._
 
 ---
 

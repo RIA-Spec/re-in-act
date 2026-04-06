@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
-import type { NavTab, NavPage, NavGroup, NavVersion } from "@/lib/navigation";
+import type { NavTab, NavPage } from "@/lib/navigation";
 
 interface SidebarProps {
   tabs: NavTab[];

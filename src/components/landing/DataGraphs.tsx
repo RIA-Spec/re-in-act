@@ -13,25 +13,25 @@ const PARADIGM_SHIFT_COMPARISONS: Array<{
   bold?: boolean;
 }> = [
   {
-    from: "Low-Variety Action Interface",
-    to: "RAS Expands Local Action Variety",
+    from: "Thin Execution Layer",
+    to: "RAS Strengthens Local Execution",
     bold: true,
   },
   {
     from: "Round-Trip Tax (Reason-Act-Observe)",
-    to: "One Delegated Action Phase",
+    to: "One Orchestrated Execution Phase",
   },
   {
-    from: "Context Bloat from Intermediate Observations",
-    to: "Intermediate State Stays in RAS",
+    from: "Raw Intermediate Data in Main Context",
+    to: "Intermediate Data Stays in RAS",
   },
   {
     from: "Probabilistic Micro-Control Flow",
     to: "Deterministic Runtime Control Flow",
   },
   {
-    from: "No Local Internal Model at Action Layer",
-    to: "Feedback-Capable Local Regulator",
+    from: "No Local Structure During Action",
+    to: "Intermediate Data + Judgment Inside Execution",
   },
 ] as const;
 
@@ -425,7 +425,7 @@ function ParadigmShift() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 2.8, type: "spring", damping: 10 }}
           >
-            Delegated action phase
+            Orchestrated execution phase
           </motion.text>
         </g>
       </svg>
@@ -542,7 +542,7 @@ function RASFlow() {
           fontFamily={MONO}
           fontWeight={600}
         >
-          Main Reasoning
+          Top-Level Reasoning
         </text>
 
         <line
@@ -594,7 +594,7 @@ function RASFlow() {
           fontSize={8.2}
           fontFamily={MONO}
         >
-          local regulation
+          local execution
         </text>
 
         <rect
@@ -743,10 +743,10 @@ function RuntimeLayers() {
           fontFamily={MONO}
           fontWeight={600}
         >
-          Main Reasoning Loop
+          Top-Level Loop
         </text>
         <text x={26} y={48} fill="var(--muted)" fontSize={10} fontFamily={SANS}>
-          Sets goals, constraints, and when to delegate
+          Defines the RAS, its constraints, and when to run it
         </text>
 
         {/* Code RAS - Left */}
@@ -827,14 +827,14 @@ export function DataGraphs() {
     <Section>
       <SectionHeader
         title="From ReAct to Re in Act"
-        sub="How the paradigm shift works — from protocol to execution model."
+        sub="How the flow changes: less stop-and-think, more structured execution."
       />
 
       <div className="mb-16">
         <IndexLabel
           index="01"
           title="Paradigm Shift"
-          sub="ReAct keeps reasoning and acting in the outer loop. Re in Act delegates one action phase and lets local reasoning happen inside execution."
+          sub="ReAct returns to the outer loop at every step. Re in Act keeps the work moving inside one RAS."
         />
         <div className="space-y-4">
           <ParadigmShift />
@@ -845,8 +845,8 @@ export function DataGraphs() {
       <div className="mb-16">
         <IndexLabel
           index="02"
-          title="Local Regulation"
-          sub="Delegate once. The RAS handles local adjustment and returns a denoised result."
+          title="Local Execution"
+          sub="The RAS handles retries, branching, and local checks, then returns the result."
         />
         <RASFlow />
       </div>
@@ -855,7 +855,7 @@ export function DataGraphs() {
         <IndexLabel
           index="03"
           title="Two Execution Forms"
-          sub="The same RAS model can run as code or shell pipelines. The syntax changes, but local regulation stays the same."
+          sub="The same idea can run as code or shell pipelines. The syntax changes; the workflow does not."
         />
         <RuntimeLayers />
       </div>

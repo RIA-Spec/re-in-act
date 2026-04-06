@@ -32,6 +32,16 @@ export function Hero() {
       </motion.div>
 
       {/* Tagline */}
+      <motion.div
+        className="mb-4 inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em]"
+        style={{ borderColor: "var(--border)", color: "var(--accent)" }}
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, delay: 0.08, ease: "easeOut" }}
+      >
+        Open Spec For Agent Execution
+      </motion.div>
+
       <motion.h1
         className="mb-6 text-center text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl"
         style={{ color: "var(--foreground)" }}
@@ -49,8 +59,9 @@ export function Hero() {
         transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
       >
         <p className="max-w-2xl text-lg leading-tight" style={{ color: "var(--foreground)" }}>
-          A bigger action space for AI agents. Re in Act lets execution absorb local disturbances
-          before they turn into round trips, context bloat, and brittle control in traditional{" "}
+          Re in Act strengthens the execution layer of an AI agent. It lets execution handle local
+          disturbances before they turn into extra round trips, noisy context, and brittle control
+          in traditional{" "}
           <a
             href="https://arxiv.org/abs/2210.03629"
             target="_blank"
@@ -61,11 +72,19 @@ export function Hero() {
           </a>
           .
         </p>
+        <p
+          className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed"
+          style={{ color: "var(--muted)" }}
+        >
+          Top-level reasoning defines the RAS and its constraints. Inside that orchestrated
+          workspace, intermediate data stays available, noisy evidence becomes bounded judgments,
+          and execution keeps moving.
+        </p>
       </motion.div>
 
       {/* CTA */}
       <motion.div
-        className="mb-16 flex items-center gap-3"
+        className="mb-16 flex flex-wrap items-center justify-center gap-3"
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
@@ -85,6 +104,13 @@ export function Hero() {
         >
           <BookOpen className="h-4 w-4" />
           Read the Spec
+        </Link>
+        <Link
+          href="/docs/learn/control-theoretic-view"
+          className="inline-flex cursor-pointer items-center gap-2 rounded-lg border px-5 py-2.5 text-sm font-medium transition-colors duration-200"
+          style={{ borderColor: "var(--border)", color: "var(--foreground)" }}
+        >
+          Why It Works
         </Link>
       </motion.div>
     </section>

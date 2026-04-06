@@ -12,7 +12,8 @@
           {
             "group": "Learn",
             "pages": [
-              "docs/learn/ras-snapshot",
+              "docs/learn/control-theoretic-view",
+              "docs/learn/riff",
               "docs/learn/integrations",
               "docs/learn/subagents-agent-teams"
             ]

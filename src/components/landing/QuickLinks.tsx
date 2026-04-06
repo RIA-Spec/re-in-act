@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { BookOpen, FileText, Lightbulb, Users } from "lucide-react";
+import { BookOpen, FileText, Orbit, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { NAV_TABS } from "@/lib/constants";
@@ -21,25 +21,25 @@ interface QuickLink {
 const links: QuickLink[] = [
   {
     title: "Documentation",
-    description: "Understand the Cerebellum design: RAS, reason(), act(), and how to get started.",
+    description: "Start with the basics: RAS, reason(), and how Re in Act works.",
     href: NAV_TABS[0].href,
     icon: BookOpen,
   },
   {
     title: "Specification",
-    description: "Read the formal Re in Act draft specification in full.",
+    description: "Read the current draft of the Re in Act specification.",
     href: NAV_TABS[1].href,
     icon: FileText,
   },
   {
-    title: "Proposals",
-    description: "Browse and submit spec change proposals.",
-    href: NAV_TABS[2].href,
-    icon: Lightbulb,
+    title: "Why It Works",
+    description: "Read the deeper design argument behind Re in Act.",
+    href: "/docs/learn/control-theoretic-view",
+    icon: Orbit,
   },
   {
     title: "Community",
-    description: "Contribute, discuss, and shape Re in Act.",
+    description: "Join the discussion and help shape the project.",
     href: NAV_TABS[3].href,
     icon: Users,
   },
@@ -52,7 +52,10 @@ const links: QuickLink[] = [
 export function QuickLinks() {
   return (
     <Section>
-      <SectionHeader title="Explore" sub="Everything you need to get started with Re in Act." />
+      <SectionHeader
+        title="Start Here"
+        sub="Start with the docs, read the spec, dig into the rationale, or join the project."
+      />
 
       <motion.div
         className="grid gap-3 sm:grid-cols-2"

@@ -1,6 +1,22 @@
+import Link from "next/link";
+
 export function Footer() {
   return (
     <footer className="border-t py-10 text-center" style={{ borderColor: "var(--border)" }}>
+      <nav className="mb-4 flex flex-wrap items-center justify-center gap-4 text-xs">
+        <Link href="/docs/getting-started/intro" style={{ color: "var(--muted)" }}>
+          Docs
+        </Link>
+        <Link href="/specification/draft/index" style={{ color: "var(--muted)" }}>
+          Spec
+        </Link>
+        <Link href="/docs/learn/control-theoretic-view" style={{ color: "var(--muted)" }}>
+          Why It Works
+        </Link>
+        <Link href="/community/contributing" style={{ color: "var(--muted)" }}>
+          Community
+        </Link>
+      </nav>
       <p className="text-xs" style={{ color: "var(--muted)" }}>
         © {new Date().getFullYear()} RIA Spec · Spec licensed under{" "}
         <a
