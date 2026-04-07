@@ -11,8 +11,8 @@ const reasonFields: { key: string; type: string; value: string; note?: string }[
   {
     key: "prompt",
     type: "string | list",
-    value: '"Analyze the build log: ..."',
-    note: "context + task",
+    value: '"Goal: assess build. Observation: ... Constraints: ..."',
+    note: "goal + observation + context + constraints",
   },
   {
     key: "example_output",
@@ -201,7 +201,7 @@ export function Interfaces() {
         <IndexLabel
           index="01"
           title="reason(prompt, example_output)"
-          sub="Turns local evidence into structured output that the RAS can use right away."
+          sub="Turns goal plus local reality into structured output that the RAS can use right away."
         />
         <ReasonSchema />
       </div>

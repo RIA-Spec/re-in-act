@@ -314,7 +314,7 @@ export function CerebellumGraphic() {
           fontFamily="var(--font-sans)"
           fontWeight={600}
         >
-          Main Agent
+          Top-Level Reasoning
         </text>
         <line
           x1={94}

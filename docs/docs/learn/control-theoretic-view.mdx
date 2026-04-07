@@ -106,7 +106,7 @@ This is why Re in Act is not just “one more prompting trick.” It is an attem
 
 This page uses that theorem as an architectural interpretation, not as a claim that the full runtime has been formally proven equivalent to a classical regulator.
 
-Put differently: if execution has no local model, the main model must keep rebuilding one through tokens. That is expensive, slow, and fragile.
+Put differently: if execution has no local model, the top-level reasoning loop must keep rebuilding one through tokens. That is expensive, slow, and fragile.
 
 ---
 
@@ -121,9 +121,14 @@ It should not be understood as a second full agent or as open-ended deliberation
 - apply a bounded output schema,
 - return a structured judgment that execution can immediately use.
 
-In that sense, `reason()` behaves like a **semantic comparator and filter**.
+In that sense, `reason()` behaves like a **semantic comparator and local controller**.
 
-The analogy is not that it is literally a textbook comparator from classical control diagrams. The point is functional: raw observations become useful only after they are interpreted relative to a target and compressed into a bounded control signal.
+More concretely, it includes two tightly linked roles inside the local loop:
+
+- compare the goal against the current local reality,
+- then produce a bounded control decision that execution can use immediately.
+
+The analogy is not that it is literally a textbook comparator from classical control diagrams. The point is functional: raw observations become useful only after they are interpreted relative to a target and then turned into a bounded control signal.
 
 Examples:
 
@@ -143,9 +148,9 @@ This is also why `reason()` belongs inside the execution story, not outside it. 
 This is the most useful way to map Re in Act into control language:
 
 - **Top-level reasoning** defines the RAS, its constraints, and its success criteria.
-- **Team Context** carries the bounded task package that defines that RAS into execution.
+- **The `reason()` prompt** carries the objective, local observations, task-relevant context, and governing constraints into the local judgment step.
 - **RAS execution** handles intermediate data, control flow, and action.
-- **`reason()`** turns local evidence into structured judgments.
+- **`reason()`** compares local reality against the target, then turns that local deviation into structured judgments.
 - **Final observation** returns a denoised result to the outer loop.
 
 This is a helpful engineering mapping, but it has limits.
@@ -158,7 +163,7 @@ Re in Act is **not** claiming:
 
 The claim is narrower: putting more sensing, comparison, and correction inside execution makes agents behave better on real tasks.
 
-That is the main architectural move of Re in Act. It does not try to replace the main model. It tries to stop overusing the main model for work that should happen locally.
+That is the main architectural move of Re in Act. It does not try to replace top-level reasoning. It tries to stop overusing top-level reasoning for work that should happen locally.
 
 ---
 

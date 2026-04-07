@@ -49,7 +49,7 @@ That is close to the Re in Act intuition: loops, filtering, branching, and local
 
 Re in Act is broader than that specific product feature. The spec does not require Anthropic-managed code execution or Anthropic's response protocol. `reason()` can be backed by any LLM API that supports structured output and fresh local inference calls, while `act()` can be wired to MCP tools, custom functions, or runtime-native actions.
 
-Recommended models for `reason()` calls: lightweight, fast models. `reason()` is an atomic local decision step, not a full main reasoning pass — it does not need frontier-scale capability.
+Recommended models for `reason()` calls: lightweight, fast models. `reason()` is an atomic local decision step, not a full top-level reasoning pass — it does not need frontier-scale capability.
 
 ---
 

@@ -14,9 +14,8 @@ This page walks through the two RAS runtime flavors and the two core interfaces 
 Re in Act is easiest to understand as a local control architecture.
 
 - The **top-level reasoner** defines the RAS and its constraints.
-- The **Team Context** defines the RAS with that work specification plus local inputs.
 - The RAS runs deterministic control flow such as loops, retries, and tool calls.
-- `reason()` plays the role of a **semantic comparator and filter**: it takes the current local observations and intermediate data, compares them against the work specification, and returns schema-bounded output that execution can act on.
+- `reason()` plays the role of a **local comparator and controller**: its prompt carries the goal, local observations, relevant context, and governing constraints, then it compares local reality against that target and returns schema-bounded output that execution can act on.
 
 This is an engineering analogy, not a claim that the runtime is literally a classical control block diagram. The point is that raw observations become useful only after local filtering and comparison.
 
@@ -104,16 +103,21 @@ Unix pipelines are useful here because they compose programs through standard st
 ### Key rules
 
 - **Uses a fresh inference context** — each call should include the needed local context explicitly, but the surrounding execution state and orchestration still stay in the same RAS.
-- **Include reference + observation + constraints** — prompts should state target objective, local observations/feedback, and operational bounds.
+- **Include goal + observation + context + constraints** — prompts should state the target objective, local observations/feedback, task-relevant context, and governing constraints or rules.
 - **Retry on schema failure** — validates the output against the schema inferred from `example_output`. Retries up to N times with the error as feedback before returning `{ "error": "..." }`.
 - **Bound output variety with schema** — `example_output` constrains responses into an executable control channel.
-- **Use a lightweight model when possible** — `reason()` is an atomic local reasoning call, not a full main reasoning cycle.
+- **Use a lightweight model when possible** — `reason()` is an atomic local reasoning call, not a full top-level reasoning cycle.
 
 ### What `reason()` is for
 
-`reason()` is not a second full agent. It is a local judgment step inside an orchestrable RAS. Its job is to turn raw local evidence into bounded decisions that execution can carry out deterministically under the control of the enclosing runtime.
+`reason()` is not a second full agent. It is a local judgment step inside an orchestrable RAS. Its job is to compare goal against local reality, use the resulting deviation to decide what matters, and return bounded decisions that execution can carry out deterministically under the control of the enclosing runtime.
 
 That is why `reason()` improves execution quality: it lets the agent compress noisy local observations and intermediate data into something small, explicit, and actionable.
+
+Conceptually, `reason()` includes two tightly coupled steps:
+
+- a **comparison step** that assesses the relevant gap between the goal and the current local reality
+- a **control step** that turns that gap into a bounded output that the runtime can use immediately
 
 Typical uses include:
 
@@ -127,7 +131,7 @@ Typical uses include:
 ```python
 items = ["Great product!", "Broke after two days", "Absolutely love it"]
 r = await reason(
-    f"Classify sentiment for each: {items}",
+  f"Goal: classify sentiment. Observation: {items}. Constraints: return one label per item.",
     example=[{"text": "", "sentiment": ""}]
 )
 for x in r["data"]:
@@ -138,7 +142,7 @@ for x in r["data"]:
 
 ```python
 r = await reason(
-    "System status: 15 errors in the last hour, threshold is 10. Should we alert?",
+  "Goal: decide whether to alert. Observation: 15 errors in the last hour; threshold is 10. Constraints: return a boolean only.",
     example=True
 )
 if r["data"]:

@@ -297,7 +297,7 @@ function ParadigmShift() {
             RAS
           </text>
 
-          {/* Delegate Arrow */}
+          {/* RAS definition arrow */}
           <motion.g
             initial={{ pathLength: 0, opacity: 0 }}
             animate={{ pathLength: 1, opacity: 1 }}
@@ -321,7 +321,7 @@ function ParadigmShift() {
               fontFamily={MONO}
               fontWeight={600}
             >
-              delegate
+              define RAS
             </text>
           </motion.g>
 
@@ -562,7 +562,7 @@ function RASFlow() {
           fontSize={8}
           fontFamily={MONO}
         >
-          goal + constraints
+          RAS + constraints
         </text>
 
         <rect
@@ -808,7 +808,7 @@ function RuntimeLayers() {
           Shared Interfaces
         </text>
         <text x={66} y={181} fill="var(--muted)" fontSize={10} fontFamily={MONO}>
-          reason(prompt, example) · act(name, args)
+          reason(prompt, example_output) · act(name, args)
         </text>
         <text x={66} y={198} fill="var(--muted)" fontSize={10} fontFamily={SANS}>
           Guaranteed compatibility across both runtime flavors

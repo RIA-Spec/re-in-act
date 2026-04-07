@@ -17,7 +17,7 @@ The result is simpler execution: fewer outer-loop turns, less context bloat, and
 
 ## The Cerebellum Metaphor
 
-Think about walking. The conscious brain decides to move, but it does not micromanage every correction. Adjustment happens closer to the body and closer to feedback.
+Think about walking. The conscious brain decides to move, but it does not micromanage every correction. Adjustment happens closer to the body and closer to feedback, saving cognitive load and preserving better feedback.
 
 That is the intuition behind the RAS.
 
@@ -55,8 +55,7 @@ If you want the deeper version of this argument, see [Control-Theoretic View](/d
 
 The RAS is the execution context that top-level reasoning defines for an orchestrated action phase. It contains:
 
-- **Team Context** — the work specification, local inputs, and constraints that define the RAS
-- **`reason(prompt, example_output)`** — a local semantic judgment step that turns context plus feedback into structured output
+- **`reason(prompt, example_output)`** — a local judgment step whose prompt carries the goal, local observations, relevant context, and governing constraints or rules
 - deterministic control flow for retries, branching, and intermediate-data handling
 
 The important point is that the RAS is not just a place to run tools. It is the part of the system that top-level reasoning can still structure and control while execution inspects local observations and intermediate data, makes bounded judgments, and keeps moving without turning every small issue into another outer-loop turn.

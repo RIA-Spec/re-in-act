@@ -155,15 +155,7 @@ function PipeNode({ node }: { node: PipeNode }) {
   return (
     <g>
       {/* Ring pulse */}
-      <circle
-        cx={node.cx}
-        cy={node.cy}
-        r={r}
-        fill="none"
-        stroke={stroke}
-        strokeWidth={1}
-        opacity="0"
-      >
+      <circle cx={node.cx} cy={node.cy} r={r} stroke={stroke} strokeWidth={1} opacity="0">
         <animate
           attributeName="r"
           from={r}
@@ -236,8 +228,8 @@ export function NetworkPulse() {
             style={{ borderColor: "var(--border)", color: "var(--muted)" }}
           >
             <span style={{ color: "var(--accent)" }}>$</span> cat api_docs.md{" "}
-            <span style={{ color: "var(--accent)" }}>|</span> reason --context - --prompt
-            &quot;Build test cmd&quot; --structure &apos;{"{"}&quot;cmd&quot;: &quot;&quot;{"}"}
+            <span style={{ color: "var(--accent)" }}>|</span> reason --prompt &quot;Goal: produce
+            test cmd&quot; --prompt - --structure &apos;{"{"}&quot;cmd&quot;: &quot;&quot;{"}"}
             &apos; <span style={{ color: "var(--accent)" }}>|</span> jq -r &apos;.data.cmd&apos;{" "}
             <span style={{ color: "var(--accent)" }}>|</span> act bash -
           </div>

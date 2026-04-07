@@ -14,11 +14,11 @@ The short answer is: **they are different directions**.
 - **Subagents** add more reasoning actors.
 - **Re in Act** strengthens execution.
 
-At first glance, Re in Act can look similar to subagents or agent teams. In all three patterns, the main agent does not execute every step directly in the outer loop.
+At first glance, Re in Act can look similar to subagents or agent teams. In all three patterns, top-level reasoning does not execute every step directly in the outer loop.
 
 The difference is **what is being created**.
 
-In Re in Act, the main agent defines and orchestrates **one action phase** inside a **Reason-able Action Space (RAS)**. The RAS program can call `reason()` locally, use deterministic control flow, call tools through `act()`, and return one final observation to the outer loop.
+In Re in Act, top-level reasoning defines and orchestrates **one action phase** inside a **Reason-able Action Space (RAS)**. The RAS program can call `reason()` locally, use deterministic control flow, call tools through `act()`, and return one final observation to the outer loop.
 
 In a subagent or agent-team design, delegation usually creates another reasoning actor with its own prompt, context, handoff protocol, and coordination surface.
 
@@ -45,7 +45,7 @@ That is why these two patterns solve different problems:
 
 They are not two versions of the same architecture. They point in different design directions.
 
-Re in Act does not answer "which additional agent should do this?" It answers "how should this work execute once the main agent has decided to do it?"
+Re in Act does not answer "which additional agent should do this?" It answers "how should this work execute once top-level reasoning has decided to do it?"
 
 So the two ideas can be combined:
 
@@ -123,16 +123,16 @@ If the system needs more reasoning actors, use subagents. If the system needs be
 
 ## Comparison at a Glance
 
-| Question                                | Subagents / Agent Teams                 | Re in Act                                      |
-| --------------------------------------- | --------------------------------------- | ---------------------------------------------- |
-| **What gets created?**                  | Another reasoning actor                 | **One orchestrated execution workspace**       |
-| **What stays primary?**                 | Multiple reasoning contexts             | **One top-level reasoning context**            |
-| **How is control expressed?**           | Prompts, handoffs, role boundaries      | **Code, shell, schemas, and runtime control**  |
-| **Where does local judgment happen?**   | In another agent context                | **Inside execution through `reason()`**        |
-| **Where does intermediate data live?**  | Across handoffs or multiple transcripts | **Inside one RAS runtime**                     |
-| **What is easier to explain?**          | High-level role decisions               | **Concrete execution traces and local checks** |
-| **What is the common failure mode?**    | Misalignment across agent boundaries    | **Execution failure near the tool boundary**   |
-| **What does reuse look like?**          | Reusable specialists or roles           | **Riffs and reusable RAS programs**            |
+| Question                               | Subagents / Agent Teams                 | Re in Act                                      |
+| -------------------------------------- | --------------------------------------- | ---------------------------------------------- |
+| **What gets created?**                 | Another reasoning actor                 | **One orchestrated execution workspace**       |
+| **What stays primary?**                | Multiple reasoning contexts             | **One top-level reasoning context**            |
+| **How is control expressed?**          | Prompts, handoffs, role boundaries      | **Code, shell, schemas, and runtime control**  |
+| **Where does local judgment happen?**  | In another agent context                | **Inside execution through `reason()`**        |
+| **Where does intermediate data live?** | Across handoffs or multiple transcripts | **Inside one RAS runtime**                     |
+| **What is easier to explain?**         | High-level role decisions               | **Concrete execution traces and local checks** |
+| **What is the common failure mode?**   | Misalignment across agent boundaries    | **Execution failure near the tool boundary**   |
+| **What does reuse look like?**         | Reusable specialists or roles           | **Riffs and reusable RAS programs**            |
 
 This table is about architectural direction. Re in Act itself is not a subagent pattern; it is an execution pattern, and a subagent may still choose to use it internally.
 
@@ -163,7 +163,7 @@ Re in Act is usually the better fit when the hard part of the problem is:
 - enforcing deterministic branches, loops, and validation,
 - reducing the round-trip tax of repeated outer-loop reasoning.
 
-This is especially true for coding, research, shell automation, and tool-heavy workflows where the main agent should define the RAS once and receive a denoised result.
+This is especially true for coding, research, shell automation, and tool-heavy workflows where top-level reasoning should define the RAS once and receive a denoised result.
 
 ---
 
