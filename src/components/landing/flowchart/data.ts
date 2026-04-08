@@ -7,12 +7,12 @@ import type { GNode, GEdge, ParticleRoute } from "./types";
          │ read build.log     │
          └────────┬───────────┘
          ┌────────▼───────────┐
-         │ reason(log)        │
+         │ reason(noisy log)  │
          └────────┬───────────┘
-                ╱   success?   ╲
-              yes               no
+                ╱    retry?     ╲
+              yes                no
       ┌────────▼───────┐   ┌────▼──────────┐
-      │ act('deploy')  │   │ act('notify') │
+      │ act('bash')    │   │ act('deploy') │
       └────────┬───────┘   └────┬──────────┘
                └───────┬────────┘
                        ▼
@@ -21,10 +21,10 @@ import type { GNode, GEdge, ParticleRoute } from "./types";
 
 export const NODES: GNode[] = [
   { id: "read_log", label: "read(build.log)", x: 250, y: 36, w: 156, h: 36, kind: "start" },
-  { id: "reason", label: "reason(log)", x: 250, y: 108, w: 148, h: 36, kind: "process" },
-  { id: "success", label: "success?", x: 250, y: 182, w: 88, h: 42, kind: "decision" },
-  { id: "deploy", label: "act('deploy')", x: 178, y: 274, w: 128, h: 36, kind: "process" },
-  { id: "notify", label: "act('notify')", x: 322, y: 274, w: 128, h: 36, kind: "process" },
+  { id: "reason", label: "reason(noisy log)", x: 250, y: 108, w: 164, h: 36, kind: "process" },
+  { id: "success", label: "retry?", x: 250, y: 182, w: 88, h: 42, kind: "decision" },
+  { id: "deploy", label: "act('bash build')", x: 178, y: 274, w: 148, h: 36, kind: "process" },
+  { id: "notify", label: "act('deploy')", x: 332, y: 274, w: 128, h: 36, kind: "process" },
   { id: "done", label: "done", x: 250, y: 352, w: 96, h: 34, kind: "end" },
 ];
 

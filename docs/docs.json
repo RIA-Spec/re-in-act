@@ -7,12 +7,17 @@
         "pages": [
           {
             "group": "Get Started",
-            "pages": ["docs/getting-started/intro", "docs/getting-started/concepts"]
+            "pages": [
+              "docs/getting-started/try",
+              "docs/getting-started/intro",
+              "docs/getting-started/concepts"
+            ]
           },
           {
             "group": "Learn",
             "pages": [
               "docs/learn/control-theoretic-view",
+              "docs/learn/playbook",
               "docs/learn/riff",
               "docs/learn/integrations",
               "docs/learn/subagents-agent-teams"

@@ -13,13 +13,13 @@ const PARADIGM_SHIFT_COMPARISONS: Array<{
   bold?: boolean;
 }> = [
   {
-    from: "Thin Execution Layer",
-    to: "RAS Strengthens Local Execution",
+    from: "Thin Action Layer",
+    to: "RAS Strengthens Local Action",
     bold: true,
   },
   {
     from: "Round-Trip Tax (Reason-Act-Observe)",
-    to: "One Orchestrated Execution Phase",
+    to: "One Orchestrated Action Phase",
   },
   {
     from: "Raw Intermediate Data in Main Context",
@@ -31,7 +31,7 @@ const PARADIGM_SHIFT_COMPARISONS: Array<{
   },
   {
     from: "No Local Structure During Action",
-    to: "Intermediate Data + Judgment Inside Execution",
+    to: "Intermediate Data + Judgment Inside Action",
   },
 ] as const;
 
@@ -425,7 +425,7 @@ function ParadigmShift() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 2.8, type: "spring", damping: 10 }}
           >
-            Orchestrated execution phase
+            Orchestrated action phase
           </motion.text>
         </g>
       </svg>
@@ -471,7 +471,7 @@ function ParadigmShiftComparisons() {
 }
 
 /* ────────────────────────────────────────────
-  02 — RAS Execution Flow (directed graph)
+  02 — RAS Action Flow (directed graph)
    ──────────────────────────────────────────── */
 
 function RASFlow() {
@@ -584,7 +584,7 @@ function RASFlow() {
           fontFamily={MONO}
           fontWeight={700}
         >
-          RAS Environment
+          RAS Action Space
         </text>
         <text
           x={355}
@@ -594,7 +594,7 @@ function RASFlow() {
           fontSize={8.2}
           fontFamily={MONO}
         >
-          local execution
+          local action space
         </text>
 
         <rect
@@ -705,6 +705,62 @@ function RASFlow() {
           denoised result
         </text>
       </svg>
+    </motion.div>
+  );
+}
+
+function LocalActionSequence() {
+  const steps = [
+    {
+      index: "1",
+      title: "act() gathers local evidence",
+      body: "Run tests, read logs, or fetch a document without pushing raw output back to top-level reasoning.",
+      code: "act('bash', 'npm test -- --reporter json')",
+    },
+    {
+      index: "2",
+      title: "reason() compresses the local signal",
+      body: "Turn noisy evidence into one bounded decision using an explicit goal, observation, relevant context, and constraints.",
+      code: "reason([\n  'Goal: identify the best retry step.',\n  observation,\n  'Relevant context: CI run after latest change.',\n  'Constraints and rules: return retry_cmd + reason only.',\n], { retry_cmd: '', reason: '' })",
+    },
+    {
+      index: "3",
+      title: "act() + reason() keep the space moving",
+      body: "Execute the next step, inspect the result again, and only return a denoised outcome once the local job is actually settled.",
+      code: "act('bash', retry_cmd) -> reason(...) -> act('deploy' | 'notify')",
+    },
+  ];
+
+  return (
+    <motion.div className="mt-4 flex flex-col gap-3" {...fade}>
+      {steps.map((step) => (
+        <div
+          key={step.index}
+          className="rounded-xl border p-4"
+          style={{ borderColor: "var(--border)", backgroundColor: "var(--card-bg)" }}
+        >
+          <div className="mb-3 flex items-center gap-3">
+            <div
+              className="flex h-7 w-7 items-center justify-center rounded-full text-[12px] font-bold"
+              style={{ backgroundColor: "var(--accent-muted)", color: "var(--accent)" }}
+            >
+              {step.index}
+            </div>
+            <div className="text-[14px] font-semibold" style={{ color: "var(--foreground)" }}>
+              {step.title}
+            </div>
+          </div>
+          <p className="mb-3 text-[13px] leading-relaxed" style={{ color: "var(--muted)" }}>
+            {step.body}
+          </p>
+          <div
+            className="rounded-lg border px-3 py-2 font-mono text-[11px] whitespace-pre-wrap break-words"
+            style={{ borderColor: "var(--border)", backgroundColor: "var(--surface-elevated)" }}
+          >
+            {step.code}
+          </div>
+        </div>
+      ))}
     </motion.div>
   );
 }
@@ -827,7 +883,7 @@ export function DataGraphs() {
     <Section>
       <SectionHeader
         title="From ReAct to Re in Act"
-        sub="How the flow changes: less stop-and-think, more structured execution."
+        sub="How the flow changes: less stop-and-think, more structured action."
       />
 
       <div className="mb-16">
@@ -845,17 +901,18 @@ export function DataGraphs() {
       <div className="mb-16">
         <IndexLabel
           index="02"
-          title="Local Execution"
-          sub="The RAS handles retries, branching, and local checks, then returns the result."
+          title="Local Action Space"
+          sub="One RAS can coordinate multiple act() and reason() steps before returning a denoised result."
         />
         <RASFlow />
+        <LocalActionSequence />
       </div>
 
       <div>
         <IndexLabel
           index="03"
-          title="Two Execution Forms"
-          sub="The same idea can run as code or shell pipelines. The syntax changes; the workflow does not."
+          title="Two Action Forms"
+          sub="The same idea can run as code or shell pipelines. In both forms, deterministic Turing-complete control is stronger than probabilistic LLM-stepped flow."
         />
         <RuntimeLayers />
       </div>

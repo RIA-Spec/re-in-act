@@ -1,6 +1,6 @@
 ---
 title: Subagent vs Re in Act
-description: Why subagents and Re in Act are different architectural directions, and how subagents can still use Re in Act as an execution layer.
+description: Why subagents and Re in Act are different architectural directions, and how subagents can still use Re in Act as an action space.
 ---
 
 # Subagent vs Re in Act
@@ -12,7 +12,7 @@ This page exists only to clarify the boundary, because people often map the patt
 The short answer is: **they are different directions**.
 
 - **Subagents** add more reasoning actors.
-- **Re in Act** strengthens execution.
+- **Re in Act** strengthens action.
 
 At first glance, Re in Act can look similar to subagents or agent teams. In all three patterns, top-level reasoning does not execute every step directly in the outer loop.
 
@@ -22,9 +22,9 @@ In Re in Act, top-level reasoning defines and orchestrates **one action phase** 
 
 In a subagent or agent-team design, delegation usually creates another reasoning actor with its own prompt, context, handoff protocol, and coordination surface.
 
-That is the core distinction for this project: Re in Act strengthens execution without introducing another agent identity.
+That is the core distinction for this project: Re in Act strengthens action without introducing another agent identity.
 
-Re in Act can still be used **inside** a subagent. If a larger architecture already has subagents, a subagent can use a RAS as its execution layer. The important boundary is that the subagent and the RAS are not the same thing: the subagent is a reasoning unit, while the RAS is the execution workspace used to carry work out.
+Re in Act can still be used **inside** a subagent. If a larger architecture already has subagents, a subagent can use a RAS as its action space. The important boundary is that the subagent and the RAS are not the same thing: the subagent is a reasoning unit, while the RAS is the action space used to carry work out.
 
 So there is no contradiction in saying both of these at once:
 
@@ -36,12 +36,12 @@ So there is no contradiction in saying both of these at once:
 If you only keep one distinction in mind, keep this one:
 
 - **Subagent**: create another agent-like reasoning unit.
-- **Re in Act**: create a better execution workspace for the same agent.
+- **Re in Act**: create a better action space for the same agent.
 
 That is why these two patterns solve different problems:
 
 - subagents separate reasoning roles
-- Re in Act strengthens execution
+- Re in Act strengthens action
 
 They are not two versions of the same architecture. They point in different design directions.
 
@@ -50,9 +50,9 @@ Re in Act does not answer "which additional agent should do this?" It answers "h
 So the two ideas can be combined:
 
 - a system may use subagents for decomposition
-- each subagent may use Re in Act for execution
+- each subagent may use Re in Act for action
 
-That combination is often stronger than either pattern alone: subagents can decompose the work, and Re in Act can make execution inside each subagent more reliable.
+That combination is often stronger than either pattern alone: subagents can decompose the work, and Re in Act can make action inside each subagent more reliable.
 
 ---
 
@@ -61,14 +61,14 @@ That combination is often stronger than either pattern alone: subagents can deco
 The surface similarity is real:
 
 - The surrounding workflow assigns a bounded unit of work.
-- The execution unit can make local decisions.
+- The action unit can make local decisions.
 - The surrounding workflow gets back a more useful result than a raw tool response.
 
 That is why a fresh local `reason()` call can look superficially similar to a subagent call.
 
-But that similarity is only at the edge of the interface. Architecturally, Re in Act is not about creating another planner. It is about giving execution more local structure.
+But that similarity is only at the edge of the interface. Architecturally, Re in Act is not about creating another planner. It is about giving action more local structure.
 
-That is why this page should not be read as "Re in Act versus subagents" in the sense of two competing variants of the same idea. One pattern changes the reasoning topology. The other changes the execution architecture.
+That is why this page should not be read as "Re in Act versus subagents" in the sense of two competing variants of the same idea. One pattern changes the reasoning topology. The other changes the action architecture.
 
 ---
 
@@ -77,14 +77,14 @@ That is why this page should not be read as "Re in Act versus subagents" in the 
 The core Re in Act idea is still the Cerebrum/Cerebellum split introduced in [Introduction](/docs/getting-started/intro):
 
 - The **Cerebrum** defines the structure, constraints, and return conditions of the RAS.
-- The **RAS** absorbs local disturbances during execution under that structure.
+- The **RAS** absorbs local disturbances in the action phase under that structure.
 
-That means the RAS in Re in Act is usually best thought of as a **bounded, orchestrable execution workspace**, not as a peer agent.
+That means the RAS in Re in Act is usually best thought of as a **bounded, orchestrable action space**, not as a peer agent.
 
 Put more sharply:
 
 - a subagent is another reasoning center
-- a RAS is an execution environment
+- a RAS is an action environment
 
 Inside that workspace:
 
@@ -92,32 +92,32 @@ Inside that workspace:
 - loops, branches, validation, and retries happen in **code or shell**, not by re-prompting the outer loop.
 - intermediate logs, tool outputs, and failed attempts stay **inside the RAS** unless the RAS program decides they matter.
 
-This is the main distinction from agent-team patterns. Agent teams multiply reasoning contexts. Re in Act keeps one orchestrated execution workspace and expands the action layer inside it.
+This is the main distinction from agent-team patterns. Agent teams multiply reasoning contexts. Re in Act keeps one orchestrated action space and expands the action layer inside it.
 
 In that sense, they are fully different architectural moves:
 
 - subagents split work across reasoning actors
-- Re in Act makes one actor's execution better structured and easier to control
+- Re in Act makes one actor's action better structured and easier to control
 
 That is why the relationship is best stated this way:
 
 - subagents answer "who should handle this sub-problem?"
-- Re in Act answers "how should this orchestrated execution workspace run reliably once it has the work?"
+- Re in Act answers "how should this orchestrated action space run reliably once it has the work?"
 
-## Why Re in Act Is Often Better for Execution
+## Why Re in Act Is Often Better for Action
 
-When the problem is execution rather than role separation, Re in Act often has practical advantages over a subagent-style design.
+When the problem is action rather than role separation, Re in Act often has practical advantages over a subagent-style design.
 
-- **Better explainability**: the execution path is usually easier to inspect because control flow lives in code or shell, `reason()` returns bounded structured output, and the trace stays in one runtime instead of being spread across handoffs.
+- **Better explainability**: the action path is usually easier to inspect because control flow lives in code or shell, `reason()` returns bounded structured output, and the trace stays in one runtime instead of being spread across handoffs.
 - **Better observability**: logs, retries, tool calls, and intermediate artifacts stay in one place, so it is easier to see what happened and why.
 - **Stronger control**: retries, branching, validation, and stop conditions can be enforced directly by the runtime instead of being left to another conversational agent loop.
-- **Less coordination overhead**: execution does not need another agent prompt, another transcript, and another handoff boundary just to work through local issues.
+- **Less coordination overhead**: action does not need another agent prompt, another transcript, and another handoff boundary just to work through local issues.
 - **Cleaner intermediate-data handling**: local observations, logs, and intermediate data stay inside the RAS instead of being copied across agent boundaries.
-- **More reusable execution**: RAS programs and reusable definitions are easier to replay, compose, and standardize as execution building blocks.
+- **More reusable action**: RAS programs and reusable definitions are easier to replay, compose, and standardize as action building blocks.
 
-These are not arguments against subagents in general. They are arguments for using Re in Act when the real need is a better execution layer.
+These are not arguments against subagents in general. They are arguments for using Re in Act when the real need is a better action layer.
 
-If the system needs more reasoning actors, use subagents. If the system needs better execution, use Re in Act. If it needs both, use both.
+If the system needs more reasoning actors, use subagents. If the system needs better action, use Re in Act. If it needs both, use both.
 
 ---
 
@@ -125,16 +125,16 @@ If the system needs more reasoning actors, use subagents. If the system needs be
 
 | Question                               | Subagents / Agent Teams                 | Re in Act                                      |
 | -------------------------------------- | --------------------------------------- | ---------------------------------------------- |
-| **What gets created?**                 | Another reasoning actor                 | **One orchestrated execution workspace**       |
+| **What gets created?**                 | Another reasoning actor                 | **One orchestrated action space**              |
 | **What stays primary?**                | Multiple reasoning contexts             | **One top-level reasoning context**            |
 | **How is control expressed?**          | Prompts, handoffs, role boundaries      | **Code, shell, schemas, and runtime control**  |
-| **Where does local judgment happen?**  | In another agent context                | **Inside execution through `reason()`**        |
+| **Where does local judgment happen?**  | In another agent context                | **Inside the action space through `reason()`** |
 | **Where does intermediate data live?** | Across handoffs or multiple transcripts | **Inside one RAS runtime**                     |
-| **What is easier to explain?**         | High-level role decisions               | **Concrete execution traces and local checks** |
-| **What is the common failure mode?**   | Misalignment across agent boundaries    | **Execution failure near the tool boundary**   |
+| **What is easier to explain?**         | High-level role decisions               | **Concrete action traces and local checks**    |
+| **What is the common failure mode?**   | Misalignment across agent boundaries    | **Action failure near the tool boundary**      |
 | **What does reuse look like?**         | Reusable specialists or roles           | **Riffs and reusable RAS programs**            |
 
-This table is about architectural direction. Re in Act itself is not a subagent pattern; it is an execution pattern, and a subagent may still choose to use it internally.
+This table is about architectural direction. Re in Act itself is not a subagent pattern; it is an action pattern, and a subagent may still choose to use it internally.
 
 ---
 
@@ -142,15 +142,15 @@ This table is about architectural direction. Re in Act itself is not a subagent 
 
 If you are looking for the closest Re in Act analogue to a reusable helper, it is usually a [Riff](/docs/learn/riff).
 
-A Riff can replay a proven execution flow, be composed into a larger program, and behave like a fast subroutine. That makes it similar to a specialized helper in practice.
+A Riff can replay a proven action flow, be composed into a larger program, and behave like a fast subroutine. That makes it similar to a specialized helper in practice.
 
 The difference is that Riffs are built on the same RAS model:
 
 - they do not require a new long-lived planning authority,
 - they reuse a proven RAS program instead of introducing a new conversational role,
-- and they keep the execution boundary local to the action layer.
+- and they keep the action boundary local to the action layer.
 
-So Riffs may look like reusable helpers from the outside, but internally they are still RAS-native execution patterns.
+So Riffs may look like reusable helpers from the outside, but internally they are still RAS-native action patterns.
 
 ---
 
@@ -176,8 +176,8 @@ Separate subagents or agent teams can still be useful when the system genuinely 
 - different incentives or review responsibilities,
 - coordination across parallel workstreams that should stay conceptually separate.
 
-Re in Act does not claim those patterns are wrong. Its claim is narrower and more practical: many workflows that look like they need more agents actually need a better execution layer.
+Re in Act does not claim those patterns are wrong. Its claim is narrower and more practical: many workflows that look like they need more agents actually need a better action layer.
 
 If the problem is local adaptation during action, reach for the RAS first. If the problem is organizational separation of reasoning roles, separate agents may still be the right abstraction.
 
-If a larger system happens to use subagents elsewhere, Re in Act can still be used inside one of those systems as its execution layer. But Re in Act itself should not be described as a subagent design.
+If a larger system happens to use subagents elsewhere, Re in Act can still be used inside one of those systems as its action space. But Re in Act itself should not be described as a subagent design.

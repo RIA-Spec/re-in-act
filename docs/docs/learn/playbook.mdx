@@ -1,0 +1,245 @@
+---
+title: Playbook
+description: A growing set of Re in Act application patterns shown directly as reusable Riffs.
+---
+
+# Playbook
+
+This page collects concrete **Re in Act applications** that become natural once action can keep working inside a **Reason-able Action Space (RAS)**.
+
+These are not just prompt tricks. Each example below is shown directly as a **Riff**:
+
+- local noise stays inside the RAS
+- `reason()` produces bounded judgments instead of open-ended narration
+- `act()` gets data or changes the world from inside the same space
+- deterministic control flow keeps the work moving
+- the reusable unit is the **Riff** itself
+
+Each example is both:
+
+- shown inline on this page
+- saved as a real file under `/playbook/riffs/`
+
+If you are new to Riffs, see [Riff](/docs/learn/riff).
+
+---
+
+## Operations
+
+### CI Retry Gate
+
+Turn a noisy CI build into a local control loop.
+
+Instead of sending raw logs back to top-level reasoning after every failure, the RAS classifies the current state as `continue`, `retry`, or `escalate`, then executes the next deterministic step immediately.
+
+**Why it fits Re in Act:** the advantage comes from keeping ANSI noise, repeated stack traces, and retry policy local to action.
+
+Source file: [/playbook/riffs/ci-retry-gate.py](/playbook/riffs/ci-retry-gate.py)
+
+```python
+RIFF_ID = "playbook.ci_retry_gate.v1"
+
+
+async def run(inputs):
+	log = inputs["log"]
+
+	decision = await reason(
+		"\n".join(
+			[
+				"Goal: decide whether the current CI step should continue, retry, or escalate.",
+				f"Observation:\n{log}",
+				"Relevant context: the log may contain ANSI color, progress output, repeated stack traces, and partial retries.",
+				"Constraints and rules: ignore cosmetic noise; return one action plus a short grounded reason and a concrete follow-up command when retry is needed.",
+			]
+		),
+		{"action": "continue", "reason": "", "retry_cmd": ""},
+	)
+
+	data = decision["data"]
+
+	if data["action"] == "retry":
+		return await act("bash", data["retry_cmd"])
+
+	if data["action"] == "escalate":
+		return await act("notify", {"channel": "#build-failures", "message": data["reason"]})
+
+	return {"status": "continue", "reason": data["reason"]}
+```
+
+This is a minimal but complete local loop: action reads the local evidence, `reason()` decides the next move, and `act()` performs that move without leaving the RAS.
+
+### API Health Check Extractor
+
+Turn HTML-heavy API documentation into one executable health-check command.
+
+The RAS filters markup and unrelated endpoints locally, extracts the minimal probe command, runs it, then judges the result before returning only the decision that matters.
+
+**Why it fits Re in Act:** the useful result emerges from local cleanup plus bounded inference, not from a single outer-loop prompt.
+
+Source file: [/playbook/riffs/api-health-check.py](/playbook/riffs/api-health-check.py)
+
+```python
+RIFF_ID = "playbook.api_health_check.v1"
+
+
+async def run(inputs):
+	html = inputs["api_reference_html"]
+
+	cmd = await reason(
+		"\n".join(
+			[
+				"Goal: extract the smallest executable health-check command from this API reference.",
+				f"Observation:\n{html}",
+				"Relevant context: the document may contain navigation, styling, examples for multiple endpoints, and unrelated prose.",
+				"Constraints and rules: ignore markup noise, prefer a read-only endpoint, and return one direct shell command only.",
+			]
+		),
+		{"cmd": "", "endpoint": "", "why": ""},
+	)
+
+	probe = await act("bash", cmd["data"]["cmd"])
+
+	decision = await reason(
+		"\n".join(
+			[
+				"Goal: decide whether the API health check passed.",
+				f"Observation:\n{probe['content'][0]['text']}",
+				f"Relevant context: the executed endpoint was {cmd['data']['endpoint']}.",
+				"Constraints and rules: return passed plus a short grounded reason only.",
+			]
+		),
+		{"passed": True, "reason": ""},
+	)
+
+	return {"probe": cmd["data"], "decision": decision["data"]}
+```
+
+This is the actual Re in Act advantage: `reason()` does not merely generate a command. The action space runs that command, inspects the local result, and only then returns a bounded decision.
+
+---
+
+## Research
+
+### Research Brief Builder
+
+Fetch multiple pages, strip away boilerplate locally, extract evidence-bearing claims, then synthesize a short brief with open questions.
+
+This is a good example of action-level emergence: the value comes from repeated local filtering and structured aggregation, not from asking one model call to do everything at once.
+
+Source file: [/playbook/riffs/research-brief.py](/playbook/riffs/research-brief.py)
+
+```python
+RIFF_ID = "playbook.research_brief.v1"
+
+
+async def run(inputs):
+	topic = inputs["topic"]
+	urls = inputs["urls"]
+	extracted = []
+
+	for url in urls:
+		page = await act("webfetch", {"url": url})
+		facts = await reason(
+			"\n".join(
+				[
+					f"Goal: extract only decision-relevant facts about {topic} from this source.",
+					f"Observation:\n{page['content'][0]['text']}",
+					f"Relevant context: the source URL is {url}.",
+					"Constraints and rules: ignore boilerplate, ads, and repeated navigation; return claims with evidence and uncertainty.",
+				]
+			),
+			{"claims": [{"fact": "", "evidence": "", "confidence": "high"}]},
+		)
+		extracted.append({"url": url, "claims": facts["data"]["claims"]})
+
+	brief = await reason(
+		"\n".join(
+			[
+				f"Goal: synthesize a concise research brief about {topic}.",
+				f"Observation:\n{extracted}",
+				"Constraints and rules: preserve disagreements, keep only the strongest evidence, and return a short brief plus open questions.",
+			]
+		),
+		{"brief": "", "open_questions": [""], "sources": [""]},
+	)
+
+	await act(
+		"write_file",
+		{"path": f"research-brief-{topic}.json", "content": brief["data"]},
+	)
+
+	return brief["data"]
+```
+
+This Riff uses `act()` at both ends: first to fetch local evidence, then to write out the synthesized artifact once the local work is complete.
+
+---
+
+## Customer Workflows
+
+### Support Inbox Router
+
+Read a customer thread, classify the operational queue, choose a safe next move, and either draft a response or create a ticket.
+
+This shows how a RAS can keep local evidence, policy, and routing logic together without promoting every mailbox decision into the outer loop.
+
+Source file: [/playbook/riffs/support-inbox-router.py](/playbook/riffs/support-inbox-router.py)
+
+```python
+RIFF_ID = "playbook.support_inbox_router.v1"
+
+
+async def run(inputs):
+	thread_text = inputs["thread_text"]
+	account_tier = inputs["account_tier"]
+
+	classification = await reason(
+		"\n".join(
+			[
+				"Goal: classify this support thread and choose the next operational action.",
+				f"Observation:\n{thread_text}",
+				f"Relevant context: the customer account tier is {account_tier}.",
+				"Constraints and rules: distinguish bug, billing, access, and general question; return one queue, one priority, and one safe next reply move.",
+			]
+		),
+		{"queue": "bug", "priority": "normal", "reply_action": "send_ack", "reason": ""},
+	)
+
+	data = classification["data"]
+
+	if data["reply_action"] == "send_ack":
+		reply = await act(
+			"reply_template",
+			{"queue": data["queue"], "thread": thread_text, "priority": data["priority"]},
+		)
+		return {"classification": data, "reply": reply}
+
+	if data["reply_action"] == "escalate":
+		ticket = await act(
+			"create_ticket",
+			{
+				"queue": data["queue"],
+				"priority": data["priority"],
+				"summary": data["reason"],
+			},
+		)
+		return {"classification": data, "ticket": ticket}
+
+	return {"classification": data}
+```
+
+The local judgment is useful only because it directly feeds the next action. That is the recurrent pattern across the whole Playbook.
+
+---
+
+## How To Read These
+
+Each example is intentionally small and direct. They are not tied to one framework API. The point is to show the **shape** of a reusable Re in Act capability:
+
+1. gather or observe local evidence through `act()`
+2. call `reason()` with explicit goal, observation, context, and constraints
+3. use deterministic control flow to decide the next step
+4. call `act()` again to complete the local job
+5. package the working pattern directly as a Riff
+
+As the project grows, this page can expand into a larger catalog of domain-specific Riffs.

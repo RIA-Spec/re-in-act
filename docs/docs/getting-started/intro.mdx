@@ -5,13 +5,13 @@ description: What is Re in Act? A quick orientation for new readers.
 
 # What is Re in Act?
 
-**Re in Act** is about making execution stronger.
+**Re in Act** is about making action stronger by keeping reason inside it.
 
-In traditional **ReAct** (_Reason → Act → Observe → Repeat_), small execution problems keep bouncing back to the outer loop. That creates extra round trips, noisy context, and brittle control.
+In traditional **ReAct** (_Reason → Act → Observe → Repeat_), small action problems keep bouncing back to the outer loop. That creates extra round trips, noisy context, and brittle control.
 
-Re in Act introduces a **Reason-able Action Space (RAS)** so those local problems can be handled where they appear. Top-level reasoning defines the RAS and its constraints; execution uses that workspace to inspect feedback, make bounded judgments, and keep moving.
+Re in Act introduces a **Reason-able Action Space (RAS)** so those local problems can be handled where they appear. Top-level reasoning defines the RAS and its constraints; the action phase uses that space to inspect feedback, make bounded judgments, and keep moving.
 
-The result is simpler execution: fewer outer-loop turns, less context bloat, and a larger effective action space during execution.
+The result is simpler action: fewer outer-loop turns, less context bloat, and a larger effective action space.
 
 ---
 
@@ -21,12 +21,12 @@ Think about walking. The conscious brain decides to move, but it does not microm
 
 That is the intuition behind the RAS.
 
-Top-level reasoning should define the work and its constraints. The execution layer should handle local disturbances inside that bounded workspace instead of escalating every small issue back to the outer loop.
+Top-level reasoning should define the work and its constraints. The action layer should handle local disturbances inside that bounded action space instead of escalating every small issue back to the outer loop.
 
 This metaphor matters for two reasons:
 
-1. **Bounded execution**: the RAS works inside a defined task package rather than inventing a new top-level objective.
-2. **Local adaptation**: the RAS can use nearby observations, intermediate data, and runtime control flow to adjust while execution is already underway.
+1. **Bounded action**: the RAS works inside a defined task package rather than inventing a new top-level objective.
+2. **Local adaptation**: the RAS can use nearby observations, intermediate data, and runtime control flow to adjust while action is already underway.
 
 That is why the deeper theory points in the same direction:
 
@@ -39,13 +39,13 @@ If you want the deeper version of this argument, see [Control-Theoretic View](/d
 
 ## At a Glance
 
-|                 | Traditional ReAct           | Re in Act                            |
-| --------------- | --------------------------- | ------------------------------------ |
-| **Logic**       | Probabilistic (LLM-stepped) | **Deterministic** (RAS-driven)       |
-| **Metaphor**    | Micro-managing Cerebrum     | **Bounded Cerebellum**               |
-| **Round Trips** | Continuous outer-loop turns | **One orchestrated execution phase** |
-| **Context**     | Grows with observations     | **Isolated from top-level context**  |
-| **Resilience**  | Brittle to perturbations    | **Self-correcting via RAS**          |
+|                 | Traditional ReAct           | Re in Act                           |
+| --------------- | --------------------------- | ----------------------------------- |
+| **Logic**       | Probabilistic (LLM-stepped) | **Deterministic** (RAS-driven)      |
+| **Metaphor**    | Micro-managing Cerebrum     | **Bounded Cerebellum**              |
+| **Round Trips** | Continuous outer-loop turns | **One orchestrated action phase**   |
+| **Context**     | Grows with observations     | **Isolated from top-level context** |
+| **Resilience**  | Brittle to perturbations    | **Self-correcting via RAS**         |
 
 ---
 
@@ -53,16 +53,36 @@ If you want the deeper version of this argument, see [Control-Theoretic View](/d
 
 ### Reason-able Action Space (RAS)
 
-The RAS is the execution context that top-level reasoning defines for an orchestrated action phase. It contains:
+The RAS is the action context that top-level reasoning defines for an orchestrated action phase. It contains:
 
 - **`reason(prompt, example_output)`** — a local judgment step whose prompt carries the goal, local observations, relevant context, and governing constraints or rules
 - deterministic control flow for retries, branching, and intermediate-data handling
 
-The important point is that the RAS is not just a place to run tools. It is the part of the system that top-level reasoning can still structure and control while execution inspects local observations and intermediate data, makes bounded judgments, and keeps moving without turning every small issue into another outer-loop turn.
+The important point is that the RAS is not just a place to run tools. It is the part of the system that top-level reasoning can still structure and control while the action phase inspects local observations and intermediate data, makes bounded judgments, and keeps moving without turning every small issue into another outer-loop turn.
 
 It may also provide:
 
 - **`act(name, args)`** — calls an external tool and returns its result _(optional — you may use your own action executor)_
+
+### A Typical Bash RAS Example
+
+Here is a minimal example of **reason in action** as progressive discovery.
+
+The agent does not decide all tool usage upfront. It first asks `act --manual` for the available tool surface, lets `reason` pick only the tool names relevant to the task, then asks `act --manual [name]` for the detailed definitions of just those tools.
+
+```bash
+act --manual | \
+	reason \
+		--prompt "Goal: find the tools needed to collect the most relevant API and documentation context for this task." \
+		--prompt - \
+		--prompt "Constraints: return only a JSON array of tool names. Prefer the smallest sufficient set." \
+		--structure '["tool_name"]' | \
+	jq -r '.data[]' | while read -r name; do
+		act --manual "$name"
+	done
+```
+
+This is the core Re in Act move in Bash form: `reason` stays inside the action, using live local data to narrow the next step before more external work happens.
 
 ### Two Runtime Flavors
 
@@ -73,8 +93,23 @@ See [Concepts →](/docs/getting-started/concepts) for annotated examples of bot
 
 ---
 
+## What Re in Act Is Not
+
+It helps to be explicit about the boundary.
+
+- **Not a subagent pattern** — Re in Act does not create another reasoning actor. It creates one orchestrated action space for the same agent.
+- **Not incompatible with subagents** — a subagent can still use Re in Act internally. The subagent remains the reasoning unit; the RAS is the action space it uses to carry work out.
+- **Not an independent reasoning actor** — the RAS is an action context that top-level reasoning defines and orchestrates. It is not a peer planner.
+- **Not open-ended local reasoning** — inside the RAS, `reason()` is a schema-bounded local judgment step, not a second free-form agent loop.
+- **Not step-by-step exposure to the outer loop** — intermediate action state can stay inside the RAS until there is a denoised result worth returning.
+
+If you want the full architectural comparison, see [Subagent vs Re in Act →](/docs/learn/subagents-agent-teams).
+
+---
+
 ## Next Steps
 
+- [Try Re in Act →](/docs/getting-started/try) — a Bash quickstart around `reason`, `act`, and `one-agent`
 - [Concepts →](/docs/getting-started/concepts) — deeper walkthrough of runtime flavors and interfaces
 - [Control-Theoretic View →](/docs/learn/control-theoretic-view) — the deeper design argument behind the architecture
 - [Specification →](/specification/draft/index) — the full formal draft

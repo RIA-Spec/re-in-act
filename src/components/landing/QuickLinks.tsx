@@ -21,7 +21,7 @@ interface QuickLink {
 const links: QuickLink[] = [
   {
     title: "Documentation",
-    description: "Start with the basics: RAS, reason(), and how Re in Act works.",
+    description: "Start with a Bash quickstart, then read the architecture and interfaces.",
     href: NAV_TABS[0].href,
     icon: BookOpen,
   },
@@ -52,6 +52,7 @@ const links: QuickLink[] = [
 export function QuickLinks() {
   return (
     <Section>
+      <div id="start-here" className="block h-0 scroll-mt-24" aria-hidden="true" />
       <SectionHeader
         title="Start Here"
         sub="Start with the docs, read the spec, dig into the rationale, or join the project."

@@ -14,13 +14,13 @@ description: The working draft of the Re in Act open specification.
 
 Think of an agent like a person walking. The conscious brain sets the direction, but it does not micromanage every muscle correction. Local adjustment happens in the cerebellum, close to the body, close to feedback, saving cognitive load and ensuring high-fidelity feedback.
 
-**Re in Act** applies the same idea to AI agents. Top-level reasoning should define goals and constraints. The fast, local adjustments needed during execution should happen inside a **Reason-able Action Space (RAS)**.
+**Re in Act** applies the same idea to AI agents. Top-level reasoning should define goals and constraints. The fast, local adjustments needed in the action phase should happen inside a **Reason-able Action Space (RAS)**.
 
-This makes the core idea simple: instead of sending every small disturbance back through an outer reason-act-observe loop, let execution handle local problems where they occur.
+This makes the core idea simple: instead of sending every small disturbance back through an outer reason-act-observe loop, let action handle local problems where they occur.
 
-For an agent, that means the top-level reasoning loop does not need to stop and rethink after every failed command, noisy log, or small branch in execution. It can define a bounded piece of work inside the RAS, let that work adapt locally, and only return when there is something meaningful to report.
+For an agent, that means the top-level reasoning loop does not need to stop and rethink after every failed command, noisy log, or small branch in action. It can define a bounded piece of work inside the RAS, let that work adapt locally, and only return when there is something meaningful to report.
 
-The practical result is straightforward: fewer round trips, less context bloat, and a larger effective action space during execution. The deeper claim of this specification is that many agent failures come from the execution layer being too weak, not only from the model being too weak. Re in Act strengthens that execution layer.
+The practical result is straightforward: fewer round trips, less context bloat, and a larger effective action space. The deeper claim of this specification is that many agent failures come from the action layer being too weak, not only from the model being too weak. Re in Act strengthens that action layer by giving it a Reason-able Action Space.
 
 ---
 
@@ -28,7 +28,7 @@ The practical result is straightforward: fewer round trips, less context bloat, 
 
 AI agents, especially coding agents, have evolved significantly since the advent of ReAct, which established the core paradigm of problem-solving by interleaving thought and action. Today's function calling and tool-use loops still operate within this paradigm. Yet fundamental limitations persist.
 
-ReAct relies on iterative cycles of **serialized reasoning and acting**, where execution must pause for observation before the next decision. This works for simple tasks, but it starts to break down when an agent has to deal with messy local reality: logs, retries, partial failures, branching conditions, and tool-specific details.
+ReAct relies on iterative cycles of **serialized reasoning and acting**, where action must pause for observation before the next decision. This works for simple tasks, but it starts to break down when an agent has to deal with messy local reality: logs, retries, partial failures, branching conditions, and tool-specific details.
 
 ### 2.1 What Goes Wrong for Agents
 
@@ -39,7 +39,7 @@ In a ReAct loop, every small disturbance tends to bounce back to the top-level r
 - a web page or API returns something slightly different than expected
 - a task needs a short retry loop or branch before the real work can continue
 
-The agent can still solve these problems, but it solves them in an awkward way: stop execution, push the intermediate data back into context, think again, then take one more small step.
+The agent can still solve these problems, but it solves them in an awkward way: stop action, push the intermediate data back into context, think again, then take one more small step.
 
 ### 2.2 Why That Feels Slow and Fragile
 
@@ -47,27 +47,27 @@ This outer-loop style creates three familiar agent problems:
 
 - **Too many round trips**: local issues that should be handled in place become extra think-act-observe cycles.
 - **Too much noise in context**: raw logs, raw tool output, and other intermediate artifacts crowd the top-level context window.
-- **Weak control over execution**: branching, retries, and loops are guided by repeated model turns instead of being handled directly inside the orchestrated execution phase.
+- **Weak control over action**: branching, retries, and loops are guided by repeated model turns instead of being handled directly inside the orchestrated action phase.
 
-As tasks get longer, the agent spends more effort managing execution itself and less effort advancing the user's actual goal.
+As tasks get longer, the agent spends more effort managing action itself and less effort advancing the user's actual goal.
 
 ### 2.3 What Re in Act Changes
 
-Re in Act introduces a **Reason-able Action Space (RAS)** that top-level reasoning defines and orchestrates, so local issues can be handled where they happen inside a controllable execution workspace.
+Re in Act introduces a **Reason-able Action Space (RAS)** that top-level reasoning defines and orchestrates, so local issues can be handled where they happen inside a controllable action space.
 
-Inside the RAS, execution can:
+Inside the RAS, action can:
 
 - inspect intermediate data without sending everything back to the outer loop
 - use `reason()` to turn noisy local evidence into a small structured judgment
-- continue execution through code or shell control flow until the local job is actually done
+- continue through code or shell control flow until the local job is actually done
 
-The effect is simple: top-level reasoning defines the objective and the executable workspace around it, while execution gets enough local structure to adapt without escalating every small deviation.
+The effect is simple: top-level reasoning defines the objective and the executable workspace around it, while action gets enough local structure to adapt without escalating every small deviation.
 
 ### 2.4 The Deeper Point
 
 This is the agent-facing meaning of the control-theoretic argument behind Re in Act. A capable model is not enough if the action layer is too narrow and every correction must go back through the outer loop.
 
-Re in Act expands what the agent can do **during execution**, not just what it can say before execution starts. That is why the visible improvements are fewer round trips, cleaner context, and more reliable task completion.
+Re in Act expands what the agent can do **inside the action space**, not just what it can say before action starts. That is why the visible improvements are fewer round trips, cleaner context, and more reliable task completion.
 
 For the full design rationale behind this control-theoretic framing, see [Control-Theoretic View](/docs/learn/control-theoretic-view).
 
@@ -75,32 +75,32 @@ For the full design rationale behind this control-theoretic framing, see [Contro
 
 ## 3. Overview
 
-Re in Act transforms a serial "Reason and Act" loop into an atomic **"Reason in Action"** primitive: combining deterministic control flow with non-deterministic decisions in one orchestrated execution phase.
+Re in Act transforms a serial "Reason and Act" loop into an atomic **"Reason in Action"** primitive: combining deterministic control flow with non-deterministic decisions in one **Reason-able Action Space (RAS)**.
 
 This specification models the architecture with three core elements:
 
 - **Top-level reasoning**: defines the RAS, its success criteria, and its high-level constraints.
-- **RAS execution**: keeps intermediate data local, runs deterministic control flow, and carries work forward inside the execution workspace.
-- **`reason()` inside the RAS**: compares goal against local reality, then turns that local deviation into structured judgments that execution can use immediately.
+- **RAS runtime**: keeps intermediate data local, runs deterministic control flow, and carries work forward inside the action space.
+- **`reason()` inside the RAS**: compares goal against local reality, then turns that local deviation into structured judgments that action can use immediately.
 
 Together these form a practical local feedback loop. This is an engineering mapping, not a claim that the whole architecture is a fully formalized control-system proof. The point is architectural: direction stays global, while sensing, comparison, and correction move closer to action.
 
 **Benefits:**
 
-- **Fewer round trips**: Multiple outer-loop turns collapse into a single orchestrated execution phase, reducing latency and cost.
+- **Fewer round trips**: Multiple outer-loop turns collapse into a single orchestrated action phase, reducing latency and cost.
 - **Clean context window**: Intermediate data (build logs, API responses, intermediate reasoning) stays **inside** the RAS and never enters the top-level context. Only the final observation is returned.
 - **Deterministic control flow**: `for`/`while`/`if` logic runs in code, not through the LLM — correctness is guaranteed by the runtime, not by model attention.
-- **Higher effective controller variety**: The RAS is a programmable, adaptive execution layer with more ways to sense, compare, and respond to local perturbations.
+- **Higher effective controller variety**: The RAS is a programmable, adaptive action space with more ways to sense, compare, and respond to local perturbations.
 
 **Concrete contrast, from without a RAS to with a RAS:**
 
-- **Command-line noise**: without a RAS, command output full of ANSI color codes, progress bars, and irrelevant logs gets pushed upward verbatim; with a RAS, that noisy stream can be cleaned locally and only the relevant result needs to leave execution.
+- **Command-line noise**: without a RAS, command output full of ANSI color codes, progress bars, and irrelevant logs gets pushed upward verbatim; with a RAS, that noisy stream can be cleaned locally and only the relevant result needs to leave the action space.
 - **Web retrieval noise**: without a RAS, HTML-heavy page fetches return sparse useful information buried inside markup and template noise; with a RAS, local processing can extract the relevant content before returning a bounded result.
 - **Probabilistic loops**: without a RAS, deterministic tasks like traversing files and renaming them can degenerate into turn-by-turn LLM reasoning, causing duplicate work or missed cases; with a RAS, the loop runs deterministically in code while `reason()` is used only for the bounded local judgments that actually require it.
 
 **New complexity introduced:**
 
-A **Reason-able Action Space (RAS)** is required: an execution context that top-level reasoning can define and orchestrate through `reason()` and optional `act()` calls. The RAS is a programmable execution workspace, not an independent reasoning actor, and intermediate execution state is no longer exposed step by step to the outer loop.
+A **Reason-able Action Space (RAS)** is required: an action context that top-level reasoning can define and orchestrate through `reason()` and optional `act()` calls. It is a programmable action space for deterministic control flow, local intermediate data, and bounded `reason()` / `act()` steps. As a result, intermediate action state does not need to be exposed step by step to the outer loop.
 
 ---
 
@@ -116,7 +116,7 @@ An implementation conforming to this specification MUST provide the following lo
 
 ### 4.2 Reason-able Action Space (RAS)
 
-The RAS defines the execution context and interfaces for reasoning in action. It can be run in two main forms:
+The RAS defines the action context and interfaces for reasoning in action. It can be run in two main forms:
 
 #### Bash RAS — The Unix Philosophy
 
@@ -125,17 +125,18 @@ The agent controls flow using Unix pipes (`|`) and redirection (`>`). Intermedia
 Unix pipelines matter here because they are a compositional execution mechanism: processes can be connected through standard streams while hiding internal implementation details. They do **not** by themselves provide global sensing or semantic understanding; those must still be supplied by prompts, schemas, and local filtering.
 
 ```bash
-cat api_docs.md | \
+act --manual | \
   reason \
-    --prompt "Read this API documentation:" \
+    --prompt "Goal: find the tools needed to collect the most relevant API and documentation context for this task." \
     --prompt - \
-    --prompt "Generate a bash command to test this API." \
-    --structure '{"cmd": ""}' | \
-  jq -r '.data.cmd' | \
-  act bash -
+    --prompt "Constraints and rules: return only a JSON array of tool names. Prefer the smallest sufficient set." \
+    --structure '["tool_name"]' | \
+  jq -r '.data[]' | while read -r name; do
+    act --manual "$name"
+  done
 ```
 
-This pipeline streams API documentation into the agent to generate an executable command, which is then extracted by `jq` and immediately run via `act`.
+This pipeline keeps the raw tool catalog inside the RAS, uses `reason()` to select the minimum useful subset, and then expands only those tool definitions without bouncing the whole decision process back to the outer loop.
 
 #### Code Interpreter RAS — The Programmatic Approach
 
@@ -145,23 +146,23 @@ General-purpose code sandboxes are useful because they are expressive enough to 
 
 ```python
 log = open("build.log").read()
-analysis = await reason(
+decision = await reason(
   """
-  Goal: determine whether the build succeeded.
+  Goal: decide whether action should continue or retry.
   Observation:
   """ + log + """
-  Relevant context: this is the latest build log for the current branch.
-  Constraints and rules: return only a bounded judgment grounded in the log.
+  Relevant context: this is the latest CI build log and it may contain ANSI noise, progress bars, and repeated lines.
+  Constraints and rules: ignore cosmetic noise and return only continue or retry plus a short reason grounded in the log.
   """,
-    {"success": False, "reason": ""}
+    {"action": "continue", "reason": ""}
 )
-if analysis["data"]["success"]:
-    await act("deploy", "deploy to production")
+if decision["data"]["action"] == "retry":
+    await act("bash", "npm run build")
 else:
-    await act("notify", analysis["data"]["reason"])
+    await act("deploy", "deploy to production")
 ```
 
-This script uses Python's native control flow to branch between deployment and notification based on the AI's structured analysis.
+This script uses Python's native control flow to keep retry logic local. `reason()` does the bounded judgment over noisy build output, while the runtime deterministically decides whether to rerun the build or continue.
 
 ### 4.3 Sandbox
 
@@ -178,7 +179,7 @@ Two sandbox strategies are supported:
 
 ### 5.1 `reason([prompt], [example_output])`
 
-**Description:** A local regulator interface that maps non-deterministic language inputs into deterministic structured JSON for execution control. The prompt integrates the reference objective, local observations, task-relevant context, and governing constraints and rules. In control-theoretic terms, `reason()` first compares goal against local reality to estimate the relevant deviation, then turns that deviation into a bounded control signal. It is an atomic reasoning step — no tools, no memory, no side effects.
+**Description:** A local regulator interface that maps non-deterministic language inputs into deterministic structured JSON for action control. The prompt integrates the reference objective, local observations, task-relevant context, and governing constraints and rules. In control-theoretic terms, `reason()` first compares goal against local reality to estimate the relevant deviation, then turns that deviation into a bounded control signal. It is an atomic reasoning step — no tools, no memory, no side effects.
 
 **Control-theoretic contract:**
 

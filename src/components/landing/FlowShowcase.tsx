@@ -11,19 +11,20 @@ const reasonFields: { key: string; type: string; value: string; note?: string }[
   {
     key: "prompt",
     type: "string | list",
-    value: '"Goal: assess build. Observation: ... Constraints: ..."',
+    value:
+      '"Goal: decide continue vs retry. Observation: noisy build log. Constraints: ignore ANSI noise; return action + reason."',
     note: "goal + observation + context + constraints",
   },
   {
     key: "example_output",
     type: "Any",
-    value: '{"success": false, "reason": ""}',
+    value: '{"action": "continue", "reason": ""}',
     note: "schema hint",
   },
   {
     key: "→ data",
     type: "T",
-    value: '{"success": true, "reason": "..."}',
+    value: '{"action": "retry", "reason": "registry timeout"}',
     note: "structured result",
   },
   {
@@ -141,7 +142,7 @@ function ActInterface() {
           act()
         </span>{" "}
         is <span style={{ color: "var(--foreground)" }}>optional</span> — the spec provides it as a
-        standard convenience. You may use any user-defined action execution strategy instead.
+        standard convenience. You may use any user-defined action strategy instead.
       </motion.div>
 
       {actFields.map(({ name, desc, level }, i) => (

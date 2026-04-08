@@ -1,0 +1,163 @@
+---
+title: Try Re in Act
+description: "Two ways to try Re in Act: a fast proxy launch path and a direct Bash RAS setup with reason and act."
+---
+
+# Try Re in Act
+
+This page gives a small **Bash RAS** you can run first.
+
+There are now two practical ways to try Re in Act:
+
+1. **Fast proxy experience** — launch a tool through `@one-agent/ria-proxy` and immediately experience Re in Act mode.
+2. **Direct Bash RAS setup** — install `reason` and `act`, then build the action space yourself.
+
+The relevant packages are:
+
+- `@one-agent/ria-proxy`
+- `@one-agent/reason`
+- `@one-agent/act`
+- `npx skills add ria-spec/one-agent`
+
+---
+
+## 1. Fast Proxy Experience
+
+If you want the quickest path to trying Re in Act mode, launch through the proxy:
+
+```bash
+npx @one-agent/ria-proxy launch opencode
+```
+
+This path is for immediate use: the proxy launches the target tool in Re in Act mode without requiring you to manually wire the action surface first.
+
+---
+
+## 2. Direct Bash RAS Setup
+
+If you want the interfaces directly in your shell, install the runtime surface:
+
+```bash
+npm install -g @one-agent/reason @one-agent/act
+npx skills add ria-spec/one-agent
+```
+
+The goal is simple:
+
+- `reason` gives Bash a bounded local judgment step
+- `act` gives Bash a clean action interface
+- the `one-agent` skill wires that into a usable local workflow
+
+---
+
+## 3. Configure `reason`
+
+```bash
+reason --help
+```
+
+`reason` needs a model configuration before it can run. The exact provider settings are part of the CLI surface; `reason --help` is the entry point for that configuration.
+
+---
+
+## 4. Configure `act`
+
+```bash
+act --help
+```
+
+`act` needs action backends. In practice that means configuring `mcpServers` or whatever action surface your runtime exposes.
+
+If you only want to try `reason` first, you can still combine it with ordinary Bash commands before wiring `act` into MCP.
+
+---
+
+## 5. Try a Small Bash RAS
+
+The point is not just to call a model. The point is to keep local noise and local adaptation **inside the action space**.
+
+Prompt:
+
+- Goal: decide whether this CI step should continue, retry, or escalate.
+- Observation: the contents of `build.log`, obtained through `act()`
+- Relevant context: the log may contain ANSI color, progress output, and repeated stack traces.
+- Constraints and rules: ignore cosmetic noise; return `action`, `reason`, and `retry_cmd` when retry is appropriate.
+
+```bash
+decision="$(act read_file '{"path":"build.log"}' | \
+  reason \
+    --prompt "Goal: decide whether this CI step should continue, retry, or escalate." \
+    --prompt - \
+    --prompt "Relevant context: the log may contain ANSI color, progress output, and repeated stack traces." \
+    --prompt "Constraints and rules: ignore cosmetic noise; return action, reason, and retry_cmd when retry is appropriate." \
+    --structure '{"action": "continue", "reason": "", "retry_cmd": ""}')"
+
+printf '%s\n' "$decision" | jq .
+```
+
+That is already Re in Act:
+
+- the raw build log stays local
+- `reason()` turns it into a bounded control decision
+- the outer loop does not need to inspect every line
+
+---
+
+## 6. Let Action Keep Moving
+
+The next step is where Re in Act actually becomes useful: use the structured result to keep work moving inside the same action phase.
+
+```bash
+action="$(printf '%s' "$decision" | jq -r '.data.action')"
+
+if [ "$action" = "retry" ]; then
+  printf '%s' "$decision" | jq -r '.data.retry_cmd' | act bash -
+elif [ "$action" = "escalate" ]; then
+  printf '%s' "$decision" | jq -r '.data.reason' | \
+    act notify --channel '#build-failures' --message -
+else
+  echo "continue"
+fi
+```
+
+This is the core experience the homepage should lead into:
+
+- `reason` decides locally
+- `act` touches the outside world
+- Bash keeps deterministic control flow
+- the whole thing behaves like one bounded RAS instead of many outer-loop turns
+
+---
+
+## 7. Try a Second Shape
+
+The same pattern also works on tool discovery and filtered tool use, not just logs.
+
+Prompt:
+
+- Goal: find the tools needed to collect the most relevant API and documentation context for this task.
+- Observation: the tool catalog returned by `act --manual`
+- Constraints and rules: return only a JSON array of tool names; prefer the smallest sufficient set.
+
+```bash
+act --manual | \
+  reason \
+    --prompt "Goal: find the tools needed to collect the most relevant API and documentation context for this task." \
+    --prompt - \
+    --prompt "Constraints and rules: return only a JSON array of tool names. Prefer the smallest sufficient set." \
+    --structure '["tool_name"]' | \
+  jq -r '.data[]' | while read -r name; do
+    act --manual "$name"
+  done
+```
+
+This is where the advantage shows up clearly: the raw tool catalog stays in the action space, `reason` selects only the minimum useful subset, and `act` immediately expands just those tools.
+
+---
+
+## 8. Where To Go Next
+
+- [Introduction →](/docs/getting-started/intro) for the architecture overview
+- [Concepts →](/docs/getting-started/concepts) for the two runtime flavors and interfaces
+- [Playbook →](/docs/learn/playbook) for larger reusable Riff patterns
+- [Specification →](/specification/draft/index) for the formal draft

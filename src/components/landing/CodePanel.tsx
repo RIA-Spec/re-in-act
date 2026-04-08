@@ -1,68 +1,32 @@
 "use client";
 
-import { motion, useMotionValue, useTransform, animate, useInView } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 
 /* ────────────────────────────────────────────
-   Re in Act — execution stays local
+  Re in Act — action stays local
    ──────────────────────────────────────────── */
 
 const CODE_LINES = [
-  { text: "# Build analyzer — local execution", cls: "cmt" },
-  { text: "log = open('build.log').read()", cls: "" },
+  { text: "test_run = await act('bash', 'npm test -- --reporter json')", cls: "act" },
   { text: "", cls: "" },
-  { text: "analysis = await reason(", cls: "kw" },
-  { text: "    f'Goal: assess build. Observation: {log}.',", cls: "" },
-  { text: "    'Constraints: return success + reason only.',", cls: "" },
-  { text: '    \'{"success": false, "reason": ""}\'', cls: "" },
+  { text: "focus = await reason(", cls: "kw" },
+  { text: "    [goal, observation, context, constraints],", cls: "" },
+  { text: '    {"retry_cmd": "", "reason": ""},', cls: "" },
   { text: ")", cls: "kw" },
   { text: "", cls: "" },
-  { text: "if analysis['data']['success']:", cls: "kw" },
-  { text: "    act('deploy', 'to prod')", cls: "act" },
+  { text: "retry_run = await act('bash', focus['data']['retry_cmd'])", cls: "act" },
+  { text: "decision = await reason(", cls: "kw" },
+  { text: "    [goal, observation, context, constraints],", cls: "" },
+  { text: '    {"action": "continue", "reason": ""},', cls: "" },
+  { text: ")", cls: "kw" },
+  { text: "if decision['data']['action'] == 'escalate':", cls: "kw" },
+  { text: "    await act('notify', {'message': decision['data']['reason']})", cls: "act" },
   { text: "else:", cls: "kw" },
-  { text: "    act('notify', analysis['data']['reason'])", cls: "act" },
+  { text: "    await act('deploy', {'target': 'production'})", cls: "act" },
 ];
 
-/* ────────────────────────────────────────────
-   Typewriter hook
-   ──────────────────────────────────────────── */
-
-function useTypewriter(text: string, delay: number, enabled: boolean, speed = 40) {
-  const count = useMotionValue(0);
-  const display = useTransform(count, (v) => text.slice(0, Math.round(v)));
-
-  useEffect(() => {
-    if (!enabled || text.length === 0) return;
-    let ctrl: ReturnType<typeof animate> | undefined;
-    const t = setTimeout(() => {
-      ctrl = animate(count, text.length, {
-        type: "tween",
-        duration: text.length / speed,
-        ease: "linear",
-      });
-    }, delay);
-    return () => {
-      clearTimeout(t);
-      ctrl?.stop();
-    };
-  }, [count, text.length, delay, speed, enabled]);
-
-  return display;
-}
-
-function TypewriterCodeLine({
-  text,
-  delay,
-  enabled,
-  cls,
-}: {
-  text: string;
-  delay: number;
-  enabled: boolean;
-  cls: string;
-}) {
-  const display = useTypewriter(text, delay, enabled);
-
+function CodeLine({ text, cls }: { text: string; cls: string }) {
   if (text === "") {
     return <span className="block h-[1.6em]">{"\u00A0"}</span>;
   }
@@ -78,24 +42,10 @@ function TypewriterCodeLine({
 
   return (
     <span className="block break-words whitespace-pre-wrap">
-      <motion.span className={colorClass}>{display}</motion.span>
+      <span className={colorClass}>{text}</span>
     </span>
   );
 }
-
-/* ────────────────────────────────────────────
-   Pre-compute cumulative delays
-   ──────────────────────────────────────────── */
-
-const lineDelays = CODE_LINES.reduce<number[]>((acc, line, i) => {
-  if (i === 0) {
-    acc.push(0);
-  } else {
-    const prevLen = CODE_LINES[i - 1].text.length || 1;
-    acc.push(acc[i - 1] + (prevLen / 40) * 1000 + 180);
-  }
-  return acc;
-}, []);
 
 /* ────────────────────────────────────────────
    Component
@@ -130,7 +80,13 @@ export function CodePanel() {
         style={{ backgroundColor: "var(--pre-bg)", color: "var(--foreground)" }}
       >
         {CODE_LINES.map((line, i) => (
-          <span key={i} className="flex min-w-0">
+          <motion.span
+            key={i}
+            className="flex min-w-0"
+            initial={{ opacity: 0, y: 4 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.18, delay: i * 0.035, ease: "easeOut" }}
+          >
             <span
               className="inline-block w-6 shrink-0 select-none text-right mr-3 tabular-nums"
               style={{ color: "var(--muted)", opacity: 0.4 }}
@@ -138,14 +94,9 @@ export function CodePanel() {
               {i + 1}
             </span>
             <div className="flex-1 min-w-0">
-              <TypewriterCodeLine
-                text={line.text}
-                delay={lineDelays[i]}
-                enabled={isInView}
-                cls={line.cls}
-              />
+              <CodeLine text={line.text} cls={line.cls} />
             </div>
-          </span>
+          </motion.span>
         ))}
       </pre>
     </div>

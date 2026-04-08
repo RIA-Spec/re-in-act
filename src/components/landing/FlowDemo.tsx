@@ -15,7 +15,7 @@ export function FlowDemo() {
     <Section>
       <SectionHeader
         title="Reason-able Action Spaces"
-        sub="What the RAS looks like in practice: local checks, bounded judgments, and work that keeps moving."
+        sub="What the RAS looks like in practice: multiple act() and reason() steps cooperating inside one bounded action space."
       />
 
       {/* ── 1. Code RAS ── */}
@@ -24,21 +24,22 @@ export function FlowDemo() {
           Code RAS (Python / TS)
         </h3>
         <p className="text-[14px] mt-1.5 leading-relaxed" style={{ color: "var(--muted)" }}>
-          Deterministic orchestration in scripts: branches, loops, and validation happen in code,
-          while `reason()` turns local evidence into structured judgments inside execution.
+          Deterministic orchestration in scripts: branches, loops, retries, and validation happen in
+          code, while `reason()` supplies bounded judgments. That gives the runtime Turing-complete
+          deterministic control instead of probabilistic LLM-stepped control.
         </p>
       </div>
 
-      {/* ── Source + Execution Flow ── */}
+      {/* ── Action Flow + Source ── */}
       <motion.div
-        className="mt-12 flex w-full flex-col lg:flex-row items-stretch gap-8"
+        className="mt-12 grid w-full grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)]"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         {/* Left — Python source code */}
-        <div className="flex flex-col lg:w-7/12">
+        <div className="flex h-full flex-col">
           <div className="mb-2 flex items-center gap-2">
             <span
               className="inline-block h-1.5 w-1.5 rounded-full"
@@ -54,8 +55,8 @@ export function FlowDemo() {
           <CodePanel />
         </div>
 
-        {/* Right — Execution flowchart */}
-        <div className="flex flex-col lg:w-5/12">
+        {/* Right — Action flowchart */}
+        <div className="flex h-full flex-col">
           <div className="mb-2 flex items-center gap-2">
             <span
               className="inline-block h-1.5 w-1.5 rounded-full"
@@ -65,11 +66,11 @@ export function FlowDemo() {
               className="font-mono text-[11px] font-medium uppercase tracking-wider"
               style={{ color: "var(--muted)" }}
             >
-              Execution Flow
+              Action Flow
             </span>
           </div>
           <div
-            className="flex-1 overflow-hidden rounded-xl border"
+            className="flex h-full flex-col overflow-hidden rounded-xl border"
             style={{
               borderColor: "var(--border)",
               backgroundColor: "var(--surface-elevated)",
@@ -86,8 +87,8 @@ export function FlowDemo() {
                 flowchart
               </span>
             </div>
-            <div className="p-4 h-full min-h-[320px] lg:min-h-0 flex items-center justify-center bg-[var(--pre-bg)]">
-              <div className="w-full h-full flex items-center justify-center">
+            <div className="flex min-h-[320px] flex-1 bg-[var(--pre-bg)] p-4 md:min-h-[360px]">
+              <div className="flex h-full w-full items-center justify-center">
                 <Flowchart />
               </div>
             </div>
@@ -98,11 +99,12 @@ export function FlowDemo() {
       {/* ── 2. Bash RAS ── */}
       <div className="mt-28 mb-8 border-b pb-4" style={{ borderColor: "var(--border)" }}>
         <h3 className="text-xl font-semibold tracking-tight" style={{ color: "var(--foreground)" }}>
-          Bash RAS Pipeline
+          Bash RAS
         </h3>
         <p className="text-[14px] mt-1.5 leading-relaxed" style={{ color: "var(--muted)" }}>
-          Unix-style pipelines compose `reason` and `act` in a single action phase, with explicit
-          data flow between steps and no need to bounce each small result back to the outer loop.
+          Unix-style pipelines compose `reason` and `act` in a single action phase. Shell gives you
+          deterministic, Turing-complete control flow, while the LLM stays confined to bounded local
+          judgments.
         </p>
       </div>
 

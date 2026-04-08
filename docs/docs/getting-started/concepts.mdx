@@ -5,94 +5,120 @@ description: Deeper walkthrough of the Reason-able Action Space, reason(), and a
 
 # RAS Concepts
 
-If the introduction explains the idea, this page explains the working parts. Think of the RAS as a small workshop attached to the agent: `reason()` makes local judgments, and `act()` touches the outside world.
+If the introduction explains the idea, this page explains the working parts.
 
-This page walks through the two RAS runtime flavors and the two core interfaces with annotated examples drawn from the [one-agent](https://github.com/RIA-Spec/one-agent) reference implementation.
+Think of the **Reason-able Action Space (RAS)** as the bounded space where action can keep moving without turning every local disturbance into another outer-loop turn.
+
+This page walks through:
+
+- what the RAS does
+- the two runtime forms
+- how `reason()` and `act()` work together inside one action space
 
 ## Control View
 
 Re in Act is easiest to understand as a local control architecture.
 
 - The **top-level reasoner** defines the RAS and its constraints.
-- The RAS runs deterministic control flow such as loops, retries, and tool calls.
-- `reason()` plays the role of a **local comparator and controller**: its prompt carries the goal, local observations, relevant context, and governing constraints, then it compares local reality against that target and returns schema-bounded output that execution can act on.
+- The **RAS runtime** keeps intermediate data local and runs deterministic control flow such as loops, retries, branches, and tool calls.
+- `reason()` plays the role of a **local comparator and controller**: its prompt carries the goal, local observations, relevant context, and governing constraints, then it compares local reality against that target and returns schema-bounded output that action can use immediately.
+- `act()` is the optional action interface that touches the outside world from inside the RAS.
 
 This is an engineering analogy, not a claim that the runtime is literally a classical control block diagram. The point is that raw observations become useful only after local filtering and comparison.
 
 If you want the deeper design rationale, see [Control-Theoretic View](/docs/learn/control-theoretic-view).
 
-In practical agent terms, this is why the RAS matters: it lets execution keep working through local uncertainty instead of handing every small disturbance back to the main loop.
+In practical agent terms, this is why the RAS matters: it lets action keep working through local uncertainty instead of handing every small disturbance back to the main loop.
 
-## The Two Runtime Flavors
+## Two Runtime Forms
 
 ### Code RAS
 
-The agent writes scripts (Python or TypeScript). `reason()` and `act()` are async interfaces available in scope.
+The agent writes scripts, typically in Python or TypeScript. `reason()` and `act()` are async interfaces available in scope.
+
+The important point is not the language. The important point is that the action space gets deterministic, Turing-complete control flow while the model stays confined to bounded local judgments.
 
 ```python
-import asyncio
+test_run = await act("bash", "npm test -- --reporter json")
 
-async def main():
-    # act() — user-defined or provided by the runtime
-    m = await act("__manual__", {})
+focus = await reason(
+    "\n".join(
+        [
+            "Goal: identify the highest-value retry step from this failed test run.",
+            f"Observation:\n{test_run['content'][0]['text']}",
+            "Constraints and rules: return only retry_cmd and a short reason grounded in the output.",
+        ]
+    ),
+    {"retry_cmd": "", "reason": ""},
+)
 
-    # reason() — structured output grounded in the tool list
-    r = await reason(
-        f"Goal: web scraping. Pick relevant tools from: {m['content'][0]['text']}",
-        example=["tool_name"]
-    )
+retry_run = await act("bash", focus["data"]["retry_cmd"])
 
-    for tool in r["data"]:
-        info = await act("__manual__", {"name": tool})
-        print(info["content"][0]["text"])
+decision = await reason(
+    "\n".join(
+        [
+            "Goal: decide whether action should continue or escalate.",
+            f"Observation:\n{retry_run['content'][0]['text']}",
+            "Constraints and rules: return one action and one grounded reason.",
+        ]
+    ),
+    {"action": "continue", "reason": ""},
+)
 
-asyncio.run(main())
+if decision["data"]["action"] == "escalate":
+    await act("notify", {"channel": "#build-failures", "message": decision["data"]["reason"]})
+else:
+    await act("deploy", {"target": "production"})
 ```
 
-**Pattern**: `act()` for data retrieval → `reason()` for selection → loop to `act()` for each result.
+**Pattern**: `act()` gathers local evidence → `reason()` compresses it into a bounded control signal → `act()` runs the next step → `reason()` decides whether the space should continue or escalate.
 
-The agent can write these scripts interchangeably in **Python** or **TypeScript/Node.js**, since both provide native `async`/`await` control flow.
+Exactly the same shape works in TypeScript/Node.js because the point is the orchestration pattern, not Python syntax.
 
 ```typescript
-async function main() {
-  // act() — user-defined or provided by the runtime
-  const m = await act("__manual__", {});
+const testRun = await act("bash", "npm test -- --reporter json");
 
-  // reason() — structured output
-  const r = await reason(`Goal: web scraping. Pick relevant tools from: ${m.content[0].text}`, [
-    "tool_name",
-  ]);
+const focus = await reason(
+  [
+    "Goal: identify the highest-value retry step from this failed test run.",
+    testRun.content[0].text,
+    "Constraints and rules: return only retry_cmd and a short reason.",
+  ],
+  { retry_cmd: "", reason: "" },
+);
 
-  for (const tool of r.data) {
-    const info = await act("__manual__", { name: tool });
-    console.log(info.content[0].text);
-  }
-}
-
-main().catch(console.error);
+const retryRun = await act("bash", focus.data.retry_cmd);
+const decision = await reason(
+  [
+    "Goal: decide whether action should continue or escalate.",
+    retryRun.content[0].text,
+    "Constraints and rules: return one action and one grounded reason.",
+  ],
+  { action: "continue", reason: "" },
+);
 ```
 
-**Pattern**: Nearly identical async logic across languages.
+The action space is the same even though the host syntax changes.
 
 ### Bash RAS
 
 The agent writes shell pipelines. `reason` and `act` are CLI commands available in `PATH`.
 
 ```bash
-# Discover and filter tools
-act --manual > m.json && \
-  cat m.json | reason \
-    --prompt "Extract relevant tool names as JSON array:" \
+act --manual | \
+  reason \
+    --prompt "Goal: find the tools needed to collect the most relevant API and documentation context for this task." \
     --prompt - \
-    --structure '["bash"]' > tools.json && \
-  cat tools.json | jq -r '.data[]' | while read -r t; do
-    act --manual "$t"
+    --prompt "Constraints and rules: return only a JSON array of tool names. Prefer the smallest sufficient set." \
+    --structure '["tool_name"]' | \
+  jq -r '.data[]' | while read -r name; do
+    act --manual "$name"
   done
 ```
 
-**Pattern**: redirect intermediate results with `>` → use `jq` to extract from `.data` → pipe into the next command.
+**Pattern**: `act()` emits the local tool catalog to stdout, `reason()` selects the minimum sufficient subset, and shell keeps the deterministic pipe-and-loop control flow.
 
-Unix pipelines are useful here because they compose programs through standard streams while hiding internal details behind clean interfaces. They do not automatically provide semantic understanding; `reason()` is still what turns raw output into a useful structured judgment.
+Unix pipelines are useful here because they are already a deterministic action fabric. `reason()` does not replace shell control flow; it gives shell one bounded semantic step inside that control flow.
 
 ---
 
@@ -102,7 +128,7 @@ Unix pipelines are useful here because they compose programs through standard st
 
 ### Key rules
 
-- **Uses a fresh inference context** — each call should include the needed local context explicitly, but the surrounding execution state and orchestration still stay in the same RAS.
+- **Uses a fresh inference context** — each call should include the needed local context explicitly, but the surrounding action state and orchestration still stay in the same RAS.
 - **Include goal + observation + context + constraints** — prompts should state the target objective, local observations/feedback, task-relevant context, and governing constraints or rules.
 - **Retry on schema failure** — validates the output against the schema inferred from `example_output`. Retries up to N times with the error as feedback before returning `{ "error": "..." }`.
 - **Bound output variety with schema** — `example_output` constrains responses into an executable control channel.
@@ -110,9 +136,9 @@ Unix pipelines are useful here because they compose programs through standard st
 
 ### What `reason()` is for
 
-`reason()` is not a second full agent. It is a local judgment step inside an orchestrable RAS. Its job is to compare goal against local reality, use the resulting deviation to decide what matters, and return bounded decisions that execution can carry out deterministically under the control of the enclosing runtime.
+`reason()` is not a second full agent. It is a local judgment step inside an orchestrable RAS. Its job is to compare goal against local reality, use the resulting deviation to decide what matters, and return bounded decisions that action can carry out deterministically under the control of the enclosing runtime.
 
-That is why `reason()` improves execution quality: it lets the agent compress noisy local observations and intermediate data into something small, explicit, and actionable.
+That is why `reason()` improves action quality: it lets the agent compress noisy local observations and intermediate data into something small, explicit, and actionable.
 
 Conceptually, `reason()` includes two tightly coupled steps:
 
@@ -126,27 +152,29 @@ Typical uses include:
 - extract structured facts from unstructured local evidence
 - summarize only the signal that should leave the RAS
 
-### Example — sentiment analysis
+### Example — local extraction
 
 ```python
-items = ["Great product!", "Broke after two days", "Absolutely love it"]
-r = await reason(
-  f"Goal: classify sentiment. Observation: {items}. Constraints: return one label per item.",
-    example=[{"text": "", "sentiment": ""}]
+response = await act("webfetch", {"url": url})
+facts = await reason(
+  "\n".join(
+      [
+          "Goal: extract the decision-relevant facts from this page.",
+          f"Observation:\n{response['content'][0]['text']}",
+          "Constraints and rules: ignore markup noise and return claims with evidence only.",
+      ]
+  ),
+  {"claims": [{"fact": "", "evidence": ""}]},
 )
-for x in r["data"]:
-    print(f"{x['text']} → {x['sentiment']}")
 ```
 
-### Example — binary decision
+### Example — local decision
 
 ```python
-r = await reason(
-  "Goal: decide whether to alert. Observation: 15 errors in the last hour; threshold is 10. Constraints: return a boolean only.",
-    example=True
+decision = await reason(
+  "Goal: decide whether action should retry or escalate. Observation: latest build retry failed. Constraints: return one action only.",
+  example={"action": "retry"},
 )
-if r["data"]:
-    print("Alert!")
 ```
 
 ---
@@ -154,6 +182,12 @@ if r["data"]:
 ## `act(name, args)` — Optional
 
 `act()` is a **convenience interface** provided by the RAS for calling external tools. The spec does not require you to use it — you may execute actions any way you like.
+
+It becomes most useful when paired with `reason()` inside one action space:
+
+- `act()` gets or changes something in the outside world
+- `reason()` interprets the local result
+- `act()` performs the next bounded step
 
 ### When to use `act()`
 
@@ -172,17 +206,25 @@ if result.get("isError"):
 # Safe to use result["content"][0]["text"]
 ```
 
-### Batch actions
+### Multi-step action pattern
 
-Always batch all related `act()` calls into a single script. Do not split related actions across multiple conversation turns:
+The action layer gets stronger when related `act()` calls and `reason()` calls stay inside one RAS instead of getting split across multiple outer-loop turns.
 
 ```python
-# Good — one script, multiple acts
-urls = (await reason(f"Top 2 URLs from: {search_result}", ["url1", "url2"]))["data"]
-data = [
-    (await act("webfetch", {"url": u}))["content"][0]["text"]
-    for u in urls
-]
-summary = (await reason(f"Synthesize: {data}", {"summary": ""}))["data"]["summary"]
-print(summary)
+search = await act("websearch", {"query": topic})
+urls = (await reason(
+  f"Goal: pick the two best sources. Observation: {search['content'][0]['text']}",
+  ["url1", "url2"],
+))["data"]
+
+pages = [(await act("webfetch", {"url": u}))["content"][0]["text"] for u in urls]
+
+brief = (await reason(
+  f"Goal: synthesize a short brief. Observation: {pages}",
+  {"brief": "", "open_questions": [""]},
+))["data"]
+
+await act("write_file", {"path": "brief.json", "content": brief})
 ```
+
+That is the core Re in Act pattern: keep the local evidence, the local judgments, and the next actions inside the same RAS until the local job is actually done.

@@ -5,7 +5,7 @@ import { fade } from "./shared";
 
 /* ────────────────────────────────────────────
   Data — Bash RAS pipeline: 4-node horizontal chain
-   api_docs.md → reason → jq → act
+  act --manual → reason → jq → act --manual
    ──────────────────────────────────────────── */
 
 interface PipeNode {
@@ -27,10 +27,10 @@ interface PipeLink {
 }
 
 const NODES: PipeNode[] = [
-  { id: "src", label: "docs.md", sub: "source", cx: 80, cy: 100, role: "source" },
-  { id: "reason", label: "reason", sub: "struct JSON", cx: 240, cy: 100, role: "relay" },
-  { id: "jq", label: "jq", sub: "extract cmd", cx: 400, cy: 100, role: "relay" },
-  { id: "act", label: "act", sub: "execute", cx: 560, cy: 100, role: "sink" },
+  { id: "src", label: "act", sub: "tool catalog", cx: 80, cy: 100, role: "source" },
+  { id: "reason", label: "reason", sub: "select tools", cx: 240, cy: 100, role: "relay" },
+  { id: "jq", label: "jq", sub: "unwrap names", cx: 400, cy: 100, role: "relay" },
+  { id: "act", label: "act", sub: "expand defs", cx: 560, cy: 100, role: "sink" },
 ];
 
 const LINKS: PipeLink[] = [
@@ -224,14 +224,31 @@ export function NetworkPulse() {
         >
           {/* Pipeline command strip */}
           <div
-            className="border-b px-5 py-2.5 font-mono text-[11px]"
+            className="border-b px-5 py-3 font-mono text-[11px] leading-relaxed"
             style={{ borderColor: "var(--border)", color: "var(--muted)" }}
           >
-            <span style={{ color: "var(--accent)" }}>$</span> cat api_docs.md{" "}
-            <span style={{ color: "var(--accent)" }}>|</span> reason --prompt &quot;Goal: produce
-            test cmd&quot; --prompt - --structure &apos;{"{"}&quot;cmd&quot;: &quot;&quot;{"}"}
-            &apos; <span style={{ color: "var(--accent)" }}>|</span> jq -r &apos;.data.cmd&apos;{" "}
-            <span style={{ color: "var(--accent)" }}>|</span> act bash -
+            <div className="mt-2">
+              <span style={{ color: "var(--accent)" }}>$</span> act --manual{" "}
+              <span style={{ color: "var(--accent)" }}>|</span> \
+            </div>
+            <div className="pl-4">reason \</div>
+            <div className="pl-8">
+              --prompt &quot;Goal: find the tools needed to collect the most relevant API and
+              documentation context for this task.&quot; \
+            </div>
+            <div className="pl-8">--prompt - \</div>
+            <div className="pl-8">
+              --prompt &quot;Constraints: return only a JSON array of tool names. Prefer the
+              smallest sufficient set.&quot; \
+            </div>
+            <div className="pl-8">
+              --structure &apos;[&quot;tool_name&quot;]&apos;{" "}
+              <span style={{ color: "var(--accent)" }}>|</span> \
+            </div>
+            <div className="pl-4">
+              jq -r &apos;.data[]&apos; | while read -r name; do act --manual &quot;$name&quot;;
+              done
+            </div>
           </div>
 
           <svg
@@ -311,7 +328,7 @@ export function NetworkPulse() {
               className="inline-block h-2 w-2 rounded-full"
               style={{ background: "var(--muted)" }}
             />
-            Shell execution
+            Shell action
           </span>
         </div>
       </motion.div>

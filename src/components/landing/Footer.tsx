@@ -4,7 +4,7 @@ export function Footer() {
   return (
     <footer className="border-t py-10 text-center" style={{ borderColor: "var(--border)" }}>
       <nav className="mb-4 flex flex-wrap items-center justify-center gap-4 text-xs">
-        <Link href="/docs/getting-started/intro" style={{ color: "var(--muted)" }}>
+        <Link href="/docs/getting-started/try" style={{ color: "var(--muted)" }}>
           Docs
         </Link>
         <Link href="/specification/draft/index" style={{ color: "var(--muted)" }}>
@@ -12,6 +12,9 @@ export function Footer() {
         </Link>
         <Link href="/docs/learn/control-theoretic-view" style={{ color: "var(--muted)" }}>
           Why It Works
+        </Link>
+        <Link href="/docs/learn/playbook" style={{ color: "var(--muted)" }}>
+          Playbook
         </Link>
         <Link href="/community/contributing" style={{ color: "var(--muted)" }}>
           Community
