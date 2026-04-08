@@ -121,6 +121,15 @@ export function RASHarness() {
         <Link href="/extensions/agent-interface" className="underline underline-offset-4">
           Agent Interface Extension
         </Link>
+        . For related harness terminology in long-running agent systems, see{" "}
+        <a
+          href="https://www.anthropic.com/engineering/harness-design-long-running-apps"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-4"
+        >
+          Harness design for long-running apps
+        </a>
         .
       </motion.p>
     </Section>

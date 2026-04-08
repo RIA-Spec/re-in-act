@@ -15,34 +15,6 @@ For optional interfaces layered on top of the core runtime contract, see [Re in 
 
 ---
 
-## MCP (Model Context Protocol)
-
-MCP is the recommended integration layer for tool discovery and execution. The RAS can act as an **MCP Server** or consume tools exposed by an MCP host.
-
-### Using MCP tools via `act()`
-
-Any MCP tool can be called through `act()`:
-
-```python
-# List available tools
-tools = await act("__manual__", {})
-
-# Call a specific MCP tool
-result = await act("websearch", {"query": "Re in Act spec"})
-```
-
-### MCP Sampling for `reason()`
-
-`reason()` can be implemented via **MCP Sampling** — the RAS acts as an MCP Server and requests LLM completion from the MCP client. This offloads model invocation to the host application, with no direct API key required inside the RAS.
-
-```
-RAS (MCP Server) → sampling/createMessage → MCP Client → LLM
-```
-
-See the [one-agent](https://github.com/RIA-Spec/one-agent) reference implementation for a working MCP Sampling integration.
-
----
-
 ## LLM APIs
 
 One useful reference design here is Anthropic's [Programmatic tool calling](https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling). In that model, Claude writes code inside a code-execution container, calls tools from the running program, pauses on `tool_use`, resumes when the host returns `tool_result`, and keeps intermediate processing out of the model's top-level context window until the final output is ready.
@@ -81,9 +53,11 @@ The runtime executes the delegated program and returns a single final observatio
 
 ---
 
-## Sandboxing
+## Sandboxing For Bash And Code
 
-The RAS executes arbitrary code, so sandboxing is essential in production. Two supported strategies:
+Sandboxing is a common operational requirement for both Bash RAS and Code RAS in production. The issue is not the surface syntax. The issue is that the RAS executes real actions against real environments.
+
+Two supported strategies:
 
 - **Cloud Sandbox** — the RAS runs in a managed cloud environment. Providers purpose-built for agent code execution:
   - [E2B](https://e2b.dev) — cloud sandboxes with Python/JS SDKs, popular for AI agent use cases
@@ -95,3 +69,31 @@ The RAS executes arbitrary code, so sandboxing is essential in production. Two s
 - **Client-side Sandbox** — the RAS runs locally or in a self-hosted environment (Docker, WASM, Cloudflare Workers).
 
 The sandboxing strategy does not affect the `reason()` / `act()` interface contract.
+
+---
+
+## MCP (Model Context Protocol)
+
+MCP is the recommended integration layer for tool discovery and execution. The RAS can act as an **MCP Server** or consume tools exposed by an MCP host.
+
+### Using MCP tools via `act()`
+
+Any MCP tool can be called through `act()`:
+
+```python
+# List available tools
+tools = await act("__manual__", {})
+
+# Call a specific MCP tool
+result = await act("websearch", {"query": "Re in Act spec"})
+```
+
+### MCP Sampling for `reason()`
+
+`reason()` can be implemented via **MCP Sampling** — the RAS acts as an MCP Server and requests LLM completion from the MCP client. This offloads model invocation to the host application, with no direct API key required inside the RAS.
+
+```
+RAS (MCP Server) → sampling/createMessage → MCP Client → LLM
+```
+
+See the [one-agent](https://github.com/RIA-Spec/one-agent) reference implementation for a working MCP Sampling integration.
