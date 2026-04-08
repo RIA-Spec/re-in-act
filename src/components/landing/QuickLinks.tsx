@@ -18,17 +18,21 @@ interface QuickLink {
   icon: LucideIcon;
 }
 
+function getTabHref(label: string, fallback: string): string {
+  return NAV_TABS.find((tab) => tab.label === label)?.href ?? fallback;
+}
+
 const links: QuickLink[] = [
   {
     title: "Documentation",
     description: "Start with a Bash quickstart, then read the architecture and interfaces.",
-    href: NAV_TABS[0].href,
+    href: getTabHref("Documentation", "/docs/getting-started/try"),
     icon: BookOpen,
   },
   {
     title: "Specification",
     description: "Read the current draft of the Re in Act specification.",
-    href: NAV_TABS[1].href,
+    href: getTabHref("Specification", "/specification/draft/index"),
     icon: FileText,
   },
   {
@@ -40,7 +44,7 @@ const links: QuickLink[] = [
   {
     title: "Community",
     description: "Join the discussion and help shape the project.",
-    href: NAV_TABS[3].href,
+    href: getTabHref("Community", "/community/contributing"),
     icon: Users,
   },
 ];

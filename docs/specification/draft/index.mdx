@@ -177,6 +177,8 @@ Two sandbox strategies are supported:
 
 `reason()` **MUST** be supported regardless of the RAS chosen. `act()` is **OPTIONAL** and may be substituted by any user-defined action execution strategy. When both are provided, they share the same contract across Bash RAS and Python RAS.
 
+For optional capability layers that sit on top of this core contract, see [Extensions Overview](/extensions/overview).
+
 ### 5.1 `reason([prompt], [example_output])`
 
 **Description:** A local regulator interface that maps non-deterministic language inputs into deterministic structured JSON for action control. The prompt integrates the reference objective, local observations, task-relevant context, and governing constraints and rules. In control-theoretic terms, `reason()` first compares goal against local reality to estimate the relevant deviation, then turns that deviation into a bounded control signal. It is an atomic reasoning step — no tools, no memory, no side effects.
@@ -224,3 +226,39 @@ For reference, we open-sourced a Re in Act implementation project called **one-a
 ## 7. Agent Benchmarks
 
 _Benchmark results and methodology are deferred to a future revision._
+
+---
+
+## 8. Extensions
+
+Re in Act defines a small core and allows optional extensions.
+
+Core conformance remains unchanged:
+
+- `reason()` is **REQUIRED**
+- `act()` is **OPTIONAL**
+
+Extensions are opt-in capability layers that add behavior without changing the core contract.
+
+### 8.1 Extension Rules
+
+An extension:
+
+- **MUST NOT** change the required status of `reason()`
+- **MUST** define explicit input/output contract and failure semantics
+- **SHOULD** define resource boundaries (time, step, token, or cost budgets)
+- **SHOULD** preserve RAS locality and avoid hidden global-state dependencies
+
+### 8.2 `agent()` as an Optional Extension
+
+`agent()` may be provided as an optional extension interface for delegated execution inside a RAS.
+
+If implemented, `agent()` is treated as an action-layer delegation primitive under runtime policy and budget constraints. A recommended interface shape is `agent(prompt, config)`.
+
+In this model, the RAS is the harness: `agent()` performs delegated work and returns text, `reason()` checks and normalizes that text, and runtime control flow enforces deterministic limits such as iteration count, timeout, and escalation.
+
+On success, `agent()` returns text output. If structured validation is needed, the RAS SHOULD run a follow-up `reason()` call to verify and normalize that text into schema-bounded data for downstream control flow.
+
+`agent()` is **not** part of the required core interfaces.
+
+This preserves the core Re in Act architecture: strengthen action in a bounded RAS while keeping top-level reasoning and local regulation boundaries explicit.

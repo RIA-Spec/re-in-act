@@ -198,6 +198,8 @@ print(decision["data"])
 
 `act()` is a **convenience interface** provided by the RAS for calling external tools. The spec does not require you to use it — you may execute actions any way you like.
 
+If you want optional interfaces beyond the core `reason()` / `act()` contract, see [Re in Act Extensions](/extensions/overview).
+
 It becomes most useful when paired with `reason()` inside one action space:
 
 - `act()` gets or changes something in the outside world

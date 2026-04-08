@@ -20,6 +20,7 @@ export const GITHUB_URL = "https://github.com/RIA-Spec/re-in-act";
 export const NAV_TABS = [
   { label: "Documentation", href: "/docs/getting-started/try" },
   { label: "Specification", href: "/specification/draft/index" },
+  { label: "Extensions", href: "/extensions/overview" },
   { label: "Proposals", href: "/proposals/index" },
   { label: "Community", href: "/community/contributing" },
 ] as const;
@@ -28,6 +29,7 @@ export const NAV_TABS = [
 export const TAB_PREFIXES: Record<string, string> = {
   Documentation: "/docs",
   Specification: "/specification",
+  Extensions: "/extensions",
   Proposals: "/proposals",
   Community: "/community",
 };

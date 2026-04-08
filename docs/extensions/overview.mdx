@@ -1,0 +1,51 @@
+---
+title: Re in Act Extensions
+description: Optional extensions to Re in Act that add capabilities without changing the core contract.
+---
+
+# Re in Act Extensions
+
+Re in Act keeps a small core and allows optional extensions on top.
+
+The core remains:
+
+- top-level reasoning defines and orchestrates the RAS
+- `reason()` is required
+- `act()` is optional
+- deterministic control flow runs inside the RAS runtime
+
+Extensions add extra capability for specific environments while preserving that core.
+
+## Why Extensions
+
+Extensions let implementations evolve faster than the core spec:
+
+- new capabilities can be introduced without forcing all runtimes to adopt them
+- production systems can standardize optional features gradually
+- experimentation can happen without destabilizing the base interfaces
+
+This follows the same design philosophy used by protocols that keep a strict core and a flexible extension surface.
+
+## Extension Design Rules
+
+An extension SHOULD:
+
+- be explicitly opt-in
+- define clear input/output schema and failure semantics
+- keep RAS boundaries clear (what stays local, what leaves the space)
+- avoid redefining the core contract of `reason()`
+- preserve runtime portability where practical
+
+An extension MUST NOT:
+
+- change the required status of `reason()`
+- assume hidden global state as part of its contract
+- bypass sandbox, policy, or budget boundaries defined by the runtime
+
+## Current Extensions
+
+| Identifier  | Reference Title           | Link                                                     |
+| ----------- | ------------------------- | -------------------------------------------------------- |
+| `ria.agent` | Agent Interface Extension | [Agent Interface Extension](/extensions/agent-interface) |
+
+See [Extension Support Matrix](/extensions/support-matrix) for status and compatibility.

@@ -35,6 +35,10 @@
         ]
       },
       {
+        "tab": "Extensions",
+        "pages": ["extensions/overview", "extensions/support-matrix", "extensions/agent-interface"]
+      },
+      {
         "tab": "Proposals",
         "pages": ["proposals/index"]
       },

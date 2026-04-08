@@ -1,0 +1,137 @@
+---
+title: Agent Interface Extension
+description: Optional `agent()` interface for delegated execution inside the Reason-able Action Space.
+---
+
+# Agent Interface Extension
+
+- Extension identifier: `ria.agent`
+- Status: `Draft`
+- Core dependency: requires Re in Act core (`reason()` required; `act()` optional)
+
+## Intent
+
+`agent()` is an optional extension interface for delegated execution inside a RAS.
+
+It is designed for cases where a local action unit benefits from a bounded delegated worker, while keeping Re in Act's core principle unchanged: strengthen action without turning the core into a multi-agent topology.
+
+In other words, this extension adds delegation as an action capability, not as a replacement for top-level reasoning.
+
+## Agent Harness Pattern
+
+`agent()` is most useful when treated as part of the RAS harness.
+
+In this model, the **RAS is the harness**.
+
+- `agent(prompt, config)` performs delegated work and returns text
+- `reason()` checks that text, extracts structured signals, and decides next control action
+- runtime code enforces deterministic boundaries such as max iteration, timeout, and escalation
+
+This means `agent()` is one delegated component inside the harness, while the RAS remains the place where control stays explicit, bounded, and auditable.
+
+## Conceptual Boundary
+
+The extension SHOULD be interpreted as:
+
+- a delegated action primitive under runtime control
+- bounded by explicit schema, resource limits, and return conditions
+- local to the current RAS execution context
+
+The extension SHOULD NOT be interpreted as:
+
+- a new required core interface
+- an unbounded planner with implicit authority over outer-loop policy
+- a mechanism that bypasses `reason()` contracts or sandbox policy
+
+## Proposed Signature
+
+```ts
+agent(prompt, config?) -> string | { error }
+```
+
+Suggested `config` fields:
+
+- `budget`: max steps/time/tokens/cost
+- `policy`: tool and network policy profile
+- `model`: optional model selection hint
+- `on_error`: `fail` | `return_error` | `retry_within_budget`
+
+## Contract
+
+1. Deterministic envelope, non-deterministic inner work:
+   The runtime enforces budgets, policy, and stop conditions. The delegated worker may perform non-deterministic reasoning within those bounds.
+
+2. Text-only success output:
+   On success, `agent()` returns plain text only. Structured validation and normalization happen in a separate `reason()` step.
+
+3. Explicit failure semantics:
+   On policy violation, budget exhaustion, or runtime failure, return structured `{ error }`.
+
+4. Local traceability:
+   The runtime SHOULD emit auditable trace metadata (start/end reason, budget usage, termination reason).
+
+## Minimal Example
+
+```python
+max_iterations = 3
+iteration = 0
+
+while iteration < max_iterations:
+    iteration += 1
+    raw_text = await agent(
+        f"Goal: reproduce and patch failing checkout flow. Attempt {iteration}/{max_iterations}. Return what changed and test results.",
+        {
+            "budget": {"max_steps": 40, "max_minutes": 30},
+            "on_error": "return_error",
+        },
+    )
+
+    if isinstance(raw_text, dict) and raw_text.get("error"):
+        verdict = await reason(
+            [
+                "Goal: decide whether to retry delegation or escalate.",
+                f"Observation: {raw_text['error']}",
+                f"Relevant context: attempt {iteration} of {max_iterations}.",
+                "Constraints and rules: return retry or escalate with a short reason.",
+            ],
+            {"action": "retry", "reason": ""},
+        )
+        if verdict["data"]["action"] == "retry" and iteration < max_iterations:
+            continue
+        print({"status": "escalate", "reason": verdict["data"]["reason"]})
+        break
+
+    checked = await reason(
+        [
+            "Goal: verify and structure this delegated result.",
+            f"Observation:\n{raw_text}",
+            f"Relevant context: attempt {iteration} of {max_iterations}.",
+            "Constraints and rules: return continue, done, or escalate plus grounded reason and normalized summary.",
+        ],
+        {
+            "action": "continue",
+            "reason": "",
+            "summary": "",
+            "files_changed": [""],
+            "tests": [{"name": "", "passed": True}],
+        },
+    )
+
+    action = checked["data"]["action"]
+    if action == "done":
+        print(checked["data"])
+        break
+    if action == "continue" and iteration < max_iterations:
+        continue
+
+    print({"status": "escalate", "reason": checked["data"]["reason"]})
+    break
+```
+
+## Relationship to Core Re in Act
+
+- `reason()` remains the only required interface.
+- `act()` remains optional.
+- `agent()` is extension-only and optional.
+
+This keeps the base model stable while allowing harness-level evolution when delegation improves task reliability and throughput.

@@ -94,7 +94,7 @@ export function getAllDocSlugs(): string[][] {
   }
 
   // Walk all content dirs (not docs.json, images, logo, snippets)
-  const contentDirs = ["docs", "specification", "proposals", "community"];
+  const contentDirs = ["docs", "specification", "extensions", "proposals", "community"];
   for (const dir of contentDirs) {
     const fullPath = path.join(DOCS_ROOT, dir);
     if (fs.existsSync(fullPath)) {

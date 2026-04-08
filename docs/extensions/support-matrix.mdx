@@ -1,0 +1,29 @@
+---
+title: Extension Support Matrix
+description: Compatibility and implementation status for optional Re in Act extensions.
+---
+
+# Extension Support Matrix
+
+This matrix tracks which optional extensions are documented and their intended maturity.
+
+| Extension       | Identifier  | Status | Core Required | Notes                                       |
+| --------------- | ----------- | ------ | ------------- | ------------------------------------------- |
+| Agent Interface | `ria.agent` | Draft  | No            | Optional delegation interface inside a RAS. |
+
+## Status Meanings
+
+- `Draft`: under active design discussion
+- `Experimental`: implemented in one or more runtimes, still changing
+- `Stable`: contract is considered compatible across versions
+- `Deprecated`: supported only for migration
+
+## Conformance Notes
+
+Implementations may support any subset of extensions.
+
+A runtime claiming extension support SHOULD:
+
+- expose the extension identifier in runtime capability metadata
+- implement the documented schema and failure behavior
+- document resource and policy limits for extension calls
