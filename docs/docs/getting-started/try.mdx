@@ -72,72 +72,65 @@ If you only want to try `reason` first, you can still combine it with ordinary B
 
 ---
 
-## 5. Try a Small Bash RAS
+## 5. Four Small Examples
 
-The point is not just to call a model. The point is to keep local noise and local adaptation **inside the action space**.
+Instead of one larger workflow, here are four smaller Bash examples. Each shows one advantage emphasized in the spec.
 
-Prompt:
+### 5.1 Fewer Round Trips
 
-- Goal: decide whether this CI step should continue, retry, or escalate.
-- Observation: the contents of `build.log`, obtained through `act()`
-- Relevant context: the log may contain ANSI color, progress output, and repeated stack traces.
-- Constraints and rules: ignore cosmetic noise; return `action`, `reason`, and `retry_cmd` when retry is appropriate.
+Make one local decision, then take the next step immediately inside the same action phase.
 
 ```bash
 decision="$(act read_file '{"path":"build.log"}' | \
   reason \
-    --prompt "Goal: decide whether this CI step should continue, retry, or escalate." \
+    --prompt "Goal: decide the next local step for this failed build." \
     --prompt - \
-    --prompt "Relevant context: the log may contain ANSI color, progress output, and repeated stack traces." \
-    --prompt "Constraints and rules: ignore cosmetic noise; return action, reason, and retry_cmd when retry is appropriate." \
-    --structure '{"action": "continue", "reason": "", "retry_cmd": ""}')"
+    --prompt "Constraints and rules: return only action, reason, and retry_cmd." \
+    --structure '{"action":"continue","reason":"","retry_cmd":""}')"
 
-printf '%s\n' "$decision" | jq .
+retry_cmd="$(printf '%s' "$decision" | jq -r '.data.retry_cmd')"
+[ -n "$retry_cmd" ] && act bash "{\"cmd\":\"$retry_cmd\"}"
 ```
 
-That is already Re in Act:
+Without a RAS, this usually becomes another outer-loop turn. Here the local decision and the local follow-up stay together.
 
-- the raw build log stays local
-- `reason()` turns it into a bounded control decision
-- the outer loop does not need to inspect every line
+### 5.2 Clean Context Window
 
----
-
-## 6. Let Action Keep Moving
-
-The next step is where Re in Act actually becomes useful: use the structured result to keep work moving inside the same action phase.
+Keep the noisy log local and return only the bounded result that matters.
 
 ```bash
-action="$(printf '%s' "$decision" | jq -r '.data.action')"
-
-if [ "$action" = "retry" ]; then
-  printf '%s' "$decision" | jq -r '.data.retry_cmd' | act bash -
-elif [ "$action" = "escalate" ]; then
-  printf '%s' "$decision" | jq -r '.data.reason' | \
-    act notify --channel '#build-failures' --message -
-else
-  echo "continue"
-fi
+act read_file '{"path":"build.log"}' | \
+  reason \
+    --prompt "Goal: extract only the deployment-blocking issue from this log." \
+    --prompt - \
+    --prompt "Constraints and rules: ignore ANSI color, progress output, and repeated lines; return only issue and next_step." \
+    --structure '{"issue":"","next_step":""}' | \
+  jq .
 ```
 
-This is the core experience the homepage should lead into:
+The outer loop does not need the whole log. It only needs the denoised result.
 
-- `reason` decides locally
-- `act` touches the outside world
-- Bash keeps deterministic control flow
-- the whole thing behaves like one bounded RAS instead of many outer-loop turns
+### 5.3 Deterministic Control Flow
 
----
+Let shell handle the loop deterministically, while `reason()` only makes the bounded judgment inside each step.
 
-## 7. Try a Second Shape
+```bash
+printf '%s\n' docs/docs/getting-started/intro.mdx docs/docs/getting-started/concepts.mdx | \
+while read -r path; do
+  act read_file "{\"path\":\"$path\"}" | \
+    reason \
+      --prompt "Goal: decide whether this page discusses subagents." \
+      --prompt - \
+      --prompt "Constraints and rules: return only path and mentioned true/false." \
+      --structure '{"path":"","mentioned":false}'
+done
+```
 
-The same pattern also works on tool discovery and filtered tool use, not just logs.
+The loop is not left to the model. The runtime controls the traversal; `reason()` only interprets each file.
 
-Prompt:
+### 5.4 Higher Effective Controller Variety
 
-- Goal: find the tools needed to collect the most relevant API and documentation context for this task.
-- Observation: the tool catalog returned by `act --manual`
-- Constraints and rules: return only a JSON array of tool names; prefer the smallest sufficient set.
+Use local discovery before action, instead of deciding everything upfront.
 
 ```bash
 act --manual | \
@@ -151,11 +144,11 @@ act --manual | \
   done
 ```
 
-This is where the advantage shows up clearly: the raw tool catalog stays in the action space, `reason` selects only the minimum useful subset, and `act` immediately expands just those tools.
+This is the programmable part of the RAS: it can inspect, filter, branch, and adapt locally instead of using one fixed outer-loop response pattern.
 
 ---
 
-## 8. Where To Go Next
+## 6. Where To Go Next
 
 - [Introduction →](/docs/getting-started/intro) for the architecture overview
 - [Concepts →](/docs/getting-started/concepts) for the two runtime flavors and interfaces

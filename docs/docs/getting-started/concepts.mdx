@@ -42,33 +42,33 @@ The important point is not the language. The important point is that the action 
 test_run = await act("bash", "npm test -- --reporter json")
 
 focus = await reason(
-    "\n".join(
-        [
-            "Goal: identify the highest-value retry step from this failed test run.",
-            f"Observation:\n{test_run['content'][0]['text']}",
-            "Constraints and rules: return only retry_cmd and a short reason grounded in the output.",
-        ]
-    ),
+    [
+        "Goal: identify the highest-value retry step from this failed test run.",
+        f"Observation:\n{test_run['content'][0]['text']}",
+        "Relevant context: this is the latest CI run after the current branch changes.",
+        "Constraints and rules: return only retry_cmd and a short reason grounded in the output.",
+    ],
     {"retry_cmd": "", "reason": ""},
 )
 
 retry_run = await act("bash", focus["data"]["retry_cmd"])
 
 decision = await reason(
-    "\n".join(
-        [
-            "Goal: decide whether action should continue or escalate.",
-            f"Observation:\n{retry_run['content'][0]['text']}",
-            "Constraints and rules: return one action and one grounded reason.",
-        ]
-    ),
+    [
+        "Goal: decide whether action should continue or escalate.",
+        f"Observation:\n{retry_run['content'][0]['text']}",
+        f"Relevant context: the retry step was selected because {focus['data']['reason']}",
+        "Constraints and rules: return one action and one grounded reason.",
+    ],
     {"action": "continue", "reason": ""},
 )
 
 if decision["data"]["action"] == "escalate":
     await act("notify", {"channel": "#build-failures", "message": decision["data"]["reason"]})
+    print(decision["data"]["reason"])
 else:
     await act("deploy", {"target": "production"})
+    print("deployed")
 ```
 
 **Pattern**: `act()` gathers local evidence → `reason()` compresses it into a bounded control signal → `act()` runs the next step → `reason()` decides whether the space should continue or escalate.
@@ -81,8 +81,9 @@ const testRun = await act("bash", "npm test -- --reporter json");
 const focus = await reason(
   [
     "Goal: identify the highest-value retry step from this failed test run.",
-    testRun.content[0].text,
-    "Constraints and rules: return only retry_cmd and a short reason.",
+    `Observation:\n${testRun.content[0].text}`,
+    "Relevant context: this is the latest CI run after the current branch changes.",
+    "Constraints and rules: return only retry_cmd and a short reason grounded in the output.",
   ],
   { retry_cmd: "", reason: "" },
 );
@@ -91,11 +92,20 @@ const retryRun = await act("bash", focus.data.retry_cmd);
 const decision = await reason(
   [
     "Goal: decide whether action should continue or escalate.",
-    retryRun.content[0].text,
+    `Observation:\n${retryRun.content[0].text}`,
+    `Relevant context: the retry step was selected because ${focus.data.reason}`,
     "Constraints and rules: return one action and one grounded reason.",
   ],
   { action: "continue", reason: "" },
 );
+
+if (decision.data.action === "escalate") {
+  await act("notify", { channel: "#build-failures", message: decision.data.reason });
+  console.log(decision.data.reason);
+} else {
+  await act("deploy", { target: "production" });
+  console.log("deployed");
+}
 ```
 
 The action space is the same even though the host syntax changes.
@@ -155,6 +165,7 @@ Typical uses include:
 ### Example — local extraction
 
 ```python
+url = "https://example.com/release-notes"
 response = await act("webfetch", {"url": url})
 facts = await reason(
   "\n".join(
@@ -166,6 +177,8 @@ facts = await reason(
   ),
   {"claims": [{"fact": "", "evidence": ""}]},
 )
+
+print(facts["data"])
 ```
 
 ### Example — local decision
@@ -175,6 +188,8 @@ decision = await reason(
   "Goal: decide whether action should retry or escalate. Observation: latest build retry failed. Constraints: return one action only.",
   example={"action": "retry"},
 )
+
+print(decision["data"])
 ```
 
 ---
@@ -224,7 +239,7 @@ brief = (await reason(
   {"brief": "", "open_questions": [""]},
 ))["data"]
 
-await act("write_file", {"path": "brief.json", "content": brief})
+print(brief)
 ```
 
 That is the core Re in Act pattern: keep the local evidence, the local judgments, and the next actions inside the same RAS until the local job is actually done.

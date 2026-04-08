@@ -5,7 +5,7 @@ description: A growing set of Re in Act application patterns shown directly as r
 
 # Playbook
 
-This page collects concrete **Re in Act applications** that become natural once action can keep working inside a **Reason-able Action Space (RAS)**.
+This page collects concrete **Re in Act applications** as **agent-emergent patterns**: once action can keep working inside a **Reason-able Action Space (RAS)**, these local modes of behavior become natural and reusable.
 
 These are not just prompt tricks. Each example below is shown directly as a **Riff**:
 
@@ -39,34 +39,36 @@ Source file: [/playbook/riffs/ci-retry-gate.py](/playbook/riffs/ci-retry-gate.py
 ```python
 RIFF_ID = "playbook.ci_retry_gate.v1"
 
+test_run = await act("bash", "npm test -- --reporter json")
+log = test_run["content"][0]["text"]
 
-async def run(inputs):
-	log = inputs["log"]
+decision = await reason(
+	"\n".join(
+		[
+			"Goal: decide whether the current CI step should continue, retry, or escalate.",
+			f"Observation:\n{log}",
+			"Relevant context: the log may contain ANSI color, progress output, repeated stack traces, and partial retries.",
+			"Constraints and rules: ignore cosmetic noise; return one action plus a short grounded reason and a concrete follow-up command when retry is needed.",
+		]
+	),
+	{"action": "continue", "reason": "", "retry_cmd": ""},
+)
 
-	decision = await reason(
-		"\n".join(
-			[
-				"Goal: decide whether the current CI step should continue, retry, or escalate.",
-				f"Observation:\n{log}",
-				"Relevant context: the log may contain ANSI color, progress output, repeated stack traces, and partial retries.",
-				"Constraints and rules: ignore cosmetic noise; return one action plus a short grounded reason and a concrete follow-up command when retry is needed.",
-			]
-		),
-		{"action": "continue", "reason": "", "retry_cmd": ""},
-	)
+data = decision["data"]
 
-	data = decision["data"]
+if data["action"] == "retry":
+	retry_run = await act("bash", data["retry_cmd"])
+	print(retry_run["content"][0]["text"])
 
-	if data["action"] == "retry":
-		return await act("bash", data["retry_cmd"])
+elif data["action"] == "escalate":
+	await act("notify", {"channel": "#build-failures", "message": data["reason"]})
+	print(data["reason"])
 
-	if data["action"] == "escalate":
-		return await act("notify", {"channel": "#build-failures", "message": data["reason"]})
-
-	return {"status": "continue", "reason": data["reason"]}
+else:
+	print({"status": "continue", "reason": data["reason"]})
 ```
 
-This is a minimal but complete local loop: action reads the local evidence, `reason()` decides the next move, and `act()` performs that move without leaving the RAS.
+This is a minimal but complete local loop: action gets the live command result, `reason()` decides the next move, and `act()` performs that move without leaving the RAS.
 
 ### API Health Check Extractor
 
@@ -81,11 +83,10 @@ Source file: [/playbook/riffs/api-health-check.py](/playbook/riffs/api-health-ch
 ```python
 RIFF_ID = "playbook.api_health_check.v1"
 
+page = await act("webfetch", {"url": "https://api.example.com/docs"})
+html = page["content"][0]["text"]
 
-async def run(inputs):
-	html = inputs["api_reference_html"]
-
-	cmd = await reason(
+cmd = await reason(
 		"\n".join(
 			[
 				"Goal: extract the smallest executable health-check command from this API reference.",
@@ -97,9 +98,9 @@ async def run(inputs):
 		{"cmd": "", "endpoint": "", "why": ""},
 	)
 
-	probe = await act("bash", cmd["data"]["cmd"])
+probe = await act("bash", cmd["data"]["cmd"])
 
-	decision = await reason(
+decision = await reason(
 		"\n".join(
 			[
 				"Goal: decide whether the API health check passed.",
@@ -111,10 +112,10 @@ async def run(inputs):
 		{"passed": True, "reason": ""},
 	)
 
-	return {"probe": cmd["data"], "decision": decision["data"]}
+print({"probe": cmd["data"], "decision": decision["data"]})
 ```
 
-This is the actual Re in Act advantage: `reason()` does not merely generate a command. The action space runs that command, inspects the local result, and only then returns a bounded decision.
+This is the actual Re in Act advantage: `reason()` does not merely generate a command. The action space starts from a live fetch result, runs the probe, inspects the local result, and only then returns a bounded decision.
 
 ---
 
@@ -131,28 +132,26 @@ Source file: [/playbook/riffs/research-brief.py](/playbook/riffs/research-brief.
 ```python
 RIFF_ID = "playbook.research_brief.v1"
 
+topic = "reason in action"
+urls = ["https://example.com/post-1", "https://example.com/post-2"]
+extracted = []
 
-async def run(inputs):
-	topic = inputs["topic"]
-	urls = inputs["urls"]
-	extracted = []
+for url in urls:
+	page = await act("webfetch", {"url": url})
+	facts = await reason(
+		"\n".join(
+			[
+				f"Goal: extract only decision-relevant facts about {topic} from this source.",
+				f"Observation:\n{page['content'][0]['text']}",
+				f"Relevant context: the source URL is {url}.",
+				"Constraints and rules: ignore boilerplate, ads, and repeated navigation; return claims with evidence and uncertainty.",
+			]
+		),
+		{"claims": [{"fact": "", "evidence": "", "confidence": "high"}]},
+	)
+	extracted.append({"url": url, "claims": facts["data"]["claims"]})
 
-	for url in urls:
-		page = await act("webfetch", {"url": url})
-		facts = await reason(
-			"\n".join(
-				[
-					f"Goal: extract only decision-relevant facts about {topic} from this source.",
-					f"Observation:\n{page['content'][0]['text']}",
-					f"Relevant context: the source URL is {url}.",
-					"Constraints and rules: ignore boilerplate, ads, and repeated navigation; return claims with evidence and uncertainty.",
-				]
-			),
-			{"claims": [{"fact": "", "evidence": "", "confidence": "high"}]},
-		)
-		extracted.append({"url": url, "claims": facts["data"]["claims"]})
-
-	brief = await reason(
+brief = await reason(
 		"\n".join(
 			[
 				f"Goal: synthesize a concise research brief about {topic}.",
@@ -163,12 +162,7 @@ async def run(inputs):
 		{"brief": "", "open_questions": [""], "sources": [""]},
 	)
 
-	await act(
-		"write_file",
-		{"path": f"research-brief-{topic}.json", "content": brief["data"]},
-	)
-
-	return brief["data"]
+print(brief["data"])
 ```
 
 This Riff uses `act()` at both ends: first to fetch local evidence, then to write out the synthesized artifact once the local work is complete.
@@ -188,12 +182,10 @@ Source file: [/playbook/riffs/support-inbox-router.py](/playbook/riffs/support-i
 ```python
 RIFF_ID = "playbook.support_inbox_router.v1"
 
+thread_text = "Customer: I lost access after billing updated and now the dashboard shows a permissions error."
+account_tier = "enterprise"
 
-async def run(inputs):
-	thread_text = inputs["thread_text"]
-	account_tier = inputs["account_tier"]
-
-	classification = await reason(
+classification = await reason(
 		"\n".join(
 			[
 				"Goal: classify this support thread and choose the next operational action.",
@@ -205,27 +197,28 @@ async def run(inputs):
 		{"queue": "bug", "priority": "normal", "reply_action": "send_ack", "reason": ""},
 	)
 
-	data = classification["data"]
+data = classification["data"]
 
-	if data["reply_action"] == "send_ack":
-		reply = await act(
-			"reply_template",
-			{"queue": data["queue"], "thread": thread_text, "priority": data["priority"]},
-		)
-		return {"classification": data, "reply": reply}
+if data["reply_action"] == "send_ack":
+	reply = await act(
+		"reply_template",
+		{"queue": data["queue"], "thread": thread_text, "priority": data["priority"]},
+	)
+	print({"classification": data, "reply": reply})
 
-	if data["reply_action"] == "escalate":
-		ticket = await act(
-			"create_ticket",
-			{
-				"queue": data["queue"],
-				"priority": data["priority"],
-				"summary": data["reason"],
-			},
-		)
-		return {"classification": data, "ticket": ticket}
+elif data["reply_action"] == "escalate":
+	ticket = await act(
+		"create_ticket",
+		{
+			"queue": data["queue"],
+			"priority": data["priority"],
+			"summary": data["reason"],
+		},
+	)
+	print({"classification": data, "ticket": ticket})
 
-	return {"classification": data}
+else:
+	print({"classification": data})
 ```
 
 The local judgment is useful only because it directly feeds the next action. That is the recurrent pattern across the whole Playbook.
