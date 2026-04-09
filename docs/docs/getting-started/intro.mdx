@@ -19,8 +19,6 @@ The result is simpler action: fewer outer-loop turns, less context bloat, and a 
 
 Think about walking. The conscious brain decides to move, but it does not micromanage every correction. Adjustment happens closer to the body and closer to feedback, saving cognitive load and preserving better feedback.
 
-That is the intuition behind the RAS.
-
 Top-level reasoning should define the work and its constraints. The action layer should handle local disturbances inside that bounded action space instead of escalating every small issue back to the outer loop.
 
 This metaphor matters for two reasons:
@@ -28,7 +26,7 @@ This metaphor matters for two reasons:
 1. **Bounded action**: the RAS works inside a defined task package rather than inventing a new top-level objective.
 2. **Local adaptation**: the RAS can use nearby observations, intermediate data, and runtime control flow to adjust while action is already underway.
 
-That is why the deeper theory points in the same direction:
+The deeper theory points in the same direction:
 
 - **Ashby's Law (Requisite Variety)**: only variety can absorb variety. ReAct's fixed action layer often cannot express enough differentiated responses to handle local disturbances well. The RAS expands that local controller variety.
 - **Good Regulator Theorem**: a successful regulator needs access to a model of the system it regulates. In Re in Act, the RAS supplies task-relevant local structure, so the agent does not need to rebuild that structure from scratch on every outer-loop turn.
@@ -58,7 +56,7 @@ The RAS is the action context that top-level reasoning defines for an orchestrat
 - **`reason(prompt, example_output)`** — a local judgment step whose prompt carries the goal, local observations, relevant context, and governing constraints or rules
 - deterministic control flow for retries, branching, and intermediate-data handling
 
-The important point is that the RAS is not just a place to run tools. It is the part of the system that top-level reasoning can still structure and control while the action phase inspects local observations and intermediate data, makes bounded judgments, and keeps moving without turning every small issue into another outer-loop turn.
+The RAS is not just a place to run tools. It is the part of the system that top-level reasoning still structures while action inspects local observations, makes bounded judgments, and keeps moving without turning every small issue into another outer-loop turn.
 
 It may also provide:
 
@@ -66,9 +64,7 @@ It may also provide:
 
 ### A Typical Bash RAS Example
 
-Here is a minimal example of **reason in action** as progressive discovery.
-
-The agent does not decide all tool usage upfront. It first asks `act --manual` for the available tool surface, lets `reason` pick only the tool names relevant to the task, then asks `act --manual [name]` for the detailed definitions of just those tools.
+Here is a minimal example of **reason in action** as progressive discovery: the agent first asks `act --manual` for the available tool surface, lets `reason` pick only the relevant tool names, then asks `act --manual [name]` for the detailed definitions of just those tools.
 
 ```bash
 act --manual | \
@@ -94,8 +90,6 @@ See [Concepts →](/docs/getting-started/concepts) for annotated examples of bot
 ---
 
 ## What Re in Act Is Not
-
-It helps to be explicit about the boundary.
 
 - **Not a subagent pattern** — Re in Act does not create another reasoning actor. It creates one orchestrated action space for the same agent.
 - **Not incompatible with subagents** — a subagent can still use Re in Act internally. The subagent remains the reasoning unit; the RAS is the action space it uses to carry work out.

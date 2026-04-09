@@ -18,9 +18,7 @@ For runtime connectivity, ACP is a recommended integration path for `agent()` ca
 - [Agent Client Protocol — Agents](https://agentclientprotocol.com/get-started/agents)
 - especially useful when one runtime needs to work across multiple agent backends such as Claude Code, Codex, and OpenCode
 
-It is designed for cases where a local action unit benefits from a bounded delegated worker, while keeping Re in Act's core principle unchanged: strengthen action without turning the core into a multi-agent topology.
-
-In other words, this extension adds delegation as an action capability, not as a replacement for top-level reasoning.
+It is designed for cases where a local action unit benefits from bounded delegation while keeping Re in Act's core principle unchanged: strengthen action without turning the core into a multi-agent topology.
 
 ## Agent Harness Pattern
 
@@ -31,10 +29,22 @@ In this model, the **RAS is the harness**.
 For related engineering terminology around long-running agent harnesses, see Anthropic's [Harness design for long-running apps](https://www.anthropic.com/engineering/harness-design-long-running-apps).
 
 - `agent(prompt, config)` performs delegated work and returns `{ data: { text, trajectory } }`
-- `reason()` checks `text` and `trajectory`, extracts structured signals, and decides next control action
+- `reason()` checks `text` and `trajectory`, then decides the next control action
 - runtime code enforces deterministic boundaries such as max iteration, timeout, and escalation
 
-This means `agent()` is one delegated component inside the harness, while the RAS remains the place where control stays explicit, bounded, and auditable.
+`agent()` is one delegated component inside the harness; the RAS keeps control explicit, bounded, and auditable.
+
+## Agent Orchestration Pattern
+
+Besides harness-style local delegation, `agent()` can also be used for bounded agent orchestration.
+
+Typical orchestration usage includes:
+
+- selecting a specialized backend agent for a subtask
+- routing work across multiple agent runtimes under one runtime policy
+- aggregating multiple delegated outputs before a local `reason()` decision
+
+This remains extension-layer behavior inside the RAS, not a replacement for top-level reasoning in the core model.
 
 ## Conceptual Boundary
 
@@ -73,7 +83,7 @@ Suggested `config` fields:
    The runtime enforces budgets, policy, and stop conditions. The delegated worker may perform non-deterministic reasoning within those bounds.
 
 2. Structured success envelope:
-   On success, `agent()` returns `{ data: { text, trajectory } }`. `trajectory` MUST follow ATIF. Structured validation and normalization happen in a separate `reason()` step, and `trajectory` can be used as an additional verification signal.
+   On success, `agent()` returns `{ data: { text, trajectory } }`. `trajectory` MUST follow ATIF. Validation and normalization happen in a separate `reason()` step, and `trajectory` can be used as an additional verification signal.
 
 3. Explicit failure semantics:
    On policy violation, budget exhaustion, or runtime failure, return structured `{ error }`.
@@ -170,4 +180,4 @@ while iteration < max_iterations:
 - `act()` remains optional.
 - `agent()` is extension-only and optional.
 
-This keeps the base model stable while allowing harness-level evolution when delegation improves task reliability and throughput.
+This keeps the base model stable while allowing extension-level evolution when delegation improves task reliability and throughput.

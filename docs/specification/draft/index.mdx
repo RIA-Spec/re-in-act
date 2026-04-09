@@ -259,9 +259,7 @@ For the `agent()` extension contract, see [Agent Interface Extension](/extension
 
 In this model, the RAS is the harness: `agent()` performs delegated work and returns `{ data: { text, trajectory } }`, `reason()` checks and normalizes those signals, and runtime control flow enforces deterministic limits such as iteration count, timeout, and escalation.
 
-The recommended success envelope is `{ data: { text, trajectory } }`, so `reason()` can validate both the primary result text and the execution trajectory before producing downstream control signals.
-
-On success, `agent()` SHOULD return `{ data: { text, trajectory } }`. If structured validation is needed, the RAS SHOULD run a follow-up `reason()` call to verify and normalize both fields into schema-bounded data for downstream control flow.
+On success, `agent()` SHOULD return `{ data: { text, trajectory } }`. A follow-up `reason()` call can validate and normalize both fields into schema-bounded data for downstream control flow.
 
 `agent()` is **not** part of the required core interfaces.
 

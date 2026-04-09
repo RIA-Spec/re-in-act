@@ -5,8 +5,6 @@ description: Deeper walkthrough of the Reason-able Action Space, reason(), and a
 
 # RAS Concepts
 
-If the introduction explains the idea, this page explains the working parts.
-
 Think of the **Reason-able Action Space (RAS)** as the bounded space where action can keep moving without turning every local disturbance into another outer-loop turn.
 
 This page walks through:
@@ -36,7 +34,7 @@ In practical agent terms, this is why the RAS matters: it lets action keep worki
 
 The agent writes scripts, typically in Python or TypeScript. `reason()` and `act()` are async interfaces available in scope.
 
-The important point is not the language. The important point is that the action space gets deterministic, Turing-complete control flow while the model stays confined to bounded local judgments.
+The point is not the language. The point is that the action space gets deterministic, Turing-complete control flow while the model stays confined to bounded local judgments.
 
 ```python
 test_run = await act("bash", "npm test -- --reporter json")
@@ -148,7 +146,7 @@ Unix pipelines are useful here because they are already a deterministic action f
 
 `reason()` is not a second full agent. It is a local judgment step inside an orchestrable RAS. Its job is to compare goal against local reality, use the resulting deviation to decide what matters, and return bounded decisions that action can carry out deterministically under the control of the enclosing runtime.
 
-That is why `reason()` improves action quality: it lets the agent compress noisy local observations and intermediate data into something small, explicit, and actionable.
+`reason()` improves action quality by compressing noisy local observations and intermediate data into something small, explicit, and actionable.
 
 Conceptually, `reason()` includes two tightly coupled steps:
 
@@ -225,7 +223,7 @@ if result.get("isError"):
 
 ### Multi-step action pattern
 
-The action layer gets stronger when related `act()` calls and `reason()` calls stay inside one RAS instead of getting split across multiple outer-loop turns.
+The action layer gets stronger when related `act()` and `reason()` calls stay inside one RAS instead of getting split across multiple outer-loop turns.
 
 ```python
 search = await act("websearch", {"query": topic})

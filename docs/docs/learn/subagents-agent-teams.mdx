@@ -7,8 +7,6 @@ description: Why subagents and Re in Act are different architectural directions,
 
 Re in Act is **not** a subagent architecture.
 
-This page exists only to clarify the boundary, because people often map the pattern onto subagents too quickly.
-
 The short answer is: **they are different directions**.
 
 - **Subagents** add more reasoning actors.
@@ -21,8 +19,6 @@ The difference is **what is being created**.
 In Re in Act, top-level reasoning defines and orchestrates **one action phase** inside a **Reason-able Action Space (RAS)**. The RAS program can call `reason()` locally, use deterministic control flow, call tools through `act()`, and return one final observation to the outer loop.
 
 In a subagent or agent-team design, delegation usually creates another reasoning actor with its own prompt, context, handoff protocol, and coordination surface.
-
-That is the core distinction for this project: Re in Act strengthens action without introducing another agent identity.
 
 Re in Act can still be used **inside** a subagent. If a larger architecture already has subagents, a subagent can use a RAS as its action space. The important boundary is that the subagent and the RAS are not the same thing: the subagent is a reasoning unit, while the RAS is the action space used to carry work out.
 
@@ -68,7 +64,7 @@ That is why a fresh local `reason()` call can look superficially similar to a su
 
 But that similarity is only at the edge of the interface. Architecturally, Re in Act is not about creating another planner. It is about giving action more local structure.
 
-That is why this page should not be read as "Re in Act versus subagents" in the sense of two competing variants of the same idea. One pattern changes the reasoning topology. The other changes the action architecture.
+This page should not be read as "Re in Act versus subagents" in the sense of two competing variants of the same idea. One pattern changes the reasoning topology. The other changes the action architecture.
 
 ---
 
@@ -91,8 +87,6 @@ Inside that workspace:
 - `reason()` starts with a **fresh inference context** and produces structured JSON.
 - loops, branches, validation, and retries happen in **code or shell**, not by re-prompting the outer loop.
 - intermediate logs, tool outputs, and failed attempts stay **inside the RAS** unless the RAS program decides they matter.
-
-This is the main distinction from agent-team patterns. Agent teams multiply reasoning contexts. Re in Act keeps one orchestrated action space and expands the action layer inside it.
 
 In that sense, they are fully different architectural moves:
 
@@ -134,7 +128,7 @@ If the system needs more reasoning actors, use subagents. If the system needs be
 | **What is the common failure mode?**   | Misalignment across agent boundaries    | **Action failure near the tool boundary**      |
 | **What does reuse look like?**         | Reusable specialists or roles           | **Riffs and reusable RAS programs**            |
 
-This table is about architectural direction. Re in Act itself is not a subagent pattern; it is an action pattern, and a subagent may still choose to use it internally.
+This table is about architectural direction. Re in Act itself is an action pattern, and a subagent may still choose to use it internally.
 
 ---
 
