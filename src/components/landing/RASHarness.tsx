@@ -13,7 +13,7 @@ const STEPS = [
   {
     label: "Local Check",
     title: "Post-agent verification",
-    body: "In this pattern, reason() is not acting as an agent. It checks the text returned by agent(), extracts the signal that matters, and turns it into structured control data.",
+    body: "In this pattern, reason() is not acting as an agent. It checks both text and trajectory returned by agent(), extracts the signal that matters, and turns it into structured control data.",
   },
   {
     label: "Runtime Control",
@@ -57,8 +57,8 @@ export function RASHarness() {
             style={{ color: "var(--muted)" }}
           >
             This is specifically the agent extension pattern: agent() runs delegated work inside the
-            RAS, reason() verifies the returned text inside the RAS, and deterministic limits are
-            enforced inside the RAS.
+            RAS, returns text and trajectory, reason() verifies those signals inside the RAS, and
+            deterministic limits are enforced inside the RAS.
           </p>
         </div>
 

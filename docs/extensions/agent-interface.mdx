@@ -13,6 +13,11 @@ description: Optional `agent()` interface for delegated execution inside the Rea
 
 `agent()` is an optional extension interface for delegated execution inside a RAS.
 
+For runtime connectivity, ACP is a recommended integration path for `agent()` calls:
+
+- [Agent Client Protocol — Agents](https://agentclientprotocol.com/get-started/agents)
+- especially useful when one runtime needs to work across multiple agent backends such as Claude Code, Codex, and OpenCode
+
 It is designed for cases where a local action unit benefits from a bounded delegated worker, while keeping Re in Act's core principle unchanged: strengthen action without turning the core into a multi-agent topology.
 
 In other words, this extension adds delegation as an action capability, not as a replacement for top-level reasoning.
@@ -25,8 +30,8 @@ In this model, the **RAS is the harness**.
 
 For related engineering terminology around long-running agent harnesses, see Anthropic's [Harness design for long-running apps](https://www.anthropic.com/engineering/harness-design-long-running-apps).
 
-- `agent(prompt, config)` performs delegated work and returns text
-- `reason()` checks that text, extracts structured signals, and decides next control action
+- `agent(prompt, config)` performs delegated work and returns `{ data: { text, trajectory } }`
+- `reason()` checks `text` and `trajectory`, extracts structured signals, and decides next control action
 - runtime code enforces deterministic boundaries such as max iteration, timeout, and escalation
 
 This means `agent()` is one delegated component inside the harness, while the RAS remains the place where control stays explicit, bounded, and auditable.
@@ -48,7 +53,7 @@ The extension SHOULD NOT be interpreted as:
 ## Proposed Signature
 
 ```ts
-agent(prompt, config?) -> string | { error }
+agent(prompt, config?) -> { data: { text, trajectory } } | { error }
 ```
 
 Suggested `config` fields:
@@ -63,8 +68,8 @@ Suggested `config` fields:
 1. Deterministic envelope, non-deterministic inner work:
    The runtime enforces budgets, policy, and stop conditions. The delegated worker may perform non-deterministic reasoning within those bounds.
 
-2. Text-only success output:
-   On success, `agent()` returns plain text only. Structured validation and normalization happen in a separate `reason()` step.
+2. Structured success envelope:
+   On success, `agent()` returns `{ data: { text, trajectory } }`. Structured validation and normalization happen in a separate `reason()` step, and `trajectory` can be used as an additional verification signal.
 
 3. Explicit failure semantics:
    On policy violation, budget exhaustion, or runtime failure, return structured `{ error }`.
@@ -80,7 +85,7 @@ iteration = 0
 
 while iteration < max_iterations:
     iteration += 1
-    raw_text = await agent(
+    result = await agent(
         f"Goal: reproduce and patch failing checkout flow. Attempt {iteration}/{max_iterations}. Return what changed and test results.",
         {
             "budget": {"max_steps": 40, "max_minutes": 30},
@@ -88,11 +93,11 @@ while iteration < max_iterations:
         },
     )
 
-    if isinstance(raw_text, dict) and raw_text.get("error"):
+    if isinstance(result, dict) and result.get("error"):
         verdict = await reason(
             [
                 "Goal: decide whether to retry delegation or escalate.",
-                f"Observation: {raw_text['error']}",
+                f"Observation: {result['error']}",
                 f"Relevant context: attempt {iteration} of {max_iterations}.",
                 "Constraints and rules: return retry or escalate with a short reason.",
             ],
@@ -103,12 +108,27 @@ while iteration < max_iterations:
         print({"status": "escalate", "reason": verdict["data"]["reason"]})
         break
 
+    # Keep trajectory verification local and compact before passing to reason().
+    data = result.get("data", {})
+    traj = data.get("trajectory", {})
+    if isinstance(traj, dict):
+        tool_calls = traj.get("tool_calls", [])
+        messages = traj.get("messages", [])
+        trajectory_view = {
+            "final_status": traj.get("final_status"),
+            "tool_calls_tail": tool_calls[-8:],
+            "messages_tail": messages[-6:],
+        }
+    else:
+        trajectory_view = {"raw_tail": str(traj)[-4000:]}
+
     checked = await reason(
         [
             "Goal: verify and structure this delegated result.",
-            f"Observation:\n{raw_text}",
+            f"Observation text:\n{data['text']}",
+            f"Observation trajectory view:\n{trajectory_view}",
             f"Relevant context: attempt {iteration} of {max_iterations}.",
-            "Constraints and rules: return continue, done, or escalate plus grounded reason and normalized summary.",
+            "Constraints and rules: validate consistency using text plus the compact trajectory view; return continue, done, or escalate plus grounded reason and normalized summary.",
         ],
         {
             "action": "continue",

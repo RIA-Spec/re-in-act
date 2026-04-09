@@ -255,9 +255,13 @@ An extension:
 
 If implemented, `agent()` is treated as an action-layer delegation primitive under runtime policy and budget constraints. A recommended interface shape is `agent(prompt, config)`.
 
-In this model, the RAS is the harness: `agent()` performs delegated work and returns text, `reason()` checks and normalizes that text, and runtime control flow enforces deterministic limits such as iteration count, timeout, and escalation.
+For the `agent()` extension contract, see [Agent Interface Extension](/extensions/agent-interface).
 
-On success, `agent()` returns text output. If structured validation is needed, the RAS SHOULD run a follow-up `reason()` call to verify and normalize that text into schema-bounded data for downstream control flow.
+In this model, the RAS is the harness: `agent()` performs delegated work and returns `{ data: { text, trajectory } }`, `reason()` checks and normalizes those signals, and runtime control flow enforces deterministic limits such as iteration count, timeout, and escalation.
+
+The recommended success envelope is `{ data: { text, trajectory } }`, so `reason()` can validate both the primary result text and the execution trajectory before producing downstream control signals.
+
+On success, `agent()` SHOULD return `{ data: { text, trajectory } }`. If structured validation is needed, the RAS SHOULD run a follow-up `reason()` call to verify and normalize both fields into schema-bounded data for downstream control flow.
 
 `agent()` is **not** part of the required core interfaces.
 
