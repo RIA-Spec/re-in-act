@@ -56,6 +56,10 @@ The extension SHOULD NOT be interpreted as:
 agent(prompt, config?) -> { data: { text, trajectory } } | { error }
 ```
 
+`trajectory` follows ATIF (Agent Trajectory Interchange Format):
+
+- Spec reference: [harbor-framework RFC 0001 — trajectory format](https://github.com/harbor-framework/harbor/blob/main/rfcs/0001-trajectory-format.md)
+
 Suggested `config` fields:
 
 - `budget`: max steps/time/tokens/cost
@@ -69,7 +73,7 @@ Suggested `config` fields:
    The runtime enforces budgets, policy, and stop conditions. The delegated worker may perform non-deterministic reasoning within those bounds.
 
 2. Structured success envelope:
-   On success, `agent()` returns `{ data: { text, trajectory } }`. Structured validation and normalization happen in a separate `reason()` step, and `trajectory` can be used as an additional verification signal.
+   On success, `agent()` returns `{ data: { text, trajectory } }`. `trajectory` MUST follow ATIF. Structured validation and normalization happen in a separate `reason()` step, and `trajectory` can be used as an additional verification signal.
 
 3. Explicit failure semantics:
    On policy violation, budget exhaustion, or runtime failure, return structured `{ error }`.
@@ -112,12 +116,22 @@ while iteration < max_iterations:
     data = result.get("data", {})
     traj = data.get("trajectory", {})
     if isinstance(traj, dict):
-        tool_calls = traj.get("tool_calls", [])
-        messages = traj.get("messages", [])
+        # ATIF trajectory root uses schema_version/session_id/steps.
+        steps = traj.get("steps", [])
         trajectory_view = {
-            "final_status": traj.get("final_status"),
-            "tool_calls_tail": tool_calls[-8:],
-            "messages_tail": messages[-6:],
+            "format": "ATIF",
+            "schema_version": traj.get("schema_version"),
+            "session_id": traj.get("session_id"),
+            "step_count": len(steps),
+            "steps_tail": steps[-8:],
+            "final_metrics": traj.get("final_metrics"),
+        }
+    elif isinstance(traj, list):
+        # Fallback for runtimes that pass ATIF steps directly.
+        trajectory_view = {
+            "format": "ATIF-steps-only",
+            "step_count": len(traj),
+            "steps_tail": traj[-8:],
         }
     else:
         trajectory_view = {"raw_tail": str(traj)[-4000:]}
