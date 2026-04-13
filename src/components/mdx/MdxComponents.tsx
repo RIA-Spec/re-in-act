@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
 import { AlertTriangle, Info, Lightbulb } from "lucide-react";
-import type { MDXComponents } from "mdx/types";
+import type { MDXComponents } from "@/lib/mdx-components";
 import { ClientAccordion, ClientTabs } from "./MdxClientComponents";
 
 /* ─── Note ─── */

@@ -5,7 +5,7 @@ import { compileMDX } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import type { MDXComponents } from "mdx/types";
+import type { MDXComponents } from "@/lib/mdx-components";
 
 const DOCS_ROOT = path.join(process.cwd(), "docs");
 
