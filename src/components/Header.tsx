@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Github } from "lucide-react";
+import { LogoMark } from "./LogoMark";
 import { ThemeToggle } from "./ThemeToggle";
 import { SITE_NAME, GITHUB_URL, NAV_TABS, TAB_PREFIXES } from "@/lib/constants";
 
@@ -31,15 +32,7 @@ export function Header() {
           className="mr-8 flex items-center gap-2 text-[15px] font-semibold tracking-tight transition-colors duration-200 cursor-pointer"
           style={{ color: "var(--foreground)" }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="shrink-0">
-            <path
-              d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-              stroke="var(--accent)"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <LogoMark className="h-5 w-5 shrink-0" style={{ color: "var(--foreground)" }} />
           {SITE_NAME}
         </Link>
 

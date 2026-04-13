@@ -58,7 +58,7 @@ export default async function DocPage({ params }: PageProps) {
           </header>
 
           {/* MDX content */}
-          <article className="prose prose-neutral dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-[var(--accent)] prose-a:no-underline hover:prose-a:underline prose-code:rounded prose-code:bg-[var(--code-bg)] prose-code:px-1.5 prose-code:py-0.5 prose-code:text-[var(--foreground)] prose-code:font-mono prose-code:text-[0.875em] prose-code:before:content-none prose-code:after:content-none prose-pre:bg-[var(--pre-bg)] prose-pre:border prose-pre:border-[var(--border)] prose-pre:font-mono">
+          <article className="prose max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-[var(--foreground)] prose-p:text-[var(--foreground)] prose-p:leading-7 prose-strong:text-[var(--foreground)] prose-li:text-[var(--foreground)] prose-ol:text-[var(--foreground)] prose-ul:text-[var(--foreground)] prose-blockquote:text-[var(--muted)] prose-blockquote:border-l-[var(--border)] prose-hr:border-[var(--border)] prose-th:text-[var(--foreground)] prose-td:text-[var(--foreground)] prose-a:text-[var(--accent)] prose-a:no-underline hover:prose-a:underline prose-code:rounded prose-code:bg-[var(--code-bg)] prose-code:px-1.5 prose-code:py-0.5 prose-code:text-[var(--foreground)] prose-code:font-mono prose-code:text-[0.875em] prose-code:before:content-none prose-code:after:content-none prose-pre:bg-[var(--pre-bg)] prose-pre:border prose-pre:border-[var(--border)] prose-pre:text-[var(--foreground)] prose-pre:font-mono prose-pre:shadow-none">
             {doc.content}
           </article>
         </main>

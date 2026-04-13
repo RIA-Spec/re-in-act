@@ -13,7 +13,7 @@ export function ClientTabs({ items, children }: TabsProps) {
   const [active, setActive] = useState(0);
 
   return (
-    <div className="my-4">
+    <div className="not-prose my-4">
       <div className="flex gap-0 border-b" style={{ borderColor: "var(--border)" }}>
         {items.map((label, i) => (
           <button
@@ -51,7 +51,7 @@ export function ClientAccordion({ title, children }: AccordionProps) {
 
   return (
     <div
-      className="my-2 overflow-hidden rounded-lg border"
+      className="not-prose my-2 overflow-hidden rounded-lg border"
       style={{ borderColor: "var(--border)" }}
     >
       <button

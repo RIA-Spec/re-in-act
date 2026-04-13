@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, BookOpen, ChevronDown, ScrollText } from "lucide-react";
 import Link from "next/link";
+import { LogoMark } from "@/components/LogoMark";
 import { SITE_NAME } from "@/lib/constants";
 
 export function Hero() {
@@ -137,10 +138,10 @@ export function Hero() {
 
         <motion.a
           href="#start-here"
-          className="group inline-flex flex-col items-center gap-1 rounded-full px-3 py-2 text-xs font-medium tracking-[0.08em] uppercase transition-colors duration-200 hover:text-[var(--foreground)]"
+          className="group inline-flex flex-col items-center gap-1 px-2 py-1 text-[13px] font-medium tracking-[0.12em] uppercase transition-colors duration-200 hover:text-[var(--foreground)]"
           style={{ color: "var(--muted)" }}
           initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: [0.72, 1, 0.82, 1, 0.72], y: 0, scale: [1, 1.035, 1, 1.02, 1] }}
+          animate={{ opacity: [0.72, 1, 0.82, 1, 0.72], y: 0, scale: [1, 1.02, 1] }}
           transition={{
             opacity: {
               duration: 1.9,
@@ -158,7 +159,8 @@ export function Hero() {
           }}
           whileHover={{ scale: 1.02, opacity: 1 }}
         >
-          <span className="inline-flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5">
+            <LogoMark className="h-3.5 w-3.5" style={{ color: "var(--muted)" }} />
             Read More
             <motion.span
               className="inline-flex"

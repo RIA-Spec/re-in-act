@@ -11,11 +11,25 @@ interface NoteProps {
   type?: NoteType;
 }
 
-const NOTE_STYLES: Record<NoteType, string> = {
-  info: "border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-500/25 dark:bg-blue-500/[0.06] dark:text-blue-300",
-  warning:
-    "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-500/25 dark:bg-amber-500/[0.06] dark:text-amber-300",
-  tip: "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-500/25 dark:bg-emerald-500/[0.06] dark:text-emerald-300",
+const NOTE_STYLES: Record<
+  NoteType,
+  { borderColor: string; backgroundColor: string; color: string }
+> = {
+  info: {
+    borderColor: "color-mix(in srgb, #3b82f6 34%, var(--border))",
+    backgroundColor: "color-mix(in srgb, #3b82f6 10%, var(--background))",
+    color: "color-mix(in srgb, #60a5fa 58%, var(--foreground))",
+  },
+  warning: {
+    borderColor: "color-mix(in srgb, #f59e0b 34%, var(--border))",
+    backgroundColor: "color-mix(in srgb, #f59e0b 10%, var(--background))",
+    color: "color-mix(in srgb, #fbbf24 55%, var(--foreground))",
+  },
+  tip: {
+    borderColor: "color-mix(in srgb, #10b981 34%, var(--border))",
+    backgroundColor: "color-mix(in srgb, #10b981 10%, var(--background))",
+    color: "color-mix(in srgb, #34d399 55%, var(--foreground))",
+  },
 };
 
 const NOTE_ICONS: Record<NoteType, ReactNode> = {
@@ -24,7 +38,8 @@ const NOTE_ICONS: Record<NoteType, ReactNode> = {
   tip: <Lightbulb className="h-5 w-5 shrink-0" />,
 };
 
-const CARD_CLASSNAME = "group my-2 block rounded-xl border p-5 transition-all duration-200";
+const CARD_CLASSNAME =
+  "not-prose group my-2 block rounded-xl border p-5 transition-all duration-200";
 const CARD_STYLE = {
   borderColor: "var(--border)",
   backgroundColor: "var(--card-bg)",
@@ -32,9 +47,14 @@ const CARD_STYLE = {
 
 function Note({ children, type = "info" }: NoteProps) {
   return (
-    <div className={`my-4 flex items-center gap-3 rounded-lg border p-4 ${NOTE_STYLES[type]}`}>
+    <div
+      className="not-prose my-4 flex items-center gap-3 rounded-lg border p-4"
+      style={NOTE_STYLES[type]}
+    >
       {NOTE_ICONS[type]}
-      <div className="min-w-0 text-sm leading-relaxed [&>p]:m-0">{children}</div>
+      <div className="min-w-0 text-sm leading-relaxed [&_a]:underline [&_a]:underline-offset-4 [&_p]:m-0">
+        {children}
+      </div>
     </div>
   );
 }
