@@ -6,11 +6,13 @@ import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 initOpenNextCloudflareForDev();
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   webpack: (config) => {
     // config.plugins.push(DevInspector.webpack({ enabled: true }));
     return config;
   },
   turbopack: {
+    root: __dirname,
     // rules: turbopackDevInspector({ enabled: true }),
   },
 };

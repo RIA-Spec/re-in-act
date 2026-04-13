@@ -29,21 +29,26 @@ Then open `http://localhost:3000`.
 
 Useful scripts:
 
-| Command          | Purpose                                     |
-| :--------------- | :------------------------------------------ |
-| `pnpm dev`       | Start the local development server          |
-| `pnpm build`     | Build the production site                   |
-| `pnpm check`     | Run a production build and TypeScript check |
-| `pnpm lint`      | Run oxlint                                  |
-| `pnpm fmt:check` | Check formatting with oxfmt                 |
-| `pnpm preview`   | Preview the OpenNext output locally         |
-| `pnpm deploy`    | Deploy to Cloudflare Workers                |
+| Command          | Purpose                                                    |
+| :--------------- | :--------------------------------------------------------- |
+| `pnpm dev`       | Start the local development server                         |
+| `pnpm build`     | Build the production site and OpenNext worker bundle       |
+| `pnpm check`     | Run a production build and TypeScript check                |
+| `pnpm lint`      | Run oxlint                                                 |
+| `pnpm fmt:check` | Check formatting with oxfmt                                |
+| `pnpm preview`   | Build and preview the OpenNext output locally              |
+| `pnpm deploy`    | Build and deploy the OpenNext output to Cloudflare Workers |
 
 Project structure notes:
 
 - Content lives in `docs/**/*.mdx`.
 - Navigation is configured in `docs/docs.json`.
 - App routes are resolved by `src/app/[...slug]/page.tsx`.
+
+Deployment note:
+
+- Cloudflare deploys expect the `.open-next` output from `pnpm build`.
+- The build flow is `next build` followed by `opennextjs-cloudflare build --skipNextBuild`, so the Next app is compiled once and the OpenNext worker bundle is produced without recursive script calls.
 
 ## Join the Conversation
 
