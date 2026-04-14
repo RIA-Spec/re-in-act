@@ -8,8 +8,8 @@
           {
             "group": "Get Started",
             "pages": [
-              "docs/getting-started/try",
               "docs/getting-started/intro",
+              "docs/getting-started/try",
               "docs/getting-started/concepts"
             ]
           },
