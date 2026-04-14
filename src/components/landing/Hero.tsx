@@ -104,7 +104,7 @@ export function Hero() {
           transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
         >
           <Link
-            href="/docs/getting-started/try"
+            href="/docs/getting-started/intro"
             className="inline-flex cursor-pointer items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200"
             style={{ backgroundColor: "var(--accent)" }}
           >

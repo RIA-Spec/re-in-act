@@ -26,7 +26,7 @@ const links: QuickLink[] = [
   {
     title: "Documentation",
     description: "Start with a Bash quickstart, then read the architecture and interfaces.",
-    href: getTabHref("Documentation", "/docs/getting-started/try"),
+    href: getTabHref("Documentation", "/docs/getting-started/intro"),
     icon: BookOpen,
   },
   {
