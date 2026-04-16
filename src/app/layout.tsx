@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   applicationName: SITE_NAME,
   title: {
-    default: SITE_NAME,
+    default: "Re in Act — Open Specification for Reason in Action",
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,

@@ -65,13 +65,9 @@ export function Hero() {
             className="mx-auto max-w-xl text-lg leading-tight"
             style={{ color: "var(--foreground)" }}
           >
-            Re in Act strengthens how an AI agent turns{" "}
+            Re in Act extends{" "}
             <span className="font-semibold" style={{ color: "var(--foreground)" }}>
-              reason into action
-            </span>
-            .<br className="hidden sm:block" /> It keeps reason{" "}
-            <span className="font-semibold" style={{ color: "var(--foreground)" }}>
-              inside the action loop
+              reason into the action loop
             </span>
             , so local disturbances are handled before they turn into{" "}
             <span className="font-semibold" style={{ color: "var(--foreground)" }}>

@@ -30,9 +30,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const pathname = `/${slug.join("/")}`;
   const description = doc.meta.description || SITE_DESCRIPTION;
+  const activeTab = findTabForSlug(slug.join("/")) || "Documentation";
 
   return {
-    title: doc.meta.title,
+    title: {
+      absolute: `${doc.meta.title} | ${activeTab} | ${SITE_NAME}`,
+    },
     description,
     alternates: {
       canonical: pathname,

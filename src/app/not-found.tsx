@@ -3,7 +3,9 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Page not found",
+  title: {
+    absolute: "Page not found | Re in Act",
+  },
   robots: {
     index: false,
     follow: false,
