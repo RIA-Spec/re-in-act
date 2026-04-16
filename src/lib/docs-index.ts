@@ -9,7 +9,7 @@ export interface IndexedDocMeta {
 export interface IndexedDocEntry {
   slug: string[];
   meta: IndexedDocMeta;
-  rawContent: string;
+  htmlContent: string;
 }
 
 export type RawPageItem = string | { group: string; pages: string[] };

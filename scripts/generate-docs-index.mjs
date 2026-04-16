@@ -1,6 +1,9 @@
 import fs from "fs";
 import path from "path";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import matter from "gray-matter";
+import { compileMDX } from "next-mdx-remote/rsc";
 
 const repoRoot = process.cwd();
 const docsRoot = path.join(repoRoot, "docs");
@@ -8,21 +11,36 @@ const outputPath = path.join(repoRoot, "src/generated/docs-index.json");
 
 const contentDirs = ["docs", "specification", "extensions", "proposals", "community"];
 
+function Note({ children }) {
+  return createElement(
+    "div",
+    {
+      className: "not-prose my-4 flex items-center gap-3 rounded-lg border p-4",
+      style: {
+        borderColor: "color-mix(in srgb, #3b82f6 34%, var(--border))",
+        backgroundColor: "color-mix(in srgb, #3b82f6 10%, var(--background))",
+        color: "color-mix(in srgb, #60a5fa 58%, var(--foreground))",
+      },
+    },
+    children,
+  );
+}
+
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf-8"));
 }
 
-function collectDocs() {
+async function collectDocs() {
   const docs = {};
   const allSlugs = [];
 
-  function visit(dir, prefix) {
+  async function visit(dir, prefix) {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
 
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
       if (entry.isDirectory()) {
-        visit(fullPath, [...prefix, entry.name]);
+        await visit(fullPath, [...prefix, entry.name]);
         continue;
       }
 
@@ -35,11 +53,15 @@ function collectDocs() {
       const slugKey = slug.join("/");
       const raw = fs.readFileSync(fullPath, "utf-8");
       const { data, content } = matter(raw);
+      const { content: compiledContent } = await compileMDX({
+        source: content,
+        components: { Note },
+      });
 
       docs[slugKey] = {
         slug,
         meta: data,
-        rawContent: content,
+        htmlContent: renderToStaticMarkup(compiledContent),
       };
       allSlugs.push(slug);
     }
@@ -48,7 +70,7 @@ function collectDocs() {
   for (const dir of contentDirs) {
     const fullPath = path.join(docsRoot, dir);
     if (fs.existsSync(fullPath)) {
-      visit(fullPath, [dir]);
+      await visit(fullPath, [dir]);
     }
   }
 
@@ -59,16 +81,16 @@ function collectDocs() {
 
 function main() {
   const navConfig = readJson(path.join(docsRoot, "docs.json"));
-  const { docs, allSlugs } = collectDocs();
+  return collectDocs().then(({ docs, allSlugs }) => {
+    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+    fs.writeFileSync(
+      outputPath,
+      `${JSON.stringify({ navConfig, docs, allSlugs }, null, 2)}\n`,
+      "utf-8",
+    );
 
-  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-  fs.writeFileSync(
-    outputPath,
-    `${JSON.stringify({ navConfig, docs, allSlugs }, null, 2)}\n`,
-    "utf-8",
-  );
-
-  console.log(`Generated ${outputPath}`);
+    console.log(`Generated ${outputPath}`);
+  });
 }
 
 main();

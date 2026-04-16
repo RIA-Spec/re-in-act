@@ -1,9 +1,3 @@
-import matter from "gray-matter";
-import { compileMDX } from "next-mdx-remote/rsc";
-import remarkGfm from "remark-gfm";
-import rehypeSlug from "rehype-slug";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import type { MDXComponents } from "@/lib/mdx-components";
 import { allDocSlugs, docsBySlug } from "@/lib/docs-index";
 
 export interface DocMeta {
@@ -14,7 +8,7 @@ export interface DocMeta {
 
 export interface Doc {
   meta: DocMeta;
-  content: React.ReactElement;
+  content: string;
   slug: string[];
 }
 
@@ -22,28 +16,14 @@ export interface Doc {
  * Get a compiled MDX document by slug.
  * Components are passed in to avoid importing client components in a server module.
  */
-export async function getDocBySlug(
-  slug: string[],
-  components?: MDXComponents,
-): Promise<Doc | null> {
+export async function getDocBySlug(slug: string[]): Promise<Doc | null> {
   const slugKey = slug.join("/");
   const entry = docsBySlug[slugKey];
   if (!entry) return null;
 
-  const { content } = await compileMDX({
-    source: entry.rawContent,
-    options: {
-      mdxOptions: {
-        remarkPlugins: [remarkGfm],
-        rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
-      },
-    },
-    components,
-  });
-
   return {
     meta: entry.meta as DocMeta,
-    content,
+    content: entry.htmlContent,
     slug,
   };
 }
