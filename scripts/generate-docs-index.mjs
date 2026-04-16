@@ -4,6 +4,9 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import matter from "gray-matter";
 import { compileMDX } from "next-mdx-remote/rsc";
+import remarkGfm from "remark-gfm";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
 
 const repoRoot = process.cwd();
 const docsRoot = path.join(repoRoot, "docs");
@@ -55,6 +58,12 @@ async function collectDocs() {
       const { data, content } = matter(raw);
       const { content: compiledContent } = await compileMDX({
         source: content,
+        options: {
+          mdxOptions: {
+            remarkPlugins: [remarkGfm],
+            rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
+          },
+        },
         components: { Note },
       });
       const docEntry = {
