@@ -7,6 +7,7 @@ initOpenNextCloudflareForDev();
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  transpilePackages: ["next-mdx-remote"],
   webpack: (config) => {
     // config.plugins.push(DevInspector.webpack({ enabled: true }));
     return config;
