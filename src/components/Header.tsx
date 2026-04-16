@@ -17,7 +17,7 @@ export function Header() {
 
   return (
     <header
-      className="sticky top-0 z-50 border-b"
+      className="sticky top-0 z-50 border-b overflow-x-hidden"
       style={{
         borderColor: "var(--border)",
         backgroundColor: "var(--header-bg)",
@@ -25,11 +25,11 @@ export function Header() {
         WebkitBackdropFilter: "blur(12px)",
       }}
     >
-      <div className="mx-auto flex h-14 max-w-7xl items-center px-6">
+      <div className="mx-auto flex h-14 max-w-7xl min-w-0 items-center gap-4 px-6">
         {/* Logo */}
         <Link
           href="/"
-          className="mr-8 flex items-center gap-2 text-[15px] font-semibold tracking-tight transition-colors duration-200 cursor-pointer"
+          className="flex shrink-0 items-center gap-2 text-[15px] font-semibold tracking-tight transition-colors duration-200 cursor-pointer"
           style={{ color: "var(--foreground)" }}
         >
           <LogoMark className="h-5 w-5 shrink-0" style={{ color: "var(--foreground)" }} />
@@ -37,29 +37,31 @@ export function Header() {
         </Link>
 
         {/* Tab Navigation */}
-        <nav className="flex items-center gap-0.5">
-          {NAV_TABS.map((tab) => {
-            const active = isTabActive(tab.label);
-            return (
-              <Link
-                key={tab.label}
-                href={tab.href}
-                className={`relative rounded-md px-3 py-1.5 text-[13px] font-medium transition-colors duration-200 cursor-pointer ${
-                  active
-                    ? "text-[var(--accent)]"
-                    : "text-[var(--muted)] hover:text-[var(--foreground)]"
-                }`}
-              >
-                {tab.label}
-                {active && (
-                  <span
-                    className="absolute inset-x-1 -bottom-[9px] h-[2px] rounded-full"
-                    style={{ backgroundColor: "var(--accent)" }}
-                  />
-                )}
-              </Link>
-            );
-          })}
+        <nav className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap">
+          <div className="flex w-max items-center gap-0.5 pr-4">
+            {NAV_TABS.map((tab) => {
+              const active = isTabActive(tab.label);
+              return (
+                <Link
+                  key={tab.label}
+                  href={tab.href}
+                  className={`relative shrink-0 rounded-md px-3 py-1.5 text-[13px] font-medium transition-colors duration-200 cursor-pointer ${
+                    active
+                      ? "text-[var(--accent)]"
+                      : "text-[var(--muted)] hover:text-[var(--foreground)]"
+                  }`}
+                >
+                  {tab.label}
+                  {active && (
+                    <span
+                      className="absolute inset-x-1 -bottom-[9px] h-[2px] rounded-full"
+                      style={{ backgroundColor: "var(--accent)" }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
         </nav>
 
         {/* Spacer */}
