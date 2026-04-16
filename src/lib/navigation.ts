@@ -1,7 +1,4 @@
-import fs from "fs";
-import path from "path";
-
-const DOCS_ROOT = path.join(process.cwd(), "docs");
+import { docsBySlug, navConfig, type RawNavConfig } from "@/lib/docs-index";
 
 export interface NavPage {
   slug: string;
@@ -24,31 +21,11 @@ export interface NavTab {
   versions?: NavVersion[];
 }
 
-// Raw types from docs.json
-type RawPageItem = string | { group: string; pages: string[] };
-type RawVersionItem = { version: string; pages: string[] };
-
-interface RawNavTab {
-  tab: string;
-  pages?: RawPageItem[];
-  versions?: RawVersionItem[];
-}
-
-interface RawNavConfig {
-  name: string;
-  navigation: {
-    tabs: RawNavTab[];
-  };
-  redirects: Array<{ from: string; to: string }>;
-}
-
 /**
  * Read and parse docs.json navigation config.
  */
 function getRawNavConfig(): RawNavConfig {
-  const configPath = path.join(DOCS_ROOT, "docs.json");
-  const raw = fs.readFileSync(configPath, "utf-8");
-  return JSON.parse(raw) as RawNavConfig;
+  return navConfig;
 }
 
 /**
@@ -56,14 +33,9 @@ function getRawNavConfig(): RawNavConfig {
  * Falls back to the slug itself if not found.
  */
 function getPageTitle(slug: string): string {
-  const candidates = [path.join(DOCS_ROOT, `${slug}.mdx`), path.join(DOCS_ROOT, `${slug}.md`)];
-
-  for (const filePath of candidates) {
-    if (fs.existsSync(filePath)) {
-      const raw = fs.readFileSync(filePath, "utf-8");
-      const match = raw.match(/^---\s*\n[\s\S]*?title:\s*["']?(.+?)["']?\s*\n/m);
-      if (match) return match[1];
-    }
+  const doc = docsBySlug[slug];
+  if (typeof doc?.meta.title === "string" && doc.meta.title.length > 0) {
+    return doc.meta.title;
   }
 
   // Fallback: humanize slug
