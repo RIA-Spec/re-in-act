@@ -57,13 +57,19 @@ async function collectDocs() {
         source: content,
         components: { Note },
       });
-
-      docs[slugKey] = {
+      const docEntry = {
         slug,
         meta: data,
         htmlContent: renderToStaticMarkup(compiledContent),
       };
+
+      docs[slugKey] = docEntry;
       allSlugs.push(slug);
+      if (name === "index") {
+        const indexSlug = [...slug, "index"];
+        docs[indexSlug.join("/")] = docEntry;
+        allSlugs.push(indexSlug);
+      }
     }
   }
 
