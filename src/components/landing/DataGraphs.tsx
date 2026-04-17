@@ -29,10 +29,6 @@ const PARADIGM_SHIFT_COMPARISONS: Array<{
     from: "Probabilistic Micro-Control Flow",
     to: "Deterministic Runtime Control Flow",
   },
-  {
-    from: "No Local Structure During Action",
-    to: "Intermediate Data + Judgment Inside Action",
-  },
 ] as const;
 
 /* ────────────────────────────────────────────
@@ -448,7 +444,9 @@ function ParadigmShiftComparisons() {
           <div key={item.from} className="flex flex-col px-6 py-3">
             <div className="flex items-center justify-between">
               <span
-                style={{ color: item.bold ? "var(--foreground)" : "var(--muted)" }}
+                style={{
+                  color: item.bold ? "var(--foreground)" : "var(--muted)",
+                }}
                 className={item.bold ? "font-medium" : ""}
               >
                 {item.from}
@@ -484,7 +482,10 @@ function RASFlow() {
   return (
     <motion.div
       className="overflow-hidden rounded-xl border"
-      style={{ borderColor: "var(--border)", backgroundColor: "var(--card-bg)" }}
+      style={{
+        borderColor: "var(--border)",
+        backgroundColor: "var(--card-bg)",
+      }}
       {...fade}
     >
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} fill="none" aria-hidden="true">
@@ -737,12 +738,18 @@ function LocalActionSequence() {
         <div
           key={step.index}
           className="rounded-xl border p-4"
-          style={{ borderColor: "var(--border)", backgroundColor: "var(--card-bg)" }}
+          style={{
+            borderColor: "var(--border)",
+            backgroundColor: "var(--card-bg)",
+          }}
         >
           <div className="mb-3 flex items-center gap-3">
             <div
               className="flex h-7 w-7 items-center justify-center rounded-full text-[12px] font-bold"
-              style={{ backgroundColor: "var(--accent-muted)", color: "var(--accent)" }}
+              style={{
+                backgroundColor: "var(--accent-muted)",
+                color: "var(--accent)",
+              }}
             >
               {step.index}
             </div>
@@ -755,7 +762,10 @@ function LocalActionSequence() {
           </p>
           <div
             className="rounded-lg border px-3 py-2 font-mono text-[11px] whitespace-pre-wrap break-words"
-            style={{ borderColor: "var(--border)", backgroundColor: "var(--surface-elevated)" }}
+            style={{
+              borderColor: "var(--border)",
+              backgroundColor: "var(--surface-elevated)",
+            }}
           >
             {step.code}
           </div>
@@ -776,7 +786,10 @@ function RuntimeLayers() {
   return (
     <motion.div
       className="overflow-hidden rounded-xl border p-6 sm:p-8"
-      style={{ borderColor: "var(--border)", backgroundColor: "var(--card-bg)" }}
+      style={{
+        borderColor: "var(--border)",
+        backgroundColor: "var(--card-bg)",
+      }}
       {...fade}
     >
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} fill="none" aria-hidden="true">

@@ -25,11 +25,11 @@ export function Header() {
         WebkitBackdropFilter: "blur(12px)",
       }}
     >
-      <div className="mx-auto flex h-14 max-w-7xl min-w-0 items-center gap-4 px-6">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-6 py-2 md:h-14 md:flex-nowrap md:py-0">
         {/* Logo */}
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2 text-[15px] font-semibold tracking-tight transition-colors duration-200 cursor-pointer"
+          className="order-1 flex shrink-0 items-center gap-2 text-[15px] font-semibold tracking-tight transition-colors duration-200 cursor-pointer"
           style={{ color: "var(--foreground)" }}
         >
           <LogoMark className="h-5 w-5 shrink-0" style={{ color: "var(--foreground)" }} />
@@ -37,8 +37,8 @@ export function Header() {
         </Link>
 
         {/* Tab Navigation */}
-        <nav className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap">
-          <div className="flex w-max items-center gap-0.5 pr-4">
+        <nav className="order-3 -mx-6 basis-full min-w-0 overflow-x-auto whitespace-nowrap px-6 md:order-2 md:mx-0 md:flex-1 md:basis-auto md:px-0 md:whitespace-nowrap">
+          <div className="flex w-max items-center gap-0.5 pb-1 md:pb-0">
             {NAV_TABS.map((tab) => {
               const active = isTabActive(tab.label);
               return (
@@ -64,11 +64,8 @@ export function Header() {
           </div>
         </nav>
 
-        {/* Spacer */}
-        <div className="flex-1" />
-
         {/* Actions */}
-        <div className="flex items-center gap-1">
+        <div className="order-2 ml-auto flex shrink-0 items-center gap-1 md:order-3 md:ml-0">
           <ThemeToggle />
           <a
             href={GITHUB_URL}

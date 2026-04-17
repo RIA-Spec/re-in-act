@@ -27,7 +27,7 @@ export function RASHarness() {
     <Section>
       <SectionHeader
         title="RAS as Harness"
-        sub="When the optional agent() extension is used, the RAS is the harness: agent() does delegated work inside it, and the RAS keeps that work explicit, bounded, and auditable."
+        sub="When the optional agent() extension is used, the RAS is the harness."
       />
 
       <motion.div
@@ -117,19 +117,19 @@ export function RASHarness() {
         not that <code>reason()</code> is agent-related by itself, but that once{" "}
         <code>agent()</code>
         is introduced, the RAS becomes the harness that contains delegated work, verification, and
-        escalation. See{" "}
-        <Link href="/extensions/agent-interface" className="underline underline-offset-4">
-          Agent Interface Extension
-        </Link>
-        . For related harness terminology in long-running agent systems, see{" "}
+        escalation. For the broader harness term, see{" "}
         <a
-          href="https://www.anthropic.com/engineering/harness-design-long-running-apps"
+          href="https://openai.com/index/harness-engineering"
           target="_blank"
           rel="noopener noreferrer"
           className="underline underline-offset-4"
         >
-          Harness design for long-running apps
+          Harness engineering
         </a>
+        . See{" "}
+        <Link href="/extensions/agent-interface" className="underline underline-offset-4">
+          Agent Interface Extension
+        </Link>
         .
       </motion.p>
     </Section>
