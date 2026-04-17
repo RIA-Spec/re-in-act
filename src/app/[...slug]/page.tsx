@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { getDocBySlug, getAllDocSlugs } from "@/lib/mdx";
 import { getResolvedNav, findTabForSlug } from "@/lib/navigation";
 import { OG_IMAGE_ALT, OG_IMAGE_PATH, SITE_DESCRIPTION, SITE_NAME } from "@/lib/constants";
-import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
+import { DocsNavigation } from "@/components/DocsNavigation";
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;
@@ -79,8 +79,13 @@ export default async function DocPage({ params }: PageProps) {
     >
       <Header />
       <div className="mx-auto flex max-w-7xl px-6">
-        <Sidebar tabs={tabs} activeTab={activeTab} />
-        <main className="min-w-0 flex-1 py-10 pl-0 lg:pl-10">
+        <DocsNavigation
+          tabs={tabs}
+          activeTab={activeTab}
+          headings={doc.headings}
+          title={doc.meta.title}
+        />
+        <main className="min-w-0 flex-1 py-24 lg:py-10 lg:pl-10">
           {/* Page title */}
           <header className="mb-8">
             <h1

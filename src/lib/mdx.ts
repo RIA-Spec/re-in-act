@@ -10,6 +10,11 @@ export interface Doc {
   meta: DocMeta;
   content: string;
   slug: string[];
+  headings: Array<{
+    level: number;
+    id: string;
+    text: string;
+  }>;
 }
 
 /**
@@ -25,6 +30,7 @@ export async function getDocBySlug(slug: string[]): Promise<Doc | null> {
     meta: entry.meta as DocMeta,
     content: entry.htmlContent,
     slug,
+    headings: entry.headings,
   };
 }
 

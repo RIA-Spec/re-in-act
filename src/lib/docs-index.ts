@@ -10,6 +10,11 @@ export interface IndexedDocEntry {
   slug: string[];
   meta: IndexedDocMeta;
   htmlContent: string;
+  headings: Array<{
+    level: number;
+    id: string;
+    text: string;
+  }>;
 }
 
 export type RawPageItem = string | { group: string; pages: string[] };

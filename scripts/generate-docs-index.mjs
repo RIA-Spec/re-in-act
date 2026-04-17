@@ -33,6 +33,39 @@ function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf-8"));
 }
 
+function decodeHtmlEntities(value) {
+  return value
+    .replaceAll("&amp;", "&")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">")
+    .replaceAll("&quot;", '"')
+    .replaceAll("&#39;", "'")
+    .replaceAll("&#x27;", "'")
+    .replaceAll("&nbsp;", " ");
+}
+
+function extractHeadings(htmlContent) {
+  const headings = [];
+  const regex = /<h([23]) id="([^"]+)">([\s\S]*?)<\/h\1>/g;
+
+  for (const match of htmlContent.matchAll(regex)) {
+    const level = Number(match[1]);
+    const id = match[2];
+    const text = decodeHtmlEntities(
+      match[3]
+        .replace(/<a[^>]*>[\s\S]*?<\/a>/g, "")
+        .replace(/<[^>]+>/g, "")
+        .trim(),
+    );
+
+    if (text.length > 0) {
+      headings.push({ level, id, text });
+    }
+  }
+
+  return headings;
+}
+
 async function collectDocs() {
   const docs = {};
   const allSlugs = [];
@@ -66,10 +99,12 @@ async function collectDocs() {
         },
         components: { Note },
       });
+      const htmlContent = renderToStaticMarkup(compiledContent);
       const docEntry = {
         slug,
         meta: data,
-        htmlContent: renderToStaticMarkup(compiledContent),
+        htmlContent,
+        headings: extractHeadings(htmlContent),
       };
 
       docs[slugKey] = docEntry;
