@@ -90,23 +90,23 @@ This is the control-theoretic core of the design: the agent becomes more capable
 
 ---
 
-## Good Regulator: Why Local Structure Matters
+## Good Regulator: Why Local Modeling Matters
 
 Conant and Ashby's Good Regulator theorem is useful here as a design principle.
 
-The practical takeaway is that good regulation requires access to a model of the system being regulated. For agents, that means action cannot stay effective if every task-relevant distinction lives only in the outer reasoning loop.
+The practical takeaway is that a good regulator needs a model of the system it regulates. For agents, that means action cannot stay effective if every task-relevant distinction lives only in the outer reasoning loop.
 
-The RAS provides local task structure:
+The RAS gives the local controller a model of the local system it regulates:
 
 - files, logs, and intermediate artifacts remain available inside the action space,
-- branching and retry logic can use that intermediate data directly,
+- branching and retry logic can use that local information directly,
 - and `reason()` can produce small structured judgments tied to the current situation.
 
-This is why Re in Act is not just “one more prompting trick.” It is an attempt to give action its own workable local model of the task environment.
+This is why Re in Act is not just “one more prompting trick.” It is an attempt to give the local controller its own workable model of the task environment.
 
 This page uses that theorem as an architectural interpretation, not as a claim that the full runtime has been formally proven equivalent to a classical regulator.
 
-Put differently: if action has no local model, the top-level reasoning loop must keep rebuilding one through tokens. That is expensive, slow, and fragile.
+Put differently: if the local controller has no model, the top-level reasoning loop must keep rebuilding one through tokens. That is expensive, slow, and fragile.
 
 ---
 

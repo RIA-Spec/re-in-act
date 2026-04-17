@@ -29,7 +29,7 @@ This metaphor matters for two reasons:
 The deeper theory points in the same direction:
 
 - **Ashby's Law (Requisite Variety)**: only variety can absorb variety. ReAct's fixed action layer often cannot express enough differentiated responses to handle local disturbances well. The RAS expands that local controller variety.
-- **Good Regulator Theorem**: a successful regulator needs access to a model of the system it regulates. In Re in Act, the RAS supplies task-relevant local structure, so the agent does not need to rebuild that structure from scratch on every outer-loop turn.
+- **Good Regulator Theorem**: a successful regulator needs access to a model of the system it regulates. In Re in Act, the RAS gives the local controller a model of the local system it regulates, so the agent does not need to rebuild that model from scratch on every outer-loop turn.
 
 If you want the deeper version of this argument, see [Control-Theoretic View](/docs/learn/control-theoretic-view).
 
@@ -64,7 +64,7 @@ It may also provide:
 
 ### A Typical Bash RAS Example
 
-Here is a minimal example of **reason in action** as progressive discovery: the agent first asks `act --manual` for the available tool surface, lets `reason` pick only the relevant tool names, then asks `act --manual [name]` for the detailed definitions of just those tools.
+Here is a minimal example of **reason in action** as progressive discovery: the agent first asks `act --manual` for the available tool surface, let `reason` pick only the relevant tool names, then asks `act --manual [name]` for the detailed definitions of just those tools.
 
 ```bash
 act --manual | \
@@ -91,7 +91,7 @@ See [Concepts →](/docs/getting-started/concepts) for annotated examples of bot
 
 ## What Re in Act Is Not
 
-- **Not a subagent pattern** — Re in Act does not create another reasoning actor. It creates one orchestrated action space for the same agent.
+- **Not a subagent pattern** — Re in Act does not create another reasoning actor. It creates one orchestrated action space for the same agent. This is a layered control architecture rather than a multi-agent hierarchy.
 - **Not incompatible with subagents** — a subagent can still use Re in Act internally. The subagent remains the reasoning unit; the RAS is the action space it uses to carry work out.
 - **Not an independent reasoning actor** — the RAS is an action context that top-level reasoning defines and orchestrates. It is not a peer planner.
 - **Not open-ended local reasoning** — inside the RAS, `reason()` is a schema-bounded local judgment step, not a second free-form agent loop.

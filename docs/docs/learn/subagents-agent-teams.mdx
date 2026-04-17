@@ -82,11 +82,15 @@ Put more sharply:
 - a subagent is another reasoning center
 - a RAS is an action environment
 
+Re in Act is therefore not a multi-agent hierarchy. It keeps one top-level reasoning context and a programmable local action space.
+
 Inside that workspace:
 
 - `reason()` starts with a **fresh inference context** and produces structured JSON.
 - loops, branches, validation, and retries happen in **code or shell**, not by re-prompting the outer loop.
 - intermediate logs, tool outputs, and failed attempts stay **inside the RAS** unless the RAS program decides they matter.
+
+The action environment is intentionally Turing-complete because local work often needs loops, branches, retries, and validation to happen inside the same control envelope. If those steps cannot be expressed locally, they leak back into outer-loop reasoning and you lose the benefit of local regulation.
 
 In that sense, they are fully different architectural moves:
 
