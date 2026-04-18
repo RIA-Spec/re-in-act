@@ -9,6 +9,12 @@ import { SITE_NAME, GITHUB_URL, NAV_TABS, TAB_PREFIXES } from "@/lib/constants";
 
 export function Header() {
   const pathname = usePathname();
+  const isDocsRoute =
+    pathname.startsWith("/docs") ||
+    pathname.startsWith("/specification") ||
+    pathname.startsWith("/extensions") ||
+    pathname.startsWith("/proposals") ||
+    pathname.startsWith("/community");
 
   function isTabActive(label: string): boolean {
     const prefix = TAB_PREFIXES[label];
@@ -17,7 +23,7 @@ export function Header() {
 
   return (
     <header
-      className="sticky top-0 z-50 border-b overflow-x-hidden"
+      className={`sticky top-0 z-50 border-b overflow-x-hidden ${isDocsRoute ? "hidden md:block" : ""}`}
       style={{
         borderColor: "var(--border)",
         backgroundColor: "var(--header-bg)",

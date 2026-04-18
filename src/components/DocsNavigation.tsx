@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Github, Menu, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { NavTab, NavPage } from "@/lib/navigation";
+import { GITHUB_URL, SITE_NAME } from "@/lib/constants";
+import { ThemeToggle } from "./ThemeToggle";
+import { LogoMark } from "./LogoMark";
 
 interface Heading {
   level: number;
@@ -158,18 +161,11 @@ export function DocsNavigation({ tabs, activeTab, headings, title }: DocsNavigat
             className="absolute left-0 top-0 h-full w-[86vw] max-w-sm overflow-y-auto border-r bg-[var(--background)] px-4 py-4 shadow-2xl"
             style={{ borderColor: "var(--border)" }}
           >
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <div
-                  className="text-[11px] font-semibold uppercase tracking-widest"
-                  style={{ color: "var(--muted)" }}
-                >
-                  Docs sidebar
-                </div>
-                <div className="mt-1 text-sm font-semibold" style={{ color: "var(--foreground)" }}>
-                  {title}
-                </div>
-              </div>
+            <div className="mb-4 flex items-start justify-between gap-3">
+              <Link href="/" className="flex items-center gap-2 text-sm font-semibold">
+                <LogoMark className="h-5 w-5 shrink-0" style={{ color: "var(--foreground)" }} />
+                <span style={{ color: "var(--foreground)" }}>{SITE_NAME}</span>
+              </Link>
               <button
                 type="button"
                 className="rounded-md border p-2"
@@ -178,6 +174,32 @@ export function DocsNavigation({ tabs, activeTab, headings, title }: DocsNavigat
               >
                 <X className="h-4 w-4" />
               </button>
+            </div>
+
+            <div className="mb-4">
+              <div
+                className="text-[11px] font-semibold uppercase tracking-widest"
+                style={{ color: "var(--muted)" }}
+              >
+                Docs sidebar
+              </div>
+              <div className="mt-1 text-sm font-semibold" style={{ color: "var(--foreground)" }}>
+                {title}
+              </div>
+            </div>
+
+            <div className="mb-4 flex items-center gap-1">
+              <ThemeToggle />
+              <a
+                href={GITHUB_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center rounded-md p-2 transition-colors duration-200 cursor-pointer"
+                style={{ color: "var(--muted)" }}
+                aria-label="GitHub"
+              >
+                <Github className="h-[18px] w-[18px]" />
+              </a>
             </div>
 
             <div className="space-y-4">
