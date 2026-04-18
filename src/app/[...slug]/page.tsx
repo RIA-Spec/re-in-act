@@ -85,7 +85,7 @@ export default async function DocPage({ params }: PageProps) {
           headings={doc.headings}
           title={doc.meta.title}
         />
-        <main className="min-w-0 flex-1 py-24 lg:py-10 lg:pl-10">
+        <main className="min-w-0 flex-1 py-10 lg:pl-10">
           {/* Page title */}
           <header className="mb-8">
             <h1

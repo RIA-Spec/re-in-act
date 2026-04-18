@@ -37,7 +37,7 @@ export function Header() {
         </Link>
 
         {/* Tab Navigation */}
-        <nav className="order-3 -mx-6 basis-full min-w-0 overflow-x-auto whitespace-nowrap px-6 md:order-2 md:mx-0 md:flex-1 md:basis-auto md:px-0 md:whitespace-nowrap">
+        <nav className="order-3 hidden basis-full min-w-0 overflow-x-auto whitespace-nowrap px-6 md:order-2 md:mx-0 md:flex md:flex-1 md:basis-auto md:px-0 md:whitespace-nowrap">
           <div className="flex w-max items-center gap-0.5 pb-1 md:pb-0">
             {NAV_TABS.map((tab) => {
               const active = isTabActive(tab.label);

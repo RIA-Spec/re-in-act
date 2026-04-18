@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { NavTab, NavPage } from "@/lib/navigation";
 
@@ -130,43 +130,21 @@ function TocList({ headings }: { headings: Heading[] }) {
 export function DocsNavigation({ tabs, activeTab, headings, title }: DocsNavigationProps) {
   const currentTab = tabs.find((t) => t.tab === activeTab);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [mobileMode, setMobileMode] = useState<"nav" | "toc">("nav");
 
   if (!currentTab) return null;
 
   return (
     <>
-      <div
-        className="fixed left-0 right-0 top-14 z-30 border-b bg-[var(--background)]/95 px-6 py-3 backdrop-blur md:hidden"
+      <button
+        type="button"
+        onClick={() => setMobileOpen(true)}
+        className="fixed bottom-4 left-4 z-30 flex items-center gap-2 rounded-full border bg-[var(--background)] px-4 py-3 text-sm font-medium shadow-lg md:hidden"
         style={{ borderColor: "var(--border)" }}
+        aria-label="Open docs sidebar"
       >
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => {
-              setMobileMode("nav");
-              setMobileOpen(true);
-            }}
-            className="flex flex-1 items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors duration-200"
-            style={{ borderColor: "var(--border)" }}
-          >
-            <Menu className="h-4 w-4" />
-            Docs
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setMobileMode("toc");
-              setMobileOpen(true);
-            }}
-            className="flex flex-1 items-center justify-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors duration-200"
-            style={{ borderColor: "var(--border)" }}
-          >
-            <BookOpen className="h-4 w-4" />
-            Contents
-          </button>
-        </div>
-      </div>
+        <Menu className="h-4 w-4" />
+        Sidebar
+      </button>
 
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true">
@@ -186,7 +164,7 @@ export function DocsNavigation({ tabs, activeTab, headings, title }: DocsNavigat
                   className="text-[11px] font-semibold uppercase tracking-widest"
                   style={{ color: "var(--muted)" }}
                 >
-                  {mobileMode === "nav" ? "Docs navigation" : "Page contents"}
+                  Docs sidebar
                 </div>
                 <div className="mt-1 text-sm font-semibold" style={{ color: "var(--foreground)" }}>
                   {title}
@@ -202,45 +180,28 @@ export function DocsNavigation({ tabs, activeTab, headings, title }: DocsNavigat
               </button>
             </div>
 
-            <div className="mb-4 flex gap-2">
-              <button
-                type="button"
-                onClick={() => setMobileMode("nav")}
-                className="flex-1 rounded-md border px-3 py-2 text-sm font-medium"
-                style={{
-                  borderColor: "var(--border)",
-                  backgroundColor:
-                    mobileMode === "nav" ? "var(--sidebar-active-bg)" : "transparent",
-                }}
-              >
-                Docs
-              </button>
-              <button
-                type="button"
-                onClick={() => setMobileMode("toc")}
-                className="flex-1 rounded-md border px-3 py-2 text-sm font-medium"
-                style={{
-                  borderColor: "var(--border)",
-                  backgroundColor:
-                    mobileMode === "toc" ? "var(--sidebar-active-bg)" : "transparent",
-                }}
-              >
-                Contents
-              </button>
-            </div>
-
-            {mobileMode === "nav" ? (
+            <div className="space-y-4">
               <div>
-                {currentTab.pages?.map((group) => (
-                  <GroupSection key={group.group} group={group.group} pages={group.pages} />
-                ))}
-                {currentTab.versions?.map((ver) => (
-                  <GroupSection key={ver.version} group={ver.version} pages={ver.pages} />
-                ))}
+                <div
+                  className="px-3 text-[11px] font-semibold uppercase tracking-widest"
+                  style={{ color: "var(--muted)" }}
+                >
+                  Docs navigation
+                </div>
+                <div className="mt-2">
+                  {currentTab.pages?.map((group) => (
+                    <GroupSection key={group.group} group={group.group} pages={group.pages} />
+                  ))}
+                  {currentTab.versions?.map((ver) => (
+                    <GroupSection key={ver.version} group={ver.version} pages={ver.pages} />
+                  ))}
+                </div>
               </div>
-            ) : (
-              <TocList headings={headings} />
-            )}
+
+              <div className="border-t pt-4" style={{ borderColor: "var(--border)" }}>
+                <TocList headings={headings} />
+              </div>
+            </div>
           </aside>
         </div>
       )}
