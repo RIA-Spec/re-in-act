@@ -1,5 +1,6 @@
 "use client";
 
+import type { MouseEvent } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, BookOpen, ChevronDown, ScrollText } from "lucide-react";
 import Link from "next/link";
@@ -7,6 +8,19 @@ import { LogoMark } from "@/components/LogoMark";
 import { SITE_NAME } from "@/lib/constants";
 
 export function Hero() {
+  function handleReadMoreClick(event: MouseEvent<HTMLAnchorElement>) {
+    event.preventDefault();
+
+    const target = document.getElementById("start-here");
+    if (!target) return;
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    target.scrollIntoView({
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+      block: "start",
+    });
+  }
+
   return (
     <section className="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden px-6 pt-14">
       {/* Subtle background grid */}
@@ -134,6 +148,7 @@ export function Hero() {
 
         <motion.a
           href="#start-here"
+          onClick={handleReadMoreClick}
           className="group inline-flex flex-col items-center gap-1 px-2 py-1 text-[13px] font-medium tracking-[0.12em] uppercase transition-colors duration-200 hover:text-[var(--foreground)]"
           style={{ color: "var(--muted)" }}
           initial={{ opacity: 0, y: 24 }}

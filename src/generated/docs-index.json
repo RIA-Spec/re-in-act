@@ -31,9 +31,7 @@
           "versions": [
             {
               "version": "Working Draft",
-              "pages": [
-                "specification/draft/index"
-              ]
+              "pages": ["specification/draft/index"]
             }
           ]
         },
@@ -47,16 +45,11 @@
         },
         {
           "tab": "Proposals",
-          "pages": [
-            "proposals/index"
-          ]
+          "pages": ["proposals/index"]
         },
         {
           "tab": "Community",
-          "pages": [
-            "community/contributing",
-            "community/governance"
-          ]
+          "pages": ["community/contributing", "community/governance"]
         }
       ]
     },
@@ -64,11 +57,7 @@
   },
   "docs": {
     "docs/getting-started/concepts": {
-      "slug": [
-        "docs",
-        "getting-started",
-        "concepts"
-      ],
+      "slug": ["docs", "getting-started", "concepts"],
       "meta": {
         "title": "RAS Concepts",
         "description": "Deeper walkthrough of the Reason-able Action Space, reason(), and act() with real examples."
@@ -143,11 +132,7 @@
       ]
     },
     "docs/getting-started/intro": {
-      "slug": [
-        "docs",
-        "getting-started",
-        "intro"
-      ],
+      "slug": ["docs", "getting-started", "intro"],
       "meta": {
         "title": "Introduction",
         "description": "What is Re in Act? A quick orientation for new readers."
@@ -197,11 +182,7 @@
       ]
     },
     "docs/getting-started/try": {
-      "slug": [
-        "docs",
-        "getting-started",
-        "try"
-      ],
+      "slug": ["docs", "getting-started", "try"],
       "meta": {
         "title": "Try Re in Act",
         "description": "Two ways to try Re in Act: a fast proxy launch path and a direct Bash RAS setup with reason and act."
@@ -261,11 +242,7 @@
       ]
     },
     "docs/learn/control-theoretic-view": {
-      "slug": [
-        "docs",
-        "learn",
-        "control-theoretic-view"
-      ],
+      "slug": ["docs", "learn", "control-theoretic-view"],
       "meta": {
         "title": "Control-Theoretic View",
         "description": "Why Re in Act can be understood as strengthening the agent's local control layer in the action phase."
@@ -315,11 +292,7 @@
       ]
     },
     "docs/learn/integrations": {
-      "slug": [
-        "docs",
-        "learn",
-        "integrations"
-      ],
+      "slug": ["docs", "learn", "integrations"],
       "meta": {
         "title": "Integrations",
         "description": "How Re in Act connects to external tools, models, and runtimes."
@@ -369,11 +342,7 @@
       ]
     },
     "docs/learn/playbook": {
-      "slug": [
-        "docs",
-        "learn",
-        "playbook"
-      ],
+      "slug": ["docs", "learn", "playbook"],
       "meta": {
         "title": "Playbook",
         "description": "A growing set of Re in Act application patterns shown directly as reusable Riffs."
@@ -423,11 +392,7 @@
       ]
     },
     "docs/learn/riff": {
-      "slug": [
-        "docs",
-        "learn",
-        "riff"
-      ],
+      "slug": ["docs", "learn", "riff"],
       "meta": {
         "title": "Riff",
         "description": "Riff - Reusable RAS Definitions."
@@ -462,11 +427,7 @@
       ]
     },
     "docs/learn/subagents-agent-teams": {
-      "slug": [
-        "docs",
-        "learn",
-        "subagents-agent-teams"
-      ],
+      "slug": ["docs", "learn", "subagents-agent-teams"],
       "meta": {
         "title": "Subagent vs Re in Act",
         "description": "Why subagents and Re in Act are different architectural directions, and how subagents can still use Re in Act as an action space."
@@ -516,10 +477,7 @@
       ]
     },
     "specification/draft": {
-      "slug": [
-        "specification",
-        "draft"
-      ],
+      "slug": ["specification", "draft"],
       "meta": {
         "title": "Re in Act — Specification",
         "description": "The working draft of the Re in Act open specification."
@@ -624,10 +582,7 @@
       ]
     },
     "specification/draft/index": {
-      "slug": [
-        "specification",
-        "draft"
-      ],
+      "slug": ["specification", "draft"],
       "meta": {
         "title": "Re in Act — Specification",
         "description": "The working draft of the Re in Act open specification."
@@ -732,10 +687,7 @@
       ]
     },
     "extensions/agent-interface": {
-      "slug": [
-        "extensions",
-        "agent-interface"
-      ],
+      "slug": ["extensions", "agent-interface"],
       "meta": {
         "title": "Agent Interface Extension",
         "description": "Optional `agent()` interface for delegated execution inside the Reason-able Action Space."
@@ -785,10 +737,7 @@
       ]
     },
     "extensions/overview": {
-      "slug": [
-        "extensions",
-        "overview"
-      ],
+      "slug": ["extensions", "overview"],
       "meta": {
         "title": "Re in Act Extensions",
         "description": "Optional extensions to Re in Act that add capabilities without changing the core contract."
@@ -813,10 +762,7 @@
       ]
     },
     "extensions/support-matrix": {
-      "slug": [
-        "extensions",
-        "support-matrix"
-      ],
+      "slug": ["extensions", "support-matrix"],
       "meta": {
         "title": "Extension Support Matrix",
         "description": "Compatibility and implementation status for optional Re in Act extensions."
@@ -836,9 +782,7 @@
       ]
     },
     "proposals": {
-      "slug": [
-        "proposals"
-      ],
+      "slug": ["proposals"],
       "meta": {
         "title": "Proposals",
         "description": "Browse and submit proposals for changes to Re in Act."
@@ -863,9 +807,7 @@
       ]
     },
     "proposals/index": {
-      "slug": [
-        "proposals"
-      ],
+      "slug": ["proposals"],
       "meta": {
         "title": "Proposals",
         "description": "Browse and submit proposals for changes to Re in Act."
@@ -890,10 +832,7 @@
       ]
     },
     "community/contributing": {
-      "slug": [
-        "community",
-        "contributing"
-      ],
+      "slug": ["community", "contributing"],
       "meta": {
         "title": "Contributing",
         "description": "How to contribute to the Re in Act specification."
@@ -923,10 +862,7 @@
       ]
     },
     "community/governance": {
-      "slug": [
-        "community",
-        "governance"
-      ],
+      "slug": ["community", "governance"],
       "meta": {
         "title": "Governance",
         "description": "How decisions are made for the Re in Act specification."
@@ -952,81 +888,22 @@
     }
   },
   "allSlugs": [
-    [
-      "community",
-      "contributing"
-    ],
-    [
-      "community",
-      "governance"
-    ],
-    [
-      "docs",
-      "getting-started",
-      "concepts"
-    ],
-    [
-      "docs",
-      "getting-started",
-      "intro"
-    ],
-    [
-      "docs",
-      "getting-started",
-      "try"
-    ],
-    [
-      "docs",
-      "learn",
-      "control-theoretic-view"
-    ],
-    [
-      "docs",
-      "learn",
-      "integrations"
-    ],
-    [
-      "docs",
-      "learn",
-      "playbook"
-    ],
-    [
-      "docs",
-      "learn",
-      "riff"
-    ],
-    [
-      "docs",
-      "learn",
-      "subagents-agent-teams"
-    ],
-    [
-      "extensions",
-      "agent-interface"
-    ],
-    [
-      "extensions",
-      "overview"
-    ],
-    [
-      "extensions",
-      "support-matrix"
-    ],
-    [
-      "proposals"
-    ],
-    [
-      "proposals",
-      "index"
-    ],
-    [
-      "specification",
-      "draft"
-    ],
-    [
-      "specification",
-      "draft",
-      "index"
-    ]
+    ["community", "contributing"],
+    ["community", "governance"],
+    ["docs", "getting-started", "concepts"],
+    ["docs", "getting-started", "intro"],
+    ["docs", "getting-started", "try"],
+    ["docs", "learn", "control-theoretic-view"],
+    ["docs", "learn", "integrations"],
+    ["docs", "learn", "playbook"],
+    ["docs", "learn", "riff"],
+    ["docs", "learn", "subagents-agent-teams"],
+    ["extensions", "agent-interface"],
+    ["extensions", "overview"],
+    ["extensions", "support-matrix"],
+    ["proposals"],
+    ["proposals", "index"],
+    ["specification", "draft"],
+    ["specification", "draft", "index"]
   ]
 }

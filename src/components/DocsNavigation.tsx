@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Github, Menu, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { NavTab, NavPage } from "@/lib/navigation";
-import { GITHUB_URL, SITE_NAME } from "@/lib/constants";
+import { GITHUB_URL, NAV_TABS, SITE_NAME } from "@/lib/constants";
 import { ThemeToggle } from "./ThemeToggle";
 import { LogoMark } from "./LogoMark";
 
@@ -22,7 +22,15 @@ interface DocsNavigationProps {
   title: string;
 }
 
-function GroupSection({ group, pages }: { group: string; pages: NavPage[] }) {
+function GroupSection({
+  group,
+  pages,
+  onNavigate,
+}: {
+  group: string;
+  pages: NavPage[];
+  onNavigate?: () => void;
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(true);
 
@@ -46,6 +54,7 @@ function GroupSection({ group, pages }: { group: string; pages: NavPage[] }) {
               <li key={page.slug}>
                 <Link
                   href={href}
+                  onClick={onNavigate}
                   className="block rounded-md px-3 py-1.5 text-[13px] transition-colors duration-200 cursor-pointer"
                   style={{
                     backgroundColor: isActive ? "var(--sidebar-active-bg)" : "transparent",
@@ -64,7 +73,7 @@ function GroupSection({ group, pages }: { group: string; pages: NavPage[] }) {
   );
 }
 
-function TocList({ headings }: { headings: Heading[] }) {
+function TocList({ headings, onNavigate }: { headings: Heading[]; onNavigate?: () => void }) {
   const items = useMemo(() => {
     const list: Array<Heading & { children: Heading[] }> = [];
     let current: (typeof list)[number] | null = null;
@@ -103,6 +112,7 @@ function TocList({ headings }: { headings: Heading[] }) {
           <li key={heading.id}>
             <a
               href={`#${heading.id}`}
+              onClick={onNavigate}
               className="block rounded-md px-3 py-1.5 text-[13px] leading-snug transition-colors duration-200 hover:bg-[var(--sidebar-active-bg)]"
               style={{ color: "var(--muted)" }}
             >
@@ -114,6 +124,7 @@ function TocList({ headings }: { headings: Heading[] }) {
                   <li key={child.id}>
                     <a
                       href={`#${child.id}`}
+                      onClick={onNavigate}
                       className="block rounded-md px-3 py-1.5 text-[12px] leading-snug transition-colors duration-200 hover:bg-[var(--sidebar-active-bg)]"
                       style={{ color: "var(--muted)" }}
                     >
@@ -138,16 +149,49 @@ export function DocsNavigation({ tabs, activeTab, headings, title }: DocsNavigat
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setMobileOpen(true)}
-        className="fixed bottom-4 left-4 z-30 flex items-center gap-2 rounded-full border bg-[var(--background)] px-4 py-3 text-sm font-medium shadow-lg md:hidden"
-        style={{ borderColor: "var(--border)" }}
-        aria-label="Open docs sidebar"
+      <div
+        className="fixed inset-x-0 top-0 z-40 flex items-center justify-between gap-3 border-b px-4 py-3 md:hidden"
+        style={{
+          borderColor: "var(--border)",
+          backgroundColor: "var(--header-bg)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+        }}
       >
-        <Menu className="h-4 w-4" />
-        Sidebar
-      </button>
+        <div className="flex min-w-0 items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setMobileOpen(true)}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors duration-200 cursor-pointer hover:bg-[var(--card-hover-bg)]"
+            style={{ color: "var(--foreground)" }}
+            aria-label="Open docs sidebar"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          <Link
+            href="/"
+            className="flex min-w-0 items-center gap-2 text-[15px] font-semibold tracking-tight"
+            style={{ color: "var(--foreground)" }}
+          >
+            <LogoMark className="h-5 w-5 shrink-0" style={{ color: "var(--foreground)" }} />
+            <span className="truncate">{SITE_NAME}</span>
+          </Link>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-1">
+          <ThemeToggle />
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center rounded-md p-2 transition-colors duration-200 cursor-pointer"
+            style={{ color: "var(--muted)" }}
+            aria-label="GitHub"
+          >
+            <Github className="h-[18px] w-[18px]" />
+          </a>
+        </div>
+      </div>
 
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true">
@@ -168,11 +212,12 @@ export function DocsNavigation({ tabs, activeTab, headings, title }: DocsNavigat
               </Link>
               <button
                 type="button"
-                className="rounded-md border p-2"
-                style={{ borderColor: "var(--border)" }}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors duration-200 cursor-pointer hover:bg-[var(--card-hover-bg)]"
+                style={{ color: "var(--foreground)" }}
                 onClick={() => setMobileOpen(false)}
+                aria-label="Close docs sidebar"
               >
-                <X className="h-4 w-4" />
+                <X className="h-5 w-5" />
               </button>
             </div>
 
@@ -181,7 +226,37 @@ export function DocsNavigation({ tabs, activeTab, headings, title }: DocsNavigat
                 className="text-[11px] font-semibold uppercase tracking-widest"
                 style={{ color: "var(--muted)" }}
               >
-                Docs sidebar
+                Sections
+              </div>
+              <nav className="mt-3 grid grid-cols-2 gap-2" aria-label="Site sections">
+                {NAV_TABS.map((tab) => {
+                  const isActive = tab.label === activeTab;
+
+                  return (
+                    <Link
+                      key={tab.label}
+                      href={tab.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="rounded-xl border px-3 py-2 text-[13px] font-medium transition-colors duration-200"
+                      style={{
+                        borderColor: isActive ? "var(--accent)" : "var(--border)",
+                        backgroundColor: isActive ? "var(--sidebar-active-bg)" : "transparent",
+                        color: isActive ? "var(--sidebar-active-text)" : "var(--foreground)",
+                      }}
+                    >
+                      {tab.label}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+
+            <div className="mb-4 border-t pt-4" style={{ borderColor: "var(--border)" }}>
+              <div
+                className="text-[11px] font-semibold uppercase tracking-widest"
+                style={{ color: "var(--muted)" }}
+              >
+                Current page
               </div>
               <div className="mt-1 text-sm font-semibold" style={{ color: "var(--foreground)" }}>
                 {title}
@@ -208,20 +283,30 @@ export function DocsNavigation({ tabs, activeTab, headings, title }: DocsNavigat
                   className="px-3 text-[11px] font-semibold uppercase tracking-widest"
                   style={{ color: "var(--muted)" }}
                 >
-                  Docs navigation
+                  {activeTab} navigation
                 </div>
                 <div className="mt-2">
                   {currentTab.pages?.map((group) => (
-                    <GroupSection key={group.group} group={group.group} pages={group.pages} />
+                    <GroupSection
+                      key={group.group}
+                      group={group.group}
+                      pages={group.pages}
+                      onNavigate={() => setMobileOpen(false)}
+                    />
                   ))}
                   {currentTab.versions?.map((ver) => (
-                    <GroupSection key={ver.version} group={ver.version} pages={ver.pages} />
+                    <GroupSection
+                      key={ver.version}
+                      group={ver.version}
+                      pages={ver.pages}
+                      onNavigate={() => setMobileOpen(false)}
+                    />
                   ))}
                 </div>
               </div>
 
               <div className="border-t pt-4" style={{ borderColor: "var(--border)" }}>
-                <TocList headings={headings} />
+                <TocList headings={headings} onNavigate={() => setMobileOpen(false)} />
               </div>
             </div>
           </aside>
@@ -229,7 +314,7 @@ export function DocsNavigation({ tabs, activeTab, headings, title }: DocsNavigat
       )}
 
       <aside
-        className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-60 shrink-0 overflow-y-auto border-r py-6 pr-2 lg:col-start-1 lg:block"
+        className="hidden h-full w-60 shrink-0 overflow-y-auto border-r py-6 pr-2 lg:col-start-1 lg:block"
         style={{ borderColor: "var(--border)" }}
       >
         {currentTab.pages?.map((group) => (

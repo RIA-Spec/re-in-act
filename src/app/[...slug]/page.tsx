@@ -74,18 +74,18 @@ export default async function DocPage({ params }: PageProps) {
 
   return (
     <div
-      className="min-h-screen overflow-x-hidden"
+      className="flex h-[100svh] flex-col overflow-hidden"
       style={{ backgroundColor: "var(--background)", color: "var(--foreground)" }}
     >
       <Header />
-      <div className="mx-auto flex max-w-7xl px-6">
+      <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 overflow-hidden px-6">
         <DocsNavigation
           tabs={tabs}
           activeTab={activeTab}
           headings={doc.headings}
           title={doc.meta.title}
         />
-        <main className="min-w-0 flex-1 py-10 lg:pl-10">
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto pb-10 pt-24 md:py-10 lg:pl-10">
           {/* Page title */}
           <header className="mb-8">
             <h1
