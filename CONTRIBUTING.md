@@ -47,6 +47,7 @@ Then open `http://localhost:3000`.
 
 - Cloudflare deploys expect the `.open-next` output produced by `pnpm build`.
 - The build flow is `next build` followed by `opennextjs-cloudflare build --skipNextBuild`, so the Next app is compiled once and the OpenNext worker bundle is produced without recursive script calls.
+- If you use Cloudflare's Git-integrated Worker builds, keep the deploy step aligned with the adapter flow. Prefer `pnpm deploy` over a raw `wrangler deploy` command so the OpenNext deploy step remains the source of truth.
 
 ## Contribution Expectations
 
