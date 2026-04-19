@@ -8,6 +8,15 @@ initOpenNextCloudflareForDev();
 const nextConfig: NextConfig = {
   output: "standalone",
   transpilePackages: ["next-mdx-remote"],
+  async redirects() {
+    return [
+      {
+        source: "/opengraph-image",
+        destination: "/og",
+        permanent: true,
+      },
+    ];
+  },
   webpack: (config) => {
     // config.plugins.push(DevInspector.webpack({ enabled: true }));
     return config;
