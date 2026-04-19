@@ -19,14 +19,18 @@ function Note({ children }) {
   return createElement(
     "div",
     {
-      className: "not-prose my-4 flex items-center gap-3 rounded-lg border p-4",
+      className: "doc-note not-prose my-4 flex items-center gap-3 rounded-lg border p-4",
       style: {
         borderColor: "color-mix(in srgb, #3b82f6 34%, var(--border))",
         backgroundColor: "color-mix(in srgb, #3b82f6 10%, var(--background))",
         color: "color-mix(in srgb, #60a5fa 58%, var(--foreground))",
       },
     },
-    children,
+    createElement(
+      "div",
+      { className: "doc-note-content min-w-0 text-sm leading-relaxed" },
+      children,
+    ),
   );
 }
 

@@ -130,6 +130,25 @@ body {
   overflow-x: auto;
 }
 
+.doc-note a,
+.doc-note-content a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.16em;
+}
+
+.doc-note a:hover,
+.doc-note-content a:hover {
+  color: var(--accent-hover);
+}
+
+.doc-note a:focus-visible,
+.doc-note-content a:focus-visible {
+  outline-color: var(--accent);
+}
+
 .doc-code-block {
   position: relative;
   margin: 1.5rem 0;

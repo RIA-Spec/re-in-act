@@ -6,8 +6,8 @@ description: The working draft of the Re in Act open specification.
 # Specification
 
 <Note>
-  This is a **working draft** (2026-04-19). It is subject to change and should not be considered
-  stable. Author: [RIA-Spec](https://github.com/RIA-Spec).
+  This is a **working draft** (2026-04-19), open for public review. Author:
+  [RIA-Spec](https://github.com/RIA-Spec).
 </Note>
 
 ## 1. Introduction
@@ -213,23 +213,7 @@ For optional capability layers that sit on top of this core contract, see [Exten
 
 ---
 
-## 6. Implementation
-
-For reference, we open-sourced a Re in Act implementation project called **one-agent**.
-
-- GitHub: [RIA-Spec/one-agent](https://github.com/RIA-Spec/one-agent)
-- Supports both Bash RAS and Python RAS modes
-- Uses MCP for tool discovery and execution
-
----
-
-## 7. Agent Benchmarks
-
-_Benchmark results and methodology are deferred to a future revision._
-
----
-
-## 8. Extensions
+## 6. Extensions
 
 Re in Act defines a small core and allows optional extensions.
 
@@ -240,7 +224,7 @@ Core conformance remains unchanged:
 
 Extensions are opt-in capability layers that add behavior without changing the core contract.
 
-### 8.1 Extension Rules
+### 6.1 Extension Rules
 
 An extension:
 
@@ -249,7 +233,7 @@ An extension:
 - **SHOULD** define resource boundaries (time, step, token, or cost budgets)
 - **SHOULD** preserve RAS locality and avoid hidden global-state dependencies
 
-### 8.2 `agent()` as an Optional Extension
+### 6.2 `agent()` as an Optional Extension
 
 `agent()` may be provided as an optional extension interface for delegated execution inside a RAS.
 
@@ -267,7 +251,17 @@ This preserves the core Re in Act architecture: strengthen action in a bounded R
 
 ---
 
-## 9. Cite This Draft
+## 7. Implementation
+
+For reference, we open-sourced a Re in Act implementation project called [one-agent](https://github.com/RIA-Spec/one-agent).
+
+- Supports Bash RAS and Code RAS modes, with `reason()` implemented across Bash, Python, and TypeScript runtimes
+- Uses MCP for tool discovery and execution as one implementation of the `act()` interface
+- Implements the optional `agent()` extension and Riff for reusable harness-style RAS programs
+
+---
+
+## 8. Cite This Draft
 
 If you cite this working draft in academic or technical writing, cite the specification page itself:
 
