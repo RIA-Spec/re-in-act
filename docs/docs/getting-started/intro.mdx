@@ -19,7 +19,7 @@ The result is simpler action: fewer outer-loop turns, less context bloat, and a 
 
 Think about walking. The conscious brain decides to move, but it does not micromanage every correction. Adjustment happens closer to the body and closer to feedback, saving cognitive load and preserving better feedback.
 
-Top-level reasoning should define the work and its constraints. The action layer should handle local disturbances inside that bounded action space instead of escalating every small issue back to the outer loop.
+Top-level reasoning should define the work and its constraints. The action layer should handle environment disturbances inside that bounded action space instead of escalating every small issue back to the outer loop.
 
 This metaphor matters for two reasons:
 
@@ -28,7 +28,7 @@ This metaphor matters for two reasons:
 
 The deeper theory points in the same direction:
 
-- **Ashby's Law (Requisite Variety)**: only variety can absorb variety. ReAct's fixed action layer often cannot express enough differentiated responses to handle local disturbances well. The RAS expands that local controller variety.
+- **Ashby's Law (Requisite Variety)**: only variety can absorb variety. ReAct's fixed action layer often cannot express enough differentiated responses to handle environment disturbances well. The RAS expands that local controller variety.
 - **Good Regulator Theorem**: a successful regulator needs access to a model of the system it regulates. In Re in Act, the RAS gives the local controller a model of the local system it regulates, so the agent does not need to rebuild that model from scratch on every outer-loop turn.
 
 If you want the deeper version of this argument, see [Control-Theoretic View](/docs/learn/control-theoretic-view).

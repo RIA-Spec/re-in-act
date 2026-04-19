@@ -884,9 +884,10 @@ function RuntimeLayers() {
 export function DataGraphs() {
   return (
     <Section>
+      <div id="from-react-to-re-in-act" className="block h-0 scroll-mt-24" aria-hidden="true" />
       <SectionHeader
         title="From ReAct to Re in Act"
-        sub="How the flow changes: less stop-and-think, more structured action."
+        sub="From brittle agentic loops to a Reason-able Action Space with fewer round trips, less context noise, and stronger local control."
       />
 
       {/* ── 01: Reason-able Action Space (introduces abbreviation) ── */}

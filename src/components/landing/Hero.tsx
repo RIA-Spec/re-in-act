@@ -5,13 +5,21 @@ import { motion } from "framer-motion";
 import { ArrowRight, BookOpen, ChevronDown, ScrollText } from "lucide-react";
 import Link from "next/link";
 import { LogoMark } from "@/components/LogoMark";
-import { SITE_NAME } from "@/lib/constants";
+import {
+  SITE_HERO_LEDE_HIGHLIGHT,
+  SITE_HERO_LEDE_MIDDLE,
+  SITE_HERO_LEDE_PREFIX,
+  SITE_HERO_LEDE_VALUE,
+  SITE_HERO_SUPPORT,
+  SITE_NAME,
+  SITE_TAGLINE,
+} from "@/lib/constants";
 
 export function Hero() {
   function handleReadMoreClick(event: MouseEvent<HTMLAnchorElement>) {
     event.preventDefault();
 
-    const target = document.getElementById("start-here");
+    const target = document.getElementById("from-react-to-re-in-act");
     if (!target) return;
 
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -56,7 +64,7 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: 0.08, ease: "easeOut" }}
         >
-          Open Spec For Reason In Action
+          {SITE_TAGLINE}
         </motion.div>
 
         <motion.h1
@@ -76,80 +84,84 @@ export function Hero() {
           transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
         >
           <p
-            className="mx-auto max-w-xl text-lg leading-tight"
+            className="mx-auto max-w-xl text-lg leading-tight md:leading-[1.45]"
             style={{ color: "var(--foreground)" }}
           >
-            Re in Act extends{" "}
+            {SITE_HERO_LEDE_PREFIX}
             <span className="font-semibold" style={{ color: "var(--foreground)" }}>
-              reason into the action loop
+              {SITE_HERO_LEDE_HIGHLIGHT}
             </span>
-            , so local disturbances are handled before they turn into{" "}
+            {SITE_HERO_LEDE_MIDDLE}
             <span className="font-semibold" style={{ color: "var(--foreground)" }}>
-              extra round trips, noisy context, and brittle control
-            </span>{" "}
-            in traditional{" "}
+              {SITE_HERO_LEDE_VALUE}
+            </span>
+            . Compared with{" "}
             <a
               href="https://arxiv.org/abs/2210.03629"
               target="_blank"
               rel="noopener noreferrer"
               className="font-semibold text-accent underline decoration-[0.08em] underline-offset-4"
             >
-              ReAct agents
+              traditional ReAct agents
             </a>
             .
           </p>
           <p
-            className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed"
+            className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed md:leading-8"
             style={{ color: "var(--muted)" }}
           >
-            Set the goal and guardrails once. Let small decisions happen where the work happens.
+            {SITE_HERO_SUPPORT}
           </p>
         </motion.div>
 
         {/* CTA */}
         <motion.div
-          className="mb-16 flex w-full flex-wrap items-center justify-center gap-3"
+          className="mb-16 flex w-full max-w-3xl flex-col items-center gap-2.5"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
         >
-          <Link
-            href="/docs/getting-started/intro"
-            className="inline-flex cursor-pointer items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200"
-            style={{ backgroundColor: "var(--accent)" }}
-          >
-            Get Started
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-          <Link
-            href="/specification/draft/index"
-            className="inline-flex cursor-pointer items-center gap-2 rounded-lg border px-5 py-2.5 text-sm font-medium transition-colors duration-200"
-            style={{ borderColor: "var(--border)", color: "var(--foreground)" }}
-          >
-            <BookOpen className="h-4 w-4" />
-            Read the Spec
-          </Link>
-          <Link
-            href="/docs/learn/control-theoretic-view"
-            className="inline-flex cursor-pointer items-center gap-2 rounded-lg border px-5 py-2.5 text-sm font-medium transition-colors duration-200"
-            style={{ borderColor: "var(--border)", color: "var(--foreground)" }}
-          >
-            Why It Works
-          </Link>
-          <Link
-            href="/docs/learn/playbook"
-            className="inline-flex cursor-pointer items-center gap-2 rounded-lg border px-5 py-2.5 text-sm font-medium transition-colors duration-200"
-            style={{ borderColor: "var(--border)", color: "var(--foreground)" }}
-          >
-            <ScrollText className="h-4 w-4" />
-            Playbook
-          </Link>
+          <div className="flex w-full flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/docs/getting-started/intro"
+              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200"
+              style={{ backgroundColor: "var(--accent)" }}
+            >
+              Get Started
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/specification/draft/index"
+              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border px-5 py-2.5 text-sm font-medium transition-colors duration-200"
+              style={{ borderColor: "var(--border)", color: "var(--foreground)" }}
+            >
+              <BookOpen className="h-4 w-4" />
+              Read the Spec
+            </Link>
+          </div>
+          <div className="flex w-full flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/docs/learn/control-theoretic-view"
+              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border px-5 py-2.5 text-sm font-medium transition-colors duration-200"
+              style={{ borderColor: "var(--border)", color: "var(--foreground)" }}
+            >
+              Why It Works
+            </Link>
+            <Link
+              href="/docs/learn/playbook"
+              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border px-5 py-2.5 text-sm font-medium transition-colors duration-200"
+              style={{ borderColor: "var(--border)", color: "var(--foreground)" }}
+            >
+              <ScrollText className="h-4 w-4" />
+              Playbook
+            </Link>
+          </div>
         </motion.div>
 
         <motion.a
-          href="#start-here"
+          href="#from-react-to-re-in-act"
           onClick={handleReadMoreClick}
-          className="group inline-flex flex-col items-center gap-1 px-2 py-1 text-[13px] font-medium tracking-[0.12em] uppercase transition-colors duration-200 hover:text-[var(--foreground)]"
+          className="group inline-flex flex-col items-center gap-1 px-2 py-1 text-[13px] font-medium transition-colors duration-200 hover:text-[var(--foreground)]"
           style={{ color: "var(--muted)" }}
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: [0.72, 1, 0.82, 1, 0.72], y: 0, scale: [1, 1.02, 1] }}
@@ -172,7 +184,7 @@ export function Hero() {
         >
           <span className="inline-flex items-center gap-1.5">
             <LogoMark className="h-3.5 w-3.5" style={{ color: "var(--muted)" }} />
-            Read More
+            Read "From ReAct to Re in Act"
             <motion.span
               className="inline-flex"
               animate={{ scale: [1, 1.08, 1, 1.04, 1], opacity: [0.72, 1, 0.82, 1, 0.72] }}

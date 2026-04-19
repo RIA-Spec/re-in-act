@@ -50,7 +50,7 @@ It does not usually fail because it lacks a sentence-level explanation of what t
 - one branch should continue and another should stop
 - intermediate data matters locally but should not pollute the top-level context
 
-In a standard ReAct loop, each of these local disturbances tends to trigger another outer-loop cycle.
+In a standard ReAct loop, each of these environment disturbances tends to trigger another outer-loop cycle.
 
 That means the agent repeatedly stops, re-reads partial results, rethinks, and resumes. The model is acting like a global supervisor for every small correction.
 

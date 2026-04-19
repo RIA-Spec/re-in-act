@@ -8,6 +8,26 @@ export const SITE_NAME = "Re in Act";
 /** SEO subtitle — used in titles and previews. */
 export const SITE_TAGLINE = "Open Specification for Reason in Action";
 
+/** Homepage lead copy segments — used in hero and social previews. */
+export const SITE_HERO_LEDE_PREFIX = "Re in Act extends ";
+export const SITE_HERO_LEDE_HIGHLIGHT = "reason into the action loop";
+export const SITE_HERO_LEDE_MIDDLE = ", so AI agents can handle environment disturbances with ";
+export const SITE_HERO_LEDE_VALUE =
+  "fewer round trips, less context noise, and stronger local control";
+
+/** Homepage lead copy — used in hero and social previews. */
+export const SITE_HERO_LEDE = `${SITE_HERO_LEDE_PREFIX}${SITE_HERO_LEDE_HIGHLIGHT}${SITE_HERO_LEDE_MIDDLE}${SITE_HERO_LEDE_VALUE}.`;
+
+/** Homepage supporting copy — used where a shorter explanation is needed. */
+export const SITE_HERO_SUPPORT = "Set the goal once. Keep control where the work happens.";
+
+/** Core value props surfaced on the homepage and OG image. */
+export const SITE_VALUE_PROPS = [
+  "Fewer round trips",
+  "Less context noise",
+  "Stronger local control",
+] as const;
+
 /** Default SEO title shown in page titles and previews. */
 export const SITE_DEFAULT_TITLE = `${SITE_NAME} — ${SITE_TAGLINE}`;
 
@@ -16,14 +36,14 @@ export const SITE_URL = "https://re-in-act.org";
 
 /** Site description for <meta> and hero subtitle */
 export const SITE_DESCRIPTION =
-  "An open specification for how AI agents do work, keeping reason in action through reason-able action spaces, local judgment, and deterministic control flow.";
+  "An open specification that extends reason into the action loop so AI agents can handle environment disturbances with fewer round trips, less context noise, and stronger local control.";
 
 /** Default Open Graph image path */
 export const OG_IMAGE_PATH = "/opengraph-image";
 
 /** Default Open Graph image alt text */
 export const OG_IMAGE_ALT =
-  "Re in Act, an open specification for how AI agents do work with reason kept close to action.";
+  "Re in Act, an open specification that extends reason into the action loop for AI agents handling environment disturbances with fewer round trips, less context noise, and stronger local control.";
 
 /** The biological metaphor for the hero section */
 export const SITE_METAPHOR =

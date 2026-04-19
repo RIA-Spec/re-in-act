@@ -56,10 +56,9 @@ const links: QuickLink[] = [
 export function QuickLinks() {
   return (
     <Section>
-      <div id="start-here" className="block h-0 scroll-mt-24" aria-hidden="true" />
       <SectionHeader
-        title="Start Here"
-        sub="Start with the docs, read the spec, dig into the rationale, or join the project."
+        title="Continue Exploring"
+        sub="Go deeper in the docs, spec, rationale, or community discussion."
       />
 
       <motion.div

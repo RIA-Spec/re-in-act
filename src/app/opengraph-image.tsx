@@ -1,5 +1,11 @@
 import { ImageResponse } from "next/og";
-import { OG_IMAGE_ALT, SITE_NAME } from "@/lib/constants";
+import {
+  OG_IMAGE_ALT,
+  SITE_HERO_SUPPORT,
+  SITE_NAME,
+  SITE_TAGLINE,
+  SITE_VALUE_PROPS,
+} from "@/lib/constants";
 
 export const runtime = "edge";
 export const alt = OG_IMAGE_ALT;
@@ -103,7 +109,7 @@ export default function OpenGraphImage() {
                     textTransform: "uppercase",
                   }}
                 >
-                  AI Agents In Action
+                  {SITE_TAGLINE}
                 </div>
               </div>
 
@@ -125,13 +131,13 @@ export default function OpenGraphImage() {
                 style={{
                   display: "flex",
                   maxWidth: "760px",
-                  fontSize: "56px",
-                  lineHeight: 0.98,
+                  fontSize: "52px",
+                  lineHeight: 1.02,
                   fontWeight: 650,
                   color: "#0f172a",
                 }}
               >
-                Keep reasoning where the work happens.
+                {SITE_HERO_SUPPORT}
               </div>
             </div>
           </div>
@@ -146,7 +152,7 @@ export default function OpenGraphImage() {
               gap: "16px",
             }}
           >
-            {["Fewer round trips", "Less context noise", "Stronger control"].map((item) => (
+            {SITE_VALUE_PROPS.map((item) => (
               <div
                 key={item}
                 style={{
