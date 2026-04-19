@@ -5,6 +5,12 @@
 /** Site display name — used in metadata, header, hero, etc. */
 export const SITE_NAME = "Re in Act";
 
+/** SEO subtitle — used in titles and previews. */
+export const SITE_TAGLINE = "Open Specification for Reason in Action";
+
+/** Default SEO title shown in page titles and previews. */
+export const SITE_DEFAULT_TITLE = `${SITE_NAME} — ${SITE_TAGLINE}`;
+
 /** Production site URL — used for canonical and social metadata */
 export const SITE_URL = "https://re-in-act.org";
 

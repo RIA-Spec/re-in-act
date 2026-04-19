@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import {
   OG_IMAGE_ALT,
   OG_IMAGE_PATH,
+  SITE_DEFAULT_TITLE,
   SITE_DESCRIPTION,
   SITE_NAME,
   SITE_URL,
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   applicationName: SITE_NAME,
   title: {
-    default: "Re in Act — Open Specification for Reason in Action",
+    default: SITE_DEFAULT_TITLE,
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
     "agent control flow",
   ],
   openGraph: {
-    title: SITE_NAME,
+    title: SITE_DEFAULT_TITLE,
     description: SITE_DESCRIPTION,
     url: SITE_URL,
     siteName: SITE_NAME,
@@ -47,7 +48,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: SITE_NAME,
+    title: SITE_DEFAULT_TITLE,
     description: SITE_DESCRIPTION,
     images: [OG_IMAGE_PATH],
   },
@@ -73,6 +74,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: SITE_NAME,
+    alternateName: SITE_DEFAULT_TITLE,
     url: SITE_URL,
     description: SITE_DESCRIPTION,
   };

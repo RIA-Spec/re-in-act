@@ -6,11 +6,11 @@ import { FlowDemo } from "@/components/landing/FlowDemo";
 import { QuickLinks } from "@/components/landing/QuickLinks";
 import { RASHarness } from "@/components/landing/RASHarness";
 import { Footer } from "@/components/landing/Footer";
-import { SITE_DESCRIPTION } from "@/lib/constants";
+import { SITE_DEFAULT_TITLE, SITE_DESCRIPTION } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "Re in Act — Open Specification for Reason in Action",
+    absolute: SITE_DEFAULT_TITLE,
   },
   description: SITE_DESCRIPTION,
 };
