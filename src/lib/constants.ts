@@ -18,9 +18,6 @@ export const SITE_HERO_LEDE_VALUE =
 /** Homepage lead copy — used in hero and social previews. */
 export const SITE_HERO_LEDE = `${SITE_HERO_LEDE_PREFIX}${SITE_HERO_LEDE_HIGHLIGHT}${SITE_HERO_LEDE_MIDDLE}${SITE_HERO_LEDE_VALUE}.`;
 
-/** Homepage supporting copy — used where a shorter explanation is needed. */
-export const SITE_HERO_SUPPORT = "Set the goal once. Keep control where the work happens.";
-
 /** Core value props surfaced on the homepage and OG image. */
 export const SITE_VALUE_PROPS = [
   "Fewer round trips",

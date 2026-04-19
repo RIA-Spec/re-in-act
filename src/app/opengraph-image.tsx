@@ -1,11 +1,5 @@
 import { ImageResponse } from "next/og";
-import {
-  OG_IMAGE_ALT,
-  SITE_HERO_SUPPORT,
-  SITE_NAME,
-  SITE_TAGLINE,
-  SITE_VALUE_PROPS,
-} from "@/lib/constants";
+import { OG_IMAGE_ALT, SITE_NAME, SITE_TAGLINE, SITE_VALUE_PROPS } from "@/lib/constants";
 
 export const runtime = "nodejs";
 export const alt = OG_IMAGE_ALT;
@@ -125,19 +119,6 @@ export default function OpenGraphImage() {
                 }}
               >
                 {SITE_NAME}
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  maxWidth: "760px",
-                  fontSize: "52px",
-                  lineHeight: 1.02,
-                  fontWeight: 650,
-                  color: "#0f172a",
-                }}
-              >
-                {SITE_HERO_SUPPORT}
               </div>
             </div>
           </div>

@@ -10,7 +10,6 @@ import {
   SITE_HERO_LEDE_MIDDLE,
   SITE_HERO_LEDE_PREFIX,
   SITE_HERO_LEDE_VALUE,
-  SITE_HERO_SUPPORT,
   SITE_NAME,
   SITE_TAGLINE,
 } from "@/lib/constants";
@@ -105,12 +104,6 @@ export function Hero() {
               traditional ReAct agents
             </a>
             .
-          </p>
-          <p
-            className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed md:leading-8"
-            style={{ color: "var(--muted)" }}
-          >
-            {SITE_HERO_SUPPORT}
           </p>
         </motion.div>
 
