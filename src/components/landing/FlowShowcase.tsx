@@ -202,7 +202,7 @@ export function Interfaces() {
         <IndexLabel
           index="01"
           title="reason(prompt, example_output)"
-          sub="Turns goal plus local reality into structured output that the RAS can use right away."
+          sub="Turns goal plus local reality into structured output that the Reason-able Action Space can use right away."
         />
         <ReasonSchema />
       </div>

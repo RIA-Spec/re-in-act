@@ -8,7 +8,7 @@ const STEPS = [
   {
     label: "Agent Extension",
     title: "Delegated agent work",
-    body: "When the optional agent() extension is present, the RAS can host delegated agent work inside one bounded action space instead of turning that delegation into a separate top-level architecture.",
+    body: "When the optional agent() extension is present, the RAS can host delegated agent work inside one RAS instead of turning that delegation into a separate top-level architecture.",
   },
   {
     label: "Local Check",
@@ -18,7 +18,7 @@ const STEPS = [
   {
     label: "Runtime Control",
     title: "Deterministic boundaries",
-    body: "Loops, max iterations, timeout, escalation, and stop conditions live in the runtime. That is what makes the RAS the harness for agent() rather than just another prompt wrapper.",
+    body: "Loops, max iterations, timeout, escalation, and stop conditions live in the runtime. That is what makes the Reason-able Action Space the harness for agent() rather than just another prompt wrapper.",
   },
 ] as const;
 
@@ -26,8 +26,8 @@ export function RASHarness() {
   return (
     <Section>
       <SectionHeader
-        title="RAS as Harness"
-        sub="When the optional agent() extension is used, the RAS is the harness."
+        title="Reason-able Action Space as Harness"
+        sub="When the optional agent() extension is used, the Reason-able Action Space is the harness."
       />
 
       <motion.div
@@ -57,8 +57,8 @@ export function RASHarness() {
             style={{ color: "var(--muted)" }}
           >
             This is specifically the agent extension pattern: agent() runs delegated work inside the
-            RAS, returns text and trajectory, reason() verifies those signals inside the RAS, and
-            deterministic limits are enforced inside the RAS.
+            Reason-able Action Space, returns text and trajectory, reason() verifies those signals
+            inside the RAS, and deterministic limits are enforced inside the RAS.
           </p>
         </div>
 

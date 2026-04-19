@@ -14,7 +14,7 @@ const PARADIGM_SHIFT_COMPARISONS: Array<{
 }> = [
   {
     from: "Thin Action Layer",
-    to: "RAS Strengthens Local Action",
+    to: "Reason-able Action Space Strengthens Local Action",
     bold: true,
   },
   {
@@ -23,7 +23,7 @@ const PARADIGM_SHIFT_COMPARISONS: Array<{
   },
   {
     from: "Raw Intermediate Data in Main Context",
-    to: "Intermediate Data Stays in RAS",
+    to: "Intermediate Data Stays in Reason-able Action Space",
   },
   {
     from: "Probabilistic Micro-Control Flow",
@@ -293,7 +293,7 @@ function ParadigmShift() {
             RAS
           </text>
 
-          {/* RAS definition arrow */}
+          {/* Reason-able Action Space definition arrow */}
           <motion.g
             initial={{ pathLength: 0, opacity: 0 }}
             animate={{ pathLength: 1, opacity: 1 }}
@@ -321,7 +321,7 @@ function ParadigmShift() {
             </text>
           </motion.g>
 
-          {/* RAS Core visualization */}
+          {/* Reason-able Action Space Core visualization */}
           <motion.g
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -469,7 +469,7 @@ function ParadigmShiftComparisons() {
 }
 
 /* ────────────────────────────────────────────
-  02 — RAS Action Flow (directed graph)
+  01 — Reason-able Action Space Flow (directed graph)
    ──────────────────────────────────────────── */
 
 function RASFlow() {
@@ -585,17 +585,7 @@ function RASFlow() {
           fontFamily={MONO}
           fontWeight={700}
         >
-          RAS Action Space
-        </text>
-        <text
-          x={355}
-          y={85}
-          textAnchor="middle"
-          fill="var(--muted)"
-          fontSize={8.2}
-          fontFamily={MONO}
-        >
-          local action space
+          RAS
         </text>
 
         <rect
@@ -899,9 +889,21 @@ export function DataGraphs() {
         sub="How the flow changes: less stop-and-think, more structured action."
       />
 
+      {/* ── 01: Reason-able Action Space (introduces abbreviation) ── */}
       <div className="mb-16">
         <IndexLabel
           index="01"
+          title="Reason-able Action Space (RAS)"
+          sub="One Reason-able Action Space can coordinate multiple act() and reason() steps before returning a denoised result."
+        />
+        <RASFlow />
+        <LocalActionSequence />
+      </div>
+
+      {/* ── 02: Paradigm Shift (uses RAS abbreviation) ── */}
+      <div className="mb-16">
+        <IndexLabel
+          index="02"
           title="Paradigm Shift"
           sub="ReAct returns to the outer loop at every step. Re in Act keeps the work moving inside one RAS."
         />
@@ -909,16 +911,6 @@ export function DataGraphs() {
           <ParadigmShift />
           <ParadigmShiftComparisons />
         </div>
-      </div>
-
-      <div className="mb-16">
-        <IndexLabel
-          index="02"
-          title="Local Action Space"
-          sub="One RAS can coordinate multiple act() and reason() steps before returning a denoised result."
-        />
-        <RASFlow />
-        <LocalActionSequence />
       </div>
 
       <div>

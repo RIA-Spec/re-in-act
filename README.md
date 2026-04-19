@@ -8,7 +8,7 @@ Re in Act is an open specification for AI agents built around a simple claim: us
 
 Website: https://re-in-act.org
 
-Instead of repeatedly bouncing back to an outer `reason()` loop, Re in Act defines a **Reason-able Action Space (RAS)** where local judgment happens inside execution. The goal is not more chain-of-thought overhead, but a tighter control model for agents that need to act reliably in real environments.
+Instead of repeatedly bouncing back to an outer `reason()` loop, Re in Act defines a **Reason-able Action Space** where local judgment happens inside execution. The goal is not more chain-of-thought overhead, but a tighter control model for agents that need to act reliably in real environments.
 
 ## Core Idea
 

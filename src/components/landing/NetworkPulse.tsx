@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { fade } from "./shared";
 
 /* ────────────────────────────────────────────
-  Data — Bash RAS pipeline: 4-node horizontal chain
+  Data — Bash Reason-able Action Space pipeline: 4-node horizontal chain
   act --manual → reason → jq → act --manual
    ──────────────────────────────────────────── */
 
@@ -256,7 +256,7 @@ export function NetworkPulse() {
             className="w-full"
             style={{ display: "block" }}
             role="img"
-            aria-label="Bash RAS pipeline animation"
+            aria-label="Bash Reason-able Action Space pipeline animation"
           >
             {/* Static pipe lines */}
             {LINKS.map((l) => {

@@ -15,13 +15,13 @@ export function FlowDemo() {
     <Section>
       <SectionHeader
         title="Reason-able Action Spaces"
-        sub="What the RAS looks like in practice: multiple act() and reason() steps cooperating inside one bounded action space."
+        sub="What the RAS looks like in practice: multiple act() and reason() steps cooperating inside one RAS."
       />
 
-      {/* ── 1. Code RAS ── */}
+      {/* ── 1. Code Reason-able Action Space ── */}
       <div className="mt-12 mb-8 border-b pb-4" style={{ borderColor: "var(--border)" }}>
         <h3 className="text-xl font-semibold tracking-tight" style={{ color: "var(--foreground)" }}>
-          Code RAS (Python / TS)
+          Code Reason-able Action Space (Python / TS)
         </h3>
         <p className="text-[14px] mt-1.5 leading-relaxed" style={{ color: "var(--muted)" }}>
           Deterministic orchestration in scripts: branches, loops, retries, and validation happen in
@@ -96,10 +96,10 @@ export function FlowDemo() {
         </div>
       </motion.div>
 
-      {/* ── 2. Bash RAS ── */}
+      {/* ── 2. Bash Reason-able Action Space ── */}
       <div className="mt-28 mb-8 border-b pb-4" style={{ borderColor: "var(--border)" }}>
         <h3 className="text-xl font-semibold tracking-tight" style={{ color: "var(--foreground)" }}>
-          Bash RAS
+          Bash Reason-able Action Space
         </h3>
         <p className="text-[14px] mt-1.5 leading-relaxed" style={{ color: "var(--muted)" }}>
           Unix-style pipelines compose `reason` and `act` in a single action phase. Shell gives you
