@@ -69,6 +69,7 @@ body {
 /* ─── Scrollbar ─── */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -127,6 +128,104 @@ body {
 .prose table {
   display: block;
   overflow-x: auto;
+}
+
+.doc-code-block {
+  position: relative;
+  margin: 1.5rem 0;
+  width: 100%;
+  max-width: 100%;
+  isolation: isolate;
+}
+
+.prose .doc-code-block pre {
+  margin: 0;
+  padding-top: 1.25rem;
+  padding-right: 4rem;
+  border-radius: 0.9rem;
+  width: 100%;
+  max-width: 100%;
+}
+
+.prose .doc-code-block .shiki {
+  overflow-x: auto;
+  width: 100%;
+  max-width: 100%;
+}
+
+.prose .doc-code-block .shiki::-webkit-scrollbar {
+  height: 4px;
+}
+
+.prose .doc-code-block .shiki::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+}
+
+.prose .doc-code-block .shiki {
+  background-color: var(--shiki-light-bg, var(--pre-bg)) !important;
+}
+
+.dark .prose .doc-code-block .shiki {
+  background-color: var(--shiki-dark-bg, var(--pre-bg)) !important;
+  color: var(--shiki-dark) !important;
+}
+
+.dark .prose .doc-code-block .shiki span {
+  color: var(--shiki-dark) !important;
+}
+
+.doc-copy-button {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.8rem;
+  z-index: 2;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.68;
+  transition:
+    opacity 150ms ease,
+    background-color 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.doc-copy-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex: none;
+  pointer-events: none;
+}
+
+.doc-copy-icon * {
+  pointer-events: none;
+}
+
+.doc-copy-button[data-copy-state="success"] {
+  color: color-mix(in srgb, #16a34a 78%, var(--foreground));
+}
+
+.doc-copy-button[data-copy-state="error"] {
+  color: color-mix(in srgb, #dc2626 72%, var(--foreground));
+}
+
+.doc-copy-button:hover {
+  color: var(--foreground);
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.doc-copy-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* ─── Smooth page transitions ─── */

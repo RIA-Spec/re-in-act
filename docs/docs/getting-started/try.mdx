@@ -17,15 +17,15 @@ The relevant packages are:
 - `@one-agent/ria-proxy`
 - `@one-agent/reason`
 - `@one-agent/act`
-- `npx skills add ria-spec/one-agent`
 
 ---
 
 ## 1. Fast Proxy Experience
 
-If you want the quickest path to trying Re in Act mode, launch through the proxy:
+If you want the quickest path to trying Re in Act mode, authenticate the proxy and then launch through it:
 
 ```bash
+npx @one-agent/ria-proxy auth
 npx @one-agent/ria-proxy launch opencode
 ```
 
@@ -38,25 +38,37 @@ This path is for immediate use: the proxy launches the target tool in Re in Act 
 If you want the interfaces directly in your shell, install the runtime surface:
 
 ```bash
-npm install -g @one-agent/reason @one-agent/act
-npx skills add ria-spec/one-agent
+# Required
+npm install -g @one-agent/reason
+# Optional
+npm install -g @one-agent/act
 ```
 
-The goal is simple:
+Add this to your `CLAUDE.md` or `AGENTS.md`:
 
-- `reason` gives Bash a bounded local judgment step
-- `act` gives Bash a clean action interface
-- the `one-agent` skill wires that into a usable local workflow
+```md
+# Bash with Re in Act
 
----
+When using Bash tool, send noisy local output to `reason` instead of carrying it in the main context window.
+
+Use `reason` for a bounded local judgment:
+
+- one `--prompt` for the goal
+- one `--prompt` for rules
+- `--prompt -` for stdin observation
+- `--structure` for a typed result that Bash can keep piping
+
+Use `reason` for things like classification, extraction, prioritization, or next-step selection.
+Keep loops, retries, branching, and tool execution in Bash.
+```
 
 ## 3. Configure `reason`
 
 ```bash
-reason --help
+reason auth
 ```
 
-`reason` needs a model configuration before it can run. The exact provider settings are part of the CLI surface; `reason --help` is the entry point for that configuration.
+Authenticate `reason` with your model provider before using it in Bash workflows.
 
 ---
 
@@ -74,7 +86,7 @@ If you only want to try `reason` first, you can still combine it with ordinary B
 
 ## 5. Four Small Examples
 
-Instead of one larger workflow, here are four smaller Bash examples. Each shows one advantage emphasized in the spec.
+Here are four smaller Bash examples. Each shows one advantage emphasized in the spec.
 
 ### 5.1 Fewer Round Trips
 

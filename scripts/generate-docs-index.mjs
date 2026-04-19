@@ -4,6 +4,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import matter from "gray-matter";
 import { compileMDX } from "next-mdx-remote/rsc";
+import rehypeShiki from "@shikijs/rehype";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
@@ -94,7 +95,19 @@ async function collectDocs() {
         options: {
           mdxOptions: {
             remarkPlugins: [remarkGfm],
-            rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
+            rehypePlugins: [
+              rehypeSlug,
+              rehypeAutolinkHeadings,
+              [
+                rehypeShiki,
+                {
+                  themes: {
+                    light: "vitesse-light",
+                    dark: "vitesse-dark",
+                  },
+                },
+              ],
+            ],
           },
         },
         components: { Note },

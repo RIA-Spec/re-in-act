@@ -26,6 +26,20 @@ Re in Act treats agent behavior as structured action rather than open-ended oute
 
 This repository contains the Re in Act documentation site and working specification drafts. For contribution and website development details, see `docs/community/contributing.mdx`.
 
+## Citation
+
+If you cite this working draft in academic or technical writing, cite the specification page:
+
+```bibtex
+@misc{ria_spec_re_in_act_2026,
+	author = {{RIA-Spec}},
+	title = {{Re in Act -- Specification}},
+	year = {2026},
+	url = {https://re-in-act.org/specification/draft/index},
+	note = {Working draft, dated 2026-04-19}
+}
+```
+
 ## License
 
 - Code: Apache-2.0 (see `public/LICENSE`)
