@@ -7,7 +7,7 @@ import {
   SITE_VALUE_PROPS,
 } from "@/lib/constants";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 export const alt = OG_IMAGE_ALT;
 export const contentType = "image/png";
 export const size = {
