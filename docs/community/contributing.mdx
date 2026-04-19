@@ -5,7 +5,7 @@ description: How to contribute to the Re in Act specification.
 
 # Contributing
 
-We welcome contributions from everyone! Here's how to get involved.
+We welcome contributions to the Re in Act specification from everyone.
 
 ## Ways to Contribute
 
@@ -13,42 +13,6 @@ We welcome contributions from everyone! Here's how to get involved.
 - **Submit proposals** — Have an idea for improving the spec? See the [Proposals](/proposals/index) page.
 - **Improve docs** — Fix typos, clarify language, or add examples.
 - **Review PRs** — Help review pull requests from other contributors.
-
-## Website Development
-
-The documentation site for Re in Act is published at [re-in-act.org](https://re-in-act.org).
-
-To work on the site locally:
-
-```bash
-pnpm install
-pnpm dev
-```
-
-Then open `http://localhost:3000`.
-
-Useful scripts:
-
-| Command          | Purpose                                                    |
-| :--------------- | :--------------------------------------------------------- |
-| `pnpm dev`       | Start the local development server                         |
-| `pnpm build`     | Build the production site and OpenNext worker bundle       |
-| `pnpm check`     | Run a production build and TypeScript check                |
-| `pnpm lint`      | Run oxlint                                                 |
-| `pnpm fmt:check` | Check formatting with oxfmt                                |
-| `pnpm preview`   | Build and preview the OpenNext output locally              |
-| `pnpm deploy`    | Build and deploy the OpenNext output to Cloudflare Workers |
-
-Project structure notes:
-
-- Content lives in `docs/**/*.mdx`.
-- Navigation is configured in `docs/docs.json`.
-- App routes are resolved by `src/app/[...slug]/page.tsx`.
-
-Deployment note:
-
-- Cloudflare deploys expect the `.open-next` output from `pnpm build`.
-- The build flow is `next build` followed by `opennextjs-cloudflare build --skipNextBuild`, so the Next app is compiled once and the OpenNext worker bundle is produced without recursive script calls.
 
 ## Join the Conversation
 

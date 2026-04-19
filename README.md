@@ -24,7 +24,7 @@ Re in Act treats agent behavior as structured action rather than open-ended oute
 
 ## Repository
 
-This repository contains the Re in Act documentation site and working specification drafts. For contribution and website development details, see `docs/community/contributing.mdx`.
+This repository contains the Re in Act documentation site and working specification drafts. For repository contribution and website development details, see [CONTRIBUTING.md](CONTRIBUTING.md). For participation in the specification itself, see [docs/community/contributing.mdx](docs/community/contributing.mdx).
 
 ## Citation
 
