@@ -33,14 +33,14 @@ export const SITE_URL = "https://re-in-act.org";
 
 /** Site description for <meta> and hero subtitle */
 export const SITE_DESCRIPTION =
-  "An open specification that extends reason into the action loop so AI agents can handle environment disturbances with fewer round trips, less context noise, and stronger local control.";
+  "An open specification that extends reason into the action loop so AI agents can handle environment disturbances with fewer round trips, less context noise, and stronger deterministic control.";
 
 /** Default Open Graph image path */
 export const OG_IMAGE_PATH = "/opengraph-image";
 
 /** Default Open Graph image alt text */
 export const OG_IMAGE_ALT =
-  "Re in Act, an open specification that extends reason into the action loop for AI agents handling environment disturbances with fewer round trips, less context noise, and stronger local control.";
+  "Re in Act, an open specification that extends reason into the action loop for AI agents handling environment disturbances with fewer round trips, less context noise, and stronger deterministic control.";
 
 /** The biological metaphor for the hero section */
 export const SITE_METAPHOR =
