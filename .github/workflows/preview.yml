@@ -1,0 +1,96 @@
+name: Preview Deploy
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+jobs:
+  preview:
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: preview-deploy-${{ github.head_ref }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      pull-requests: write
+      deployments: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm build
+
+      - name: Generate preview worker name
+        id: meta
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          SLUG=$(echo "$HEAD_REF" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//' | sed 's/-$//' | cut -c1-30 | sed 's/-$//')
+          if [ -z "$SLUG" ]; then
+            SLUG="pr-${PR_NUMBER}"
+          fi
+          echo "worker_name=ria-preview-${SLUG}" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy preview (Workers)
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --name ${{ steps.meta.outputs.worker_name }}
+
+      - name: Comment preview URL on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: preview-deploy
+          message: |
+            ### Preview Deployment
+
+            | Status | URL |
+            |--------|-----|
+            | Deployed | ${{ steps.deploy.outputs.deployment-url }} |
+
+            <sub>Commit: `${{ github.sha }}`</sub>
+
+  cleanup:
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: preview-cleanup-${{ github.head_ref }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+
+    steps:
+      - name: Generate preview worker name
+        id: meta
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          SLUG=$(echo "$HEAD_REF" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//' | sed 's/-$//' | cut -c1-30 | sed 's/-$//')
+          if [ -z "$SLUG" ]; then
+            SLUG="pr-${PR_NUMBER}"
+          fi
+          echo "worker_name=ria-preview-${SLUG}" >> "$GITHUB_OUTPUT"
+
+      - name: Delete preview worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          wranglerVersion: "4"
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: delete --name ${{ steps.meta.outputs.worker_name }} --force
