@@ -27,14 +27,14 @@ When people first see Re in Act, they often focus on the surface benefits:
 
 Those benefits are real, but they are not the deepest reason the pattern works.
 
-The deeper reason is that many agents fail because their **action layer is too weak**. The model may be capable, but once action begins, it has too few local mechanisms for sensing what changed, comparing that change against the task objective, and correcting course without escalating everything back to the outer loop.
+The deeper reason is that many agents fail because their **action layer is too weak**. The LLM may be capable, but once action begins, it has too few local mechanisms for sensing what changed, comparing that change against the task objective, and correcting course without escalating everything back to the outer loop.
 
 That is why a control lens is useful. It focuses attention on regulation during action, not only on planning before action.
 
 Another way to say it is:
 
-- ReAct asks, "what should the model do next?"
-- Re in Act also asks, "what structure does action need so the model does not have to intervene at every small step?"
+- ReAct asks, "what should the LLM do next?"
+- Re in Act also asks, "what structure does action need so the LLM does not have to intervene at every small step?"
 
 ---
 
@@ -52,7 +52,7 @@ It does not usually fail because it lacks a sentence-level explanation of what t
 
 In a standard ReAct loop, each of these environment disturbances tends to trigger another outer-loop cycle.
 
-That means the agent repeatedly stops, re-reads partial results, rethinks, and resumes. The model is acting like a global supervisor for every small correction.
+That means the agent repeatedly stops, re-reads partial results, rethinks, and resumes. The LLM is acting like a global supervisor for every small correction.
 
 Re in Act changes that by letting the correction happen closer to action.
 
@@ -60,53 +60,117 @@ That shift matters because most real agent work is not a clean chain of perfect 
 
 ---
 
-## Ashby's Law: Why More Local Variety Matters
+## The Closed-Loop Structure
 
-Ashby's Law of Requisite Variety is often summarized as: **only variety can absorb variety**.
+From a control perspective, an agent's interaction with its environment is a closed loop, not one-shot execution.
 
-For Re in Act, the practical reading is simple:
+A minimal closed loop contains:
 
-If the environment can disturb action in many different ways, then the agent needs enough differentiated responses at the point of action to handle those disturbances well.
+- **Reference**: the target state, constraints, and success criteria
+- **Sensor**: the ability to observe the current state
+- **Actuator**: the ability to change the state
+- **Feedback**: using results to correct subsequent judgments and actions
 
-That does **not** mean the model itself is necessarily weak. It means the agent may be bottlenecked by the structure of the action layer.
+If any element is missing, control degrades. Without Reference the agent has no direction; without Sensor it is blind; without Actuator it is powerless; without Feedback it cannot correct.
 
-In a thin ReAct loop, the action layer is often too narrow:
+In a standard ReAct loop these four elements exist, but they are all mediated through the outer reasoning loop. Every observation travels upward, every correction travels downward. That is a closed loop, but a slow one.
 
-- tool calls are coarse,
-- intermediate data is awkward to carry cleanly,
-- intermediate evidence is pushed upward verbatim,
-- and correction depends on another outer-loop turn.
+Re in Act tightens the loop by placing all four elements inside the RAS:
 
-So the model may contain latent capability, but that capability is not effectively available where the disturbance appears.
+- The `reason()` prompt carries the **Reference** into the local scope.
+- Local access to files, logs, and artifacts provides a **Sensor** independent of the outer loop.
+- Code, shell, and tool calls inside the RAS provide the **Actuator**.
+- `reason()` closes the **Feedback** path by comparing local reality against the target and producing a structured judgment that action can immediately use.
 
-Re in Act expands local action variety by giving the agent a Reason-able Action Space:
-
-- intermediate data can stay available locally,
-- control flow can continue in code or shell,
-- `reason()` can convert noisy evidence into bounded structured judgments,
-- and only the meaningful result needs to return to the outer loop.
-
-This is the control-theoretic core of the design: the agent becomes more capable not only because it can think, but because it can respond in more differentiated ways while action is already underway.
+This is the structural reason Re in Act reduces round trips: it closes the control loop locally so that corrections no longer require an outer-loop turn.
 
 ---
 
-## Good Regulator: Why Local Modeling Matters
+## Observability and Controllability
 
-Conant and Ashby's Good Regulator theorem is useful here as a design principle.
+A closed loop only works if the environment is sufficiently **observable** and sufficiently **controllable**.
 
-The practical takeaway is that a good regulator needs a model of the system it regulates. For agents, that means action cannot stay effective if every task-relevant distinction lives only in the outer reasoning loop.
+Low observability means the agent mistakes surface symptoms for actual state, treats local signals as global facts, fills gaps with ungrounded assumptions, or believes it is on track when it has already drifted.
 
-The RAS gives the local controller a model of the local system it regulates:
+Low controllability means even a correct diagnosis cannot lead to a correct fix. Controllability requires not just "being able to do something," but being able to intervene locally, advance incrementally, adjust after failure, switch paths mid-course, and probe under uncertainty.
 
-- files, logs, and intermediate artifacts remain available inside the action space,
-- branching and retry logic can use that local information directly,
-- and `reason()` can produce small structured judgments tied to the current situation.
+In a thin ReAct action layer, both are constrained: observability suffers because raw tool output is passed upward without local interpretation; controllability suffers because each action is a single coarse tool call with no local branching or adjustment.
 
-This is why Re in Act is not just “one more prompting trick.” It is an attempt to give the local controller its own workable model of the task environment.
+The RAS improves both. `reason()` interprets local evidence in context before it reaches the outer loop (better observability). Code-level control flow — loops, branches, retries — operates at the point of action (better controllability).
 
-This page uses that theorem as an architectural interpretation, not as a claim that the full runtime has been formally proven equivalent to a classical regulator.
+Many practical agent failures trace not to the LLM being weak, but to the action layer being too opaque or too coarse.
 
-Put differently: if the local controller has no model, the top-level reasoning loop must keep rebuilding one through tokens. That is expensive, slow, and fragile.
+---
+
+## Ashby's Law: Why More Local Variety Matters
+
+Ashby's Law of Requisite Variety: **only variety can absorb variety**.
+
+If the environment can disturb action in many different ways — permission differences, data inconsistencies, state drift, branching flows, exception paths, legacy structures, gaps between documented rules and actual behavior — then the agent needs enough differentiated responses at the point of action to handle those disturbances.
+
+In a thin ReAct loop, the action layer is too narrow: tool calls are coarse, intermediate data is awkward to carry, evidence is pushed upward verbatim, and correction depends on another outer-loop turn. The LLM may have latent capability, but it is not available where the disturbance appears.
+
+Re in Act expands local variety through the RAS:
+
+- intermediate data stays available locally,
+- control flow can continue in code or shell,
+- `reason()` converts noisy evidence into bounded structured judgments,
+- only the meaningful result returns to the outer loop.
+
+This is the control-theoretic core of the design: the agent becomes more capable not because the LLM changes, but because more of its capability becomes available where disturbances actually appear.
+
+---
+
+## Good Regulator: Why Local Modeling and Grounding Matter
+
+Conant and Ashby's Good Regulator theorem: every good regulator must be a model of the system it regulates.
+
+For agents, this means action cannot stay effective if every task-relevant distinction lives only in the outer reasoning loop. The RAS gives the local controller its own workable internal model of the task environment: files, logs, and artifacts remain available inside the action space; branching and retry logic can use that information directly; and `reason()` can produce structured judgments tied to the current situation.
+
+But an internal model is only useful if it stays grounded. Every agent enters a task with prior knowledge — training data, general patterns, default assumptions. That prior is useful for bootstrapping, but the agent can easily mistake general experience for the current environment's actual state.
+
+Effective control requires ongoing correction between **prior** (what the agent brought in) and **posterior** (what the current environment's evidence actually supports). `reason()` serves as the primary grounding mechanism: each call forces structured comparison between the agent's current understanding and live local evidence, anchoring judgment in what the environment actually shows.
+
+Put differently: if the local controller has no grounded internal model, the top-level reasoning loop must keep rebuilding one through tokens. That is expensive, slow, and fragile.
+
+---
+
+## Distortion and Recalibration
+
+Agents fail in practice not only because they lack capability, but because their internal model drifts out of alignment with the environment. This is the failure mode the Good Regulator theorem predicts: when the internal model no longer matches the system, control degrades regardless of actuator strength.
+
+Common distortions: treating inference as fact, local success as global success, the standard path as the only path, stale state as current state, or documentation as equivalent to actual system behavior. In each case the agent has lost the distinction between:
+
+- **Fact**: content supported by current environment evidence
+- **Inference**: judgment formed from facts but still defeasible
+- **Unknown**: content for which current evidence is insufficient
+
+When distortion occurs, more action makes things worse. If the internal model is wrong, a stronger actuator drives the agent further off course.
+
+Recalibration means returning to basic questions: What is the environment actually showing? What has been confirmed versus merely inferred? Which constraints have been overlooked? Should the current path continue, or should understanding be corrected first?
+
+In Re in Act, `reason()` is the primary recalibration mechanism. Because it forces structured comparison between objective and local evidence, it creates a natural checkpoint where distortion can surface before further action compounds the error. Grounding and recalibration are two aspects of the same operation: grounding keeps the internal model aligned during normal execution; recalibration restores alignment after drift has occurred.
+
+---
+
+## Abstraction Layers
+
+Complex environments cannot be controlled through a single level of abstraction.
+
+Two complementary kinds are at work:
+
+- **Semantic abstraction**: goals, scenarios, object relationships, key constraints — "what problem are we solving?"
+- **Operational abstraction**: actions, conditions, inputs/outputs, local state changes — "how do we move forward step by step?"
+
+Semantic abstraction alone gives understanding without execution. Operational abstraction alone gives steps without direction.
+
+Re in Act maps these naturally:
+
+- **Top-level reasoning** operates at the semantic layer: defining the task, choosing strategy, setting success criteria.
+- **The RAS** operates at the operational layer: executing actions, handling intermediate state, managing local control flow.
+- **`reason()`** bridges the two: it takes semantic objectives and operational evidence, and produces a judgment that both layers can use.
+
+A flat ReAct loop conflates both layers into a single reasoning turn. Re in Act separates them, letting each do what it does best.
 
 ---
 
@@ -121,14 +185,16 @@ It should not be understood as a second full agent or as open-ended deliberation
 - apply a bounded output schema,
 - return a structured judgment that action can immediately use.
 
-In that sense, `reason()` behaves like a **semantic comparator and local controller**.
+In that sense, `reason()` behaves like a **semantic comparator and local controller**: it compares the goal against current local reality, then produces a bounded control decision.
 
-More concretely, it includes two tightly linked roles inside the local loop:
+The point is functional, not architectural: `reason()` is not literally a separate sensor, comparator, and feedback module wired together. It is a single LLM call that performs all of these roles at once. In the language of the earlier sections, each `reason()` call simultaneously:
 
-- compare the goal against the current local reality,
-- then produce a bounded control decision that action can use immediately.
+- interprets raw observations into structured signals (Sensor)
+- evaluates those signals against the objective (Reference comparator)
+- outputs a bounded judgment that drives the next action (Feedback)
+- forces the agent's internal model back to what the environment actually shows (Grounding / Recalibration)
 
-The analogy is not that it is literally a textbook comparator from classical control diagrams. The point is functional: raw observations become useful only after they are interpreted relative to a target and then turned into a bounded control signal.
+This is why `reason()` is central to Re in Act: it upgrades local feedback from raw text into actionable structure.
 
 Examples:
 
@@ -137,21 +203,21 @@ Examples:
 - choose one branch from a small allowed set
 - extract only the signal that should leave the RAS
 
-That is why `reason()` is central to Re in Act: it upgrades local feedback from raw text into actionable structure.
-
-This is also why `reason()` belongs inside the action story, not outside it. Its value is highest when it is judging live local evidence that the outer loop does not need to see in full.
+That is why `reason()` belongs inside the action story, not outside it. Its value is highest when it is judging live local evidence that the outer loop does not need to see in full.
 
 ---
 
 ## Mapping the Architecture
 
-This is the most useful way to map Re in Act into control language:
+The most useful way to map Re in Act into control language:
 
-- **Top-level reasoning** defines the RAS, its constraints, and its success criteria.
-- **The `reason()` prompt** carries the objective, local observations, task-relevant context, and governing constraints into the local judgment step.
-- **RAS action** handles intermediate data, control flow, and action.
-- **`reason()`** compares local reality against the target, then turns that local deviation into structured judgments.
-- **Final observation** returns a denoised result to the outer loop.
+| Re in Act concept   | Control role                                                                                                                         |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Top-level reasoning | Sets the **Reference**: defines the RAS, constraints, and success criteria                                                           |
+| RAS                 | Local closed loop with its own Sensor, Actuator, and Feedback                                                                        |
+| `reason()` prompt   | Carries objective, observations, context, and constraints into the local judgment step; bridges semantic and operational abstraction |
+| `reason()` output   | Comparator + grounding + recalibration: structured judgment from local deviation                                                     |
+| Final observation   | Denoised result returned to the outer loop                                                                                           |
 
 This is a helpful engineering mapping, but it has limits.
 
@@ -161,7 +227,7 @@ Re in Act is **not** claiming:
 - that `reason()` is literally a classical analog comparator,
 - or that a Turing-complete runtime gives infinite real-world capability.
 
-The claim is narrower: putting more sensing, comparison, and correction inside the action space makes agents behave better on real tasks.
+The claim is narrower: putting more sensing, comparison, and correction inside the action space makes agents behave better on real tasks, because it closes the control loop locally, improves observability and controllability at the point of action, and gives the local controller a grounded internal model of the task environment.
 
 That is the main architectural move of Re in Act. It does not try to replace top-level reasoning. It tries to stop overusing top-level reasoning for work that should happen locally.
 
@@ -176,29 +242,8 @@ Once local regulation improves, the visible benefits are exactly the ones practi
 - more reliable retries and branching
 - better handling of noisy tool output
 - stronger task completion under local uncertainty
+- fewer cases of the agent confidently driving in the wrong direction
 
-That is why the control-theoretic story matters. It explains why these practical wins tend to arrive together.
+They are not isolated tricks. They are different symptoms of the same architectural shift: the agent gains a stronger local control layer in the action phase — one with a tighter closed loop, better observability, finer controllability, and a grounded internal model.
 
-They are not isolated tricks. They are different symptoms of the same architectural shift: the agent gains a stronger local control layer in the action phase.
-
-That is the real claim behind Re in Act. Better agent behavior is not being explained as magic, taste, or prompt cleverness. It follows from moving more useful regulation into the part of the system that is actually touching the environment.
-
----
-
-## What Belongs in the Spec vs. Documentation
-
-The formal spec should stay relatively minimal:
-
-- what the RAS is,
-- what `reason()` and `act()` do,
-- what contracts implementations should satisfy.
-
-This deeper page belongs in documentation because it answers a different question:
-
-**Why should an agent architect believe this pattern is worth adopting?**
-
-That is a design question, not just a protocol question.
-
-If you are reading the spec, the short version is enough.
-
-If you are deciding whether this pattern changes how agents should be built, this page is where the real argument lives.
+That is the real claim behind Re in Act. Better agent behavior follows from moving more useful regulation into the part of the system that is actually touching the environment.
