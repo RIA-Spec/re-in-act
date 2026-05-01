@@ -32,17 +32,16 @@ jobs:
 
       - run: pnpm build
 
-      - name: Generate preview worker name
+      - name: Generate preview metadata
         id: meta
         env:
-          HEAD_REF: ${{ github.head_ref }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          SLUG=$(echo "$HEAD_REF" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//' | sed 's/-$//' | cut -c1-30 | sed 's/-$//')
-          if [ -z "$SLUG" ]; then
-            SLUG="pr-${PR_NUMBER}"
-          fi
-          echo "worker_name=ria-preview-${SLUG}" >> "$GITHUB_OUTPUT"
+          WORKER_NAME="ria-preview-pr-${PR_NUMBER}"
+          PREVIEW_DOMAIN="pr-${PR_NUMBER}.re-in-act.org"
+          echo "worker_name=${WORKER_NAME}" >> "$GITHUB_OUTPUT"
+          echo "preview_domain=${PREVIEW_DOMAIN}" >> "$GITHUB_OUTPUT"
+          echo "preview_url=https://${PREVIEW_DOMAIN}" >> "$GITHUB_OUTPUT"
 
       - name: Deploy preview (Workers)
         id: deploy
@@ -51,6 +50,46 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy --name ${{ steps.meta.outputs.worker_name }}
+
+      - name: Bind custom domain
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WORKER_NAME: ${{ steps.meta.outputs.worker_name }}
+          PREVIEW_DOMAIN: ${{ steps.meta.outputs.preview_domain }}
+        run: |
+          # Check if custom domain already exists for this worker
+          EXISTING=$(curl -s -X GET \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/domains" \
+            -H "Authorization: Bearer ${CF_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            | jq -r ".result[] | select(.hostname == \"${PREVIEW_DOMAIN}\") | .id // empty")
+
+          if [ -n "$EXISTING" ]; then
+            echo "Domain ${PREVIEW_DOMAIN} already bound, skipping."
+          else
+            # Get zone ID for re-in-act.org
+            ZONE_ID=$(curl -s -X GET \
+              "https://api.cloudflare.com/client/v4/zones?name=re-in-act.org" \
+              -H "Authorization: Bearer ${CF_API_TOKEN}" \
+              -H "Content-Type: application/json" \
+              | jq -r '.result[0].id')
+
+            if [ -z "$ZONE_ID" ] || [ "$ZONE_ID" = "null" ]; then
+              echo "::warning::Could not find zone for re-in-act.org. Preview available at workers.dev URL only."
+              exit 0
+            fi
+
+            # Attach custom domain to worker
+            curl -s -X PUT \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/domains" \
+              -H "Authorization: Bearer ${CF_API_TOKEN}" \
+              -H "Content-Type: application/json" \
+              -d "{\"hostname\": \"${PREVIEW_DOMAIN}\", \"zone_id\": \"${ZONE_ID}\", \"service\": \"${WORKER_NAME}\", \"environment\": \"production\"}" \
+              | jq .
+
+            echo "Bound ${PREVIEW_DOMAIN} to ${WORKER_NAME}"
+          fi
 
       - name: Comment preview URL on PR
         uses: marocchino/sticky-pull-request-comment@v2
@@ -61,7 +100,7 @@ jobs:
 
             | Status | URL |
             |--------|-----|
-            | Deployed | ${{ steps.deploy.outputs.deployment-url }} |
+            | Deployed | ${{ steps.meta.outputs.preview_url }} |
 
             <sub>Commit: `${{ github.sha }}`</sub>
 
@@ -75,17 +114,34 @@ jobs:
       contents: read
 
     steps:
-      - name: Generate preview worker name
+      - name: Generate preview metadata
         id: meta
         env:
-          HEAD_REF: ${{ github.head_ref }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          SLUG=$(echo "$HEAD_REF" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//' | sed 's/-$//' | cut -c1-30 | sed 's/-$//')
-          if [ -z "$SLUG" ]; then
-            SLUG="pr-${PR_NUMBER}"
+          echo "worker_name=ria-preview-pr-${PR_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "preview_domain=pr-${PR_NUMBER}.re-in-act.org" >> "$GITHUB_OUTPUT"
+
+      - name: Remove custom domain
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PREVIEW_DOMAIN: ${{ steps.meta.outputs.preview_domain }}
+        run: |
+          DOMAIN_ID=$(curl -s -X GET \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/domains" \
+            -H "Authorization: Bearer ${CF_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            | jq -r ".result[] | select(.hostname == \"${PREVIEW_DOMAIN}\") | .id // empty")
+
+          if [ -n "$DOMAIN_ID" ]; then
+            curl -s -X DELETE \
+              "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/workers/domains/${DOMAIN_ID}" \
+              -H "Authorization: Bearer ${CF_API_TOKEN}"
+            echo "Removed domain ${PREVIEW_DOMAIN}"
+          else
+            echo "Domain ${PREVIEW_DOMAIN} not found, skipping."
           fi
-          echo "worker_name=ria-preview-${SLUG}" >> "$GITHUB_OUTPUT"
 
       - name: Delete preview worker
         uses: cloudflare/wrangler-action@v3
