@@ -1,6 +1,6 @@
 ---
 title: Try Re in Act
-description: "Two ways to try Re in Act: a fast proxy launch path and a direct Bash RAS setup with reason and act."
+description: "Two ways to try Re in Act: a direct Bash RAS setup with reason and act, and a fast proxy launch path."
 ---
 
 # Try Re in Act
@@ -9,31 +9,18 @@ This page gives a small **Bash RAS** you can run first.
 
 There are now two practical ways to try Re in Act:
 
-1. **Fast proxy experience** — launch a tool through `@one-agent/ria-proxy` and immediately experience Re in Act mode.
-2. **Direct Bash RAS setup** — install `reason` and `act`, then build the action space yourself.
+1. **Direct Bash RAS setup** — install `reason` and `act`, then build the action space yourself.
+2. **Fast proxy experience** — launch a tool through `@one-agent/ria-proxy` and immediately experience Re in Act mode.
 
 The relevant packages are:
 
-- `@one-agent/ria-proxy`
 - `@one-agent/reason`
 - `@one-agent/act`
+- `@one-agent/ria-proxy`
 
 ---
 
-## 1. Fast Proxy Experience
-
-If you want the quickest path to trying Re in Act mode, authenticate the proxy and then launch through it:
-
-```bash
-npx @one-agent/ria-proxy auth
-npx @one-agent/ria-proxy launch opencode
-```
-
-This path is for immediate use: the proxy launches the target tool in Re in Act mode without requiring you to manually wire the action surface first.
-
----
-
-## 2. Direct Bash RAS Setup
+## 1. Direct Bash RAS Setup
 
 If you want the interfaces directly in your shell, install the runtime surface:
 
@@ -78,6 +65,19 @@ Classification, extraction, prioritization, boolean gates, next-step selection.
 
 Loops, retries, branching logic, tool execution, side effects.
 ```
+
+## 2. Fast Proxy Experience
+
+If you want the quickest path to trying Re in Act mode, authenticate the proxy and then launch through it:
+
+```bash
+npx @one-agent/ria-proxy auth
+npx @one-agent/ria-proxy launch opencode
+```
+
+This path is for immediate use: the proxy launches the target tool in Re in Act mode without requiring you to manually wire the action surface first.
+
+---
 
 ## 3. Configure `reason`
 
