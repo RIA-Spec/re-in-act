@@ -236,3 +236,38 @@ Each example is intentionally small and direct. They are not tied to one framewo
 5. package the working pattern directly as a Riff
 
 As the project grows, this page can expand into a larger catalog of domain-specific Riffs.
+
+---
+
+## Using `reason` from Bash
+
+The `reason` CLI brings the same bounded-judgment pattern to shell scripts and Claude Code hooks. It reads an observation, applies structured prompts, and returns typed JSON — keeping noisy output local instead of promoting it to the outer context.
+
+### Syntax
+
+```bash
+# Pipe stdin as observation
+<cmd> | reason --prompt "goal: ..." [--prompt "constraints: ..."] - '{"key":"","score":0}'
+
+# Inline observation
+reason --prompt "goal: ..." "observation text" '{"key":""}'
+
+# No observation (pure synthesis)
+reason --prompt "goal: ..." --structure '{"key":""}'
+```
+
+### Rules
+
+- **Structure is a JSON example**, not a Schema. Types are inferred from the example values: `""` → string, `0` → int, `false` → bool, `[""]` → string array.
+- **`--structure` flag** is required when there is no observation argument.
+- **Stack `--prompt` in order**: goal → context → constraints.
+- **Pipe output with `jq`** to branch: `reason ... | jq -e '.deploy' && deploy.sh`
+- **Chain calls** by piping one `reason` output as the next observation.
+
+### Good for
+
+Classification, extraction, prioritization, boolean gates, next-step selection.
+
+### Keep in Bash
+
+Loops, retries, branching logic, tool execution, side effects.
