@@ -1,39 +1,28 @@
 ---
 title: Try Re in Act
-description: "Two ways to try Re in Act: a fast proxy launch path and a direct Bash RAS setup with reason and act."
+description: "Three ways to try Re in Act: a direct Bash RAS setup, the one-agent reference implementation, and a fast proxy launch path."
 ---
 
 # Try Re in Act
 
 This page gives a small **Bash RAS** you can run first.
 
-There are now two practical ways to try Re in Act:
+There are three practical ways to try Re in Act:
 
-1. **Fast proxy experience** — launch a tool through `@one-agent/ria-proxy` and immediately experience Re in Act mode.
-2. **Direct Bash RAS setup** — install `reason` and `act`, then build the action space yourself.
+1. **Direct Bash RAS setup** — install `reason` and `act`, then build the action space yourself.
+2. **one-agent** — the full reference implementation with Python, TypeScript, and Bash RAS runtimes.
+3. **Fast proxy experience** — launch a tool through `@one-agent/ria-proxy` and immediately experience Re in Act mode.
 
 The relevant packages are:
 
-- `@one-agent/ria-proxy`
 - `@one-agent/reason`
 - `@one-agent/act`
+- `@one-agent/agent`
+- `@one-agent/ria-proxy`
 
 ---
 
-## 1. Fast Proxy Experience
-
-If you want the quickest path to trying Re in Act mode, authenticate the proxy and then launch through it:
-
-```bash
-npx @one-agent/ria-proxy auth
-npx @one-agent/ria-proxy launch opencode
-```
-
-This path is for immediate use: the proxy launches the target tool in Re in Act mode without requiring you to manually wire the action surface first.
-
----
-
-## 2. Direct Bash RAS Setup
+## 1. Direct Bash RAS Setup
 
 If you want the interfaces directly in your shell, install the runtime surface:
 
@@ -47,22 +36,82 @@ npm install -g @one-agent/act
 Add this to your `CLAUDE.md` or `AGENTS.md`:
 
 ```md
-# Bash with Re in Act
+# Bash with Reason in Act
 
-When using Bash tool, send noisy local output to `reason` instead of carrying it in the main context window.
+Use `reason` to make local judgments on noisy output — keeps context window clean.
 
-Use `reason` for a bounded local judgment:
+## Syntax
 
-- one `--prompt` for the goal
-- one `--prompt` for rules
-- `--prompt -` for stdin observation
-- `--structure` for a typed result that Bash can keep piping
+# With stdin observation
+<cmd> | reason --prompt "goal: ..." [--prompt "constraints: ..."] - '{"key":"","score":0}'
 
-Use `reason` for things like classification, extraction, prioritization, or next-step selection.
-Keep loops, retries, branching, and tool execution in Bash.
+# Inline observation
+reason --prompt "goal: ..." "observation text" '{"key":""}'
+
+# No observation (pure synthesis)
+reason --prompt "goal: ..." --structure '{"key":""}'
+
+## Rules
+
+- **Structure is a JSON example**, not a Schema. Use real value types: `""` string, `0` int, `false` bool, `[""]` array.
+- **`--structure` flag** is required when there is no observation argument.
+- **Stack `--prompt` in order**: goal → context → constraints.
+- **Pipe output with `jq`** to branch: `reason ... | jq -e '.deploy' && deploy.sh`
+- **Chain calls** by piping one `reason` output as the next observation.
+
+## Good for
+
+Classification, extraction, prioritization, boolean gates, next-step selection.
+
+## Keep in Bash
+
+Loops, retries, branching logic, tool execution, side effects.
 ```
 
-## 3. Configure `reason`
+## 2. one-agent (Reference Implementation)
+
+[one-agent](https://github.com/RIA-Spec/one-agent) is the full reference implementation of Re in Act, with Python, TypeScript, and Bash RAS runtimes bundled together.
+
+```bash
+npm install -g @one-agent/agent
+one-agent auth    # configure the main agent model
+one-agent reason auth   # configure the model used by reason() inside the RAS
+one-agent repl    # start the interactive agent
+```
+
+Pick a runtime surface:
+
+```bash
+export RAS_MODE=python      # default — Python RAS
+export RAS_MODE=typescript  # TypeScript RAS
+export RAS_MODE=bash        # Bash RAS
+```
+
+Use `reason` and `act` directly inside a riff:
+
+```python
+log = open("build.log").read()
+result = await reason(log + "\nDid the build succeed?", {"success": False, "reason": ""})
+if result["data"]["success"]:
+    await act("bash", {"command": "echo deploy"})
+```
+
+---
+
+## 3. Fast Proxy Experience
+
+If you want the quickest path to trying Re in Act mode, authenticate the proxy and then launch through it:
+
+```bash
+npx @one-agent/ria-proxy auth
+npx @one-agent/ria-proxy launch opencode
+```
+
+This path is for immediate use: the proxy launches the target tool in Re in Act mode without requiring you to manually wire the action surface first.
+
+---
+
+## 4. Configure `reason`
 
 ```bash
 reason auth
@@ -72,7 +121,7 @@ Authenticate `reason` with your model provider before using it in Bash workflows
 
 ---
 
-## 4. Configure `act`
+## 5. Configure `act`
 
 ```bash
 act --help
