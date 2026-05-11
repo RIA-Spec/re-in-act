@@ -47,19 +47,36 @@ npm install -g @one-agent/act
 Add this to your `CLAUDE.md` or `AGENTS.md`:
 
 ```md
-# Bash with Re in Act
+# Bash with Reason in Act
 
-When using Bash tool, send noisy local output to `reason` instead of carrying it in the main context window.
+Use `reason` to make local judgments on noisy output — keeps context window clean.
 
-Use `reason` for a bounded local judgment:
+## Syntax
 
-- one `--prompt` for the goal
-- one `--prompt` for rules
-- `--prompt -` for stdin observation
-- `--structure` for a typed result that Bash can keep piping
+# With stdin observation
+<cmd> | reason --prompt "goal: ..." [--prompt "constraints: ..."] - '{"key":"","score":0}'
 
-Use `reason` for things like classification, extraction, prioritization, or next-step selection.
-Keep loops, retries, branching, and tool execution in Bash.
+# Inline observation
+reason --prompt "goal: ..." "observation text" '{"key":""}'
+
+# No observation (pure synthesis)
+reason --prompt "goal: ..." --structure '{"key":""}'
+
+## Rules
+
+- **Structure is a JSON example**, not a Schema. Use real value types: `""` string, `0` int, `false` bool, `[""]` array.
+- **`--structure` flag** is required when there is no observation argument.
+- **Stack `--prompt` in order**: goal → context → constraints.
+- **Pipe output with `jq`** to branch: `reason ... | jq -e '.deploy' && deploy.sh`
+- **Chain calls** by piping one `reason` output as the next observation.
+
+## Good for
+
+Classification, extraction, prioritization, boolean gates, next-step selection.
+
+## Keep in Bash
+
+Loops, retries, branching logic, tool execution, side effects.
 ```
 
 ## 3. Configure `reason`
