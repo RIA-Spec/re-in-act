@@ -67,9 +67,9 @@ export function renderOpenGraphSvg() {
       <stop offset="1" stop-color="#DBEAFE" stop-opacity="0" />
     </radialGradient>
     <style>
-      .title { font: 700 108px 'IBM Plex Sans', 'Segoe UI', sans-serif; letter-spacing: -0.08em; fill: #0F172A; }
+      .title { font: 700 100px 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #0F172A; }
       .support { font: 600 42px 'IBM Plex Sans', 'Segoe UI', sans-serif; fill: #334155; }
-      .site-url { font: 500 22px 'JetBrains Mono', 'SFMono-Regular', monospace; letter-spacing: 0.04em; fill: #64748B; }
+      .site-url { font: 500 22px 'JetBrains Mono', 'SFMono-Regular', monospace; fill: #64748B; }
     </style>
   </defs>
   <rect width="${WIDTH}" height="${HEIGHT}" fill="url(#bg)" />
