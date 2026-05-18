@@ -36,7 +36,7 @@ export const SITE_DESCRIPTION =
   "An open specification that extends reason into the action loop so AI agents can handle environment disturbances with fewer round trips, less context noise, and stronger deterministic control.";
 
 /** Default Open Graph image path */
-export const OG_IMAGE_PATH = "/opengraph-image";
+export const OG_IMAGE_PATH = "/opengraph-image.png";
 
 /** Default Open Graph image alt text */
 export const OG_IMAGE_ALT =

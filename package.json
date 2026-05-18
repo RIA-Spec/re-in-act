@@ -5,8 +5,9 @@
   "license": "Apache-2.0",
   "scripts": {
     "docs:generate": "node scripts/generate-docs-index.mjs",
-    "build": "pnpm docs:generate && next build && opennextjs-cloudflare build --skipNextBuild",
-    "build:next": "pnpm docs:generate && next build",
+    "og:generate": "node scripts/generate-og-image.mjs",
+    "build": "pnpm og:generate && pnpm docs:generate && next build && opennextjs-cloudflare build --skipNextBuild",
+    "build:next": "pnpm og:generate && pnpm docs:generate && next build",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv env.d.ts",
     "check": "pnpm build && tsc",
     "deploy": "pnpm build && opennextjs-cloudflare deploy",
@@ -20,6 +21,7 @@
   },
   "dependencies": {
     "@opennextjs/cloudflare": "1.19.1",
+    "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/typography": "^0.5.19",
     "@xyflow/react": "^12.10.1",
     "framer-motion": "^12.38.0",

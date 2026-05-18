@@ -1,5 +1,3 @@
-import { OG_IMAGE_ALT, SITE_NAME } from "@/lib/constants";
-
 const WIDTH = 1200;
 const HEIGHT = 630;
 const TITLE_X = 118;
@@ -8,55 +6,19 @@ const LOGO_SIZE = 112;
 const HERO_SUPPORT_LINES = [
   "AI agents with fewer round trips, less context",
   "noise, and stronger deterministic control.",
-] as const;
+];
 
-function escapeXml(value: string) {
+const SITE_NAME = "Re in Act";
+const OG_IMAGE_ALT =
+  "Re in Act, an open specification that extends reason into the action loop for AI agents handling environment disturbances with fewer round trips, less context noise, and stronger deterministic control.";
+
+function escapeXml(value) {
   return value
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&apos;");
-}
-
-function wrapText(text: string, maxLineLength: number) {
-  const words = text.trim().split(/\s+/);
-  const lines: string[] = [];
-  let currentLine = "";
-
-  for (const word of words) {
-    const candidate = currentLine ? `${currentLine} ${word}` : word;
-    if (candidate.length <= maxLineLength) {
-      currentLine = candidate;
-      continue;
-    }
-
-    if (currentLine) {
-      lines.push(currentLine);
-    }
-    currentLine = word;
-  }
-
-  if (currentLine) {
-    lines.push(currentLine);
-  }
-
-  return lines;
-}
-
-function renderTextBlock(
-  lines: string[],
-  x: number,
-  y: number,
-  lineHeight: number,
-  className: string,
-) {
-  return lines
-    .map(
-      (line, index) =>
-        `<text x="${x}" y="${y + index * lineHeight}" class="${className}">${escapeXml(line)}</text>`,
-    )
-    .join("\n");
 }
 
 function renderLogo() {
@@ -86,6 +48,11 @@ function renderLogo() {
 }
 
 export function renderOpenGraphSvg() {
+  const supportLines = HERO_SUPPORT_LINES.map(
+    (line, i) =>
+      `<text x="${TITLE_X}" y="${366 + i * 50}" class="support">${escapeXml(line)}</text>`,
+  ).join("\n");
+
   return `
 <svg width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
   <title id="title">${escapeXml(SITE_NAME)}</title>
@@ -107,13 +74,9 @@ export function renderOpenGraphSvg() {
   </defs>
   <rect width="${WIDTH}" height="${HEIGHT}" fill="url(#bg)" />
   <rect width="${WIDTH}" height="${HEIGHT}" fill="url(#softGlow)" />
-
   <rect x="52" y="48" width="1096" height="536" rx="30" fill="#FFFFFF" fill-opacity="0.82" stroke="#D9E3F0" />
-
   <text x="${TITLE_X}" y="235" class="title">${escapeXml(SITE_NAME)}</text>
-  ${renderLogo()}
-  ${renderTextBlock([...HERO_SUPPORT_LINES], TITLE_X, 366, 50, "support")}
-
+  ${supportLines}
   <text x="${RIGHT_EDGE_X}" y="532" text-anchor="end" class="site-url">re-in-act.org</text>
 </svg>`.trim();
 }
