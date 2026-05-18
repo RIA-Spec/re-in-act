@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@opennextjs/cloudflare": "1.19.1",
+    "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/typography": "^0.5.19",
     "@xyflow/react": "^12.10.1",
     "framer-motion": "^12.38.0",
@@ -32,8 +33,7 @@
     "react-dom": "19.2.1",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-slug": "^6.0.0",
-    "remark-gfm": "^4.0.1",
-    "sharp": "^0.34.5"
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@mcpc-tech/unplugin-dev-inspector-mcp": "^0.1.49",

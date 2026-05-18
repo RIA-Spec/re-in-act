@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import sharp from "sharp";
+import { Resvg } from "@resvg/resvg-js";
 import { renderOpenGraphSvg } from "./og-svg.mjs";
 
 const repoRoot = process.cwd();
@@ -8,10 +8,12 @@ const outputPath = path.join(repoRoot, "public/opengraph-image.png");
 
 function main() {
   const svg = renderOpenGraphSvg();
-  sharp(Buffer.from(svg))
-    .png()
-    .toFile(outputPath)
-    .then(() => console.log(`Generated ${outputPath}`));
+  const resvg = new Resvg(svg, {
+    fitTo: { mode: "width", value: 1200 },
+  });
+  const png = resvg.render().asPng();
+  fs.writeFileSync(outputPath, png);
+  console.log(`Generated ${outputPath}`);
 }
 
 main();
