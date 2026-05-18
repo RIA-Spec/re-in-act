@@ -5,8 +5,9 @@
   "license": "Apache-2.0",
   "scripts": {
     "docs:generate": "node scripts/generate-docs-index.mjs",
-    "build": "pnpm docs:generate && next build && opennextjs-cloudflare build --skipNextBuild",
-    "build:next": "pnpm docs:generate && next build",
+    "og:generate": "node scripts/generate-og-image.mjs",
+    "build": "pnpm og:generate && pnpm docs:generate && next build && opennextjs-cloudflare build --skipNextBuild",
+    "build:next": "pnpm og:generate && pnpm docs:generate && next build",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv env.d.ts",
     "check": "pnpm build && tsc",
     "deploy": "pnpm build && opennextjs-cloudflare deploy",
@@ -31,7 +32,8 @@
     "react-dom": "19.2.1",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-slug": "^6.0.0",
-    "remark-gfm": "^4.0.1"
+    "remark-gfm": "^4.0.1",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@mcpc-tech/unplugin-dev-inspector-mcp": "^0.1.49",
