@@ -9,11 +9,12 @@ const outputPath = path.join(repoRoot, "public/opengraph-image.png");
 function main() {
   const svg = renderOpenGraphSvg();
   const resvg = new Resvg(svg, {
-    fitTo: { mode: "width", value: 1200 },
+    fitTo: { mode: "width", value: 2400 },
+    dpi: 144,
   });
   const png = resvg.render().asPng();
   fs.writeFileSync(outputPath, png);
-  console.log(`Generated ${outputPath}`);
+  console.log(`Generated ${outputPath} (${png.length} bytes)`);
 }
 
 main();
