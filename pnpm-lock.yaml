@@ -47,9 +47,6 @@ importers:
       remark-gfm:
         specifier: ^4.0.1
         version: 4.0.1
-      sharp:
-        specifier: ^0.34.5
-        version: 0.34.5
     devDependencies:
       '@mcpc-tech/unplugin-dev-inspector-mcp':
         specifier: ^0.1.49
