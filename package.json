@@ -49,6 +49,9 @@
     "typescript": "5.9.3",
     "wrangler": "4.83.0"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "protobufjs", "workerd"]
+  },
   "cloudflare": {
     "label": "Re in Act Docs",
     "products": [
