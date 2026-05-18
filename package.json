@@ -6,8 +6,8 @@
   "scripts": {
     "docs:generate": "node scripts/generate-docs-index.mjs",
     "og:generate": "node scripts/generate-og-image.mjs",
-    "build": "pnpm og:generate && pnpm docs:generate && next build && opennextjs-cloudflare build --skipNextBuild",
-    "build:next": "pnpm og:generate && pnpm docs:generate && next build",
+    "build": "pnpm docs:generate && next build && opennextjs-cloudflare build --skipNextBuild",
+    "build:next": "pnpm docs:generate && next build",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv env.d.ts",
     "check": "pnpm build && tsc",
     "deploy": "pnpm build && opennextjs-cloudflare deploy",
